@@ -8,9 +8,9 @@
 
 import UIKit
 
-infix operator |=: RangeFormationPrecedence
-infix operator |>=: RangeFormationPrecedence
-infix operator |<=: RangeFormationPrecedence
+infix operator =|: RangeFormationPrecedence
+infix operator >=|: RangeFormationPrecedence
+infix operator <=|: RangeFormationPrecedence
 
 public protocol UILayoutable: class {}
 
@@ -223,142 +223,142 @@ fileprivate func setup<A: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute, _ r
 }
 
 @discardableResult
-public func |=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.Size, _ rhs: ConvienceLayout<B>.Attribute.Size) -> NSLayoutConstraint {
+public func =|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.Size, _ rhs: ConvienceLayout<B>.Attribute.Size) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func |=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeadTrail, _ rhs: ConvienceLayout<B>.Attribute.LeadTrail) -> NSLayoutConstraint {
+public func =|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeadTrail, _ rhs: ConvienceLayout<B>.Attribute.LeadTrail) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func |=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.LeadTrail) -> NSLayoutConstraint {
+public func =|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.LeadTrail) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func |=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeadTrail, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
+public func =|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeadTrail, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func |=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeftRight, _ rhs: ConvienceLayout<B>.Attribute.LeftRight) -> NSLayoutConstraint {
+public func =|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeftRight, _ rhs: ConvienceLayout<B>.Attribute.LeftRight) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func |=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.LeftRight) -> NSLayoutConstraint {
+public func =|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.LeftRight) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func |=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeftRight, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
+public func =|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeftRight, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func |=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
+public func =|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func |=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.Vertical, _ rhs: ConvienceLayout<B>.Attribute.Vertical) -> NSLayoutConstraint {
+public func =|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.Vertical, _ rhs: ConvienceLayout<B>.Attribute.Vertical) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func |=<A: UILayoutable, T: ConvienceLayout<A>.Attribute>(_ lhs: T, _ rhs: CGFloat) -> NSLayoutConstraint {
+public func =|<A: UILayoutable, T: ConvienceLayout<A>.Attribute>(_ lhs: T, _ rhs: CGFloat) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func |<=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeadTrail, _ rhs: ConvienceLayout<B>.Attribute.LeadTrail) -> NSLayoutConstraint {
+public func <=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeadTrail, _ rhs: ConvienceLayout<B>.Attribute.LeadTrail) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func |<=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.LeadTrail) -> NSLayoutConstraint {
+public func <=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.LeadTrail) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func |<=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeadTrail, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
+public func <=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeadTrail, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func |<=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeftRight, _ rhs: ConvienceLayout<B>.Attribute.LeftRight) -> NSLayoutConstraint {
+public func <=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeftRight, _ rhs: ConvienceLayout<B>.Attribute.LeftRight) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func |<=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.LeftRight) -> NSLayoutConstraint {
+public func <=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.LeftRight) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func |<=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeftRight, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
+public func <=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeftRight, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func |<=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
+public func <=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func |<=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.Vertical, _ rhs: ConvienceLayout<B>.Attribute.Vertical) -> NSLayoutConstraint {
+public func <=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.Vertical, _ rhs: ConvienceLayout<B>.Attribute.Vertical) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func |<=<A: UILayoutable, T: ConvienceLayout<A>.Attribute>(_ lhs: T, _ rhs: CGFloat) -> NSLayoutConstraint {
+public func <=|<A: UILayoutable, T: ConvienceLayout<A>.Attribute>(_ lhs: T, _ rhs: CGFloat) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func |>=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeadTrail, _ rhs: ConvienceLayout<B>.Attribute.LeadTrail) -> NSLayoutConstraint {
+public func >=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeadTrail, _ rhs: ConvienceLayout<B>.Attribute.LeadTrail) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func |>=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.LeadTrail) -> NSLayoutConstraint {
+public func >=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.LeadTrail) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func |>=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeadTrail, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
+public func >=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeadTrail, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func |>=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeftRight, _ rhs: ConvienceLayout<B>.Attribute.LeftRight) -> NSLayoutConstraint {
+public func >=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeftRight, _ rhs: ConvienceLayout<B>.Attribute.LeftRight) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func |>=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.LeftRight) -> NSLayoutConstraint {
+public func >=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.LeftRight) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func |>=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeftRight, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
+public func >=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.LeftRight, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func |>=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
+public func >=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.CenterX, _ rhs: ConvienceLayout<B>.Attribute.CenterX) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func |>=<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.Vertical, _ rhs: ConvienceLayout<B>.Attribute.Vertical) -> NSLayoutConstraint {
+public func >=|<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute.Vertical, _ rhs: ConvienceLayout<B>.Attribute.Vertical) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func |>=<A: UILayoutable, T: ConvienceLayout<A>.Attribute>(_ lhs: T, _ rhs: CGFloat) -> NSLayoutConstraint {
+public func >=|<A: UILayoutable, T: ConvienceLayout<A>.Attribute>(_ lhs: T, _ rhs: CGFloat) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
