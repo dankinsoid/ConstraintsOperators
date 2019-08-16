@@ -6,7 +6,7 @@
 
 ## Usage
 
-Main idea is simple, create constraints with simple expressions:
+Сreate constraints with simple expressions:
 
 ```swift
 let offset: CGFloat = 10
