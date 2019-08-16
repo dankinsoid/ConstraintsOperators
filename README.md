@@ -22,9 +22,9 @@ let heightRatio: CGFloat = 1 / 2
 view1.layout.height =| view2.layout.height * heightRatio + 20
 ```
 
-Supported operators: =|, <=|, >=|
+Supported operators: `=|`, `<=|`, `>=|`
 
-Every operator returns a NSLayoutConstraint instance with the 'isActive' property set to 'true'.
+Every operator returns a `NSLayoutConstraint` instance with the `isActive` property set to `true`.
 
 ## Installation
 
