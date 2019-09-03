@@ -9,17 +9,17 @@
 Сreate constraints with simple expressions:
 
 ```swift
-let offset: CGFloat = 10
-view1.layout.centerX =| view2.layout.centerX + offset
-view1.layout.centerY =| offset
+view1.layout.centerX =| view2.layout.centerX + 10
+view1.layout.centerY =| 15
 
-let maxWidth: CGFloat = 200
-let minWidth: CGFloat = 100
-view1.layout.width <=| maxWidth
-view1.layout.width >=| minWidth
+view1.layout.width <=| 200
+view1.layout.width >=| 100
 
-let heightRatio: CGFloat = 1 / 2
-view1.layout.height =| view2.layout.height * heightRatio + 20
+view1.layout.height =| view2.layout.height / 2 + 20
+...
+view1.layout.height.priority(.defaultLow) =| 0
+...
+view1.layout.height.priority(900) =| 10
 ```
 
 Supported operators: `=|`, `<=|`, `>=|`
