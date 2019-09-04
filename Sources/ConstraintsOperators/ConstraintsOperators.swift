@@ -91,8 +91,9 @@ public struct ConvienceLayout<T: UILayoutable> {
         fileprivate final var constant: CGFloat
         fileprivate final var multiplier: CGFloat
         fileprivate final var priority: UILayoutPriority
+        fileprivate final var isActive = true
         
-        fileprivate init(type: NSLayoutConstraint.Attribute, item: T?, constant: CGFloat = 0, multiplier: CGFloat = 1, priority: UILayoutPriority = .required) {
+        fileprivate init(type: NSLayoutConstraint.Attribute, item: T?, constant: CGFloat = 0, multiplier: CGFloat = 1, priority: UILayoutPriority = .required, isActive: Bool = true) {
             self.type = type
             self.item = item
             self.constant = constant
@@ -110,6 +111,10 @@ public struct ConvienceLayout<T: UILayoutable> {
                 return LeadTrail(type: type, item: item, constant: constant, multiplier: multiplier, priority: UILayoutPriority(_priority))
             }
             
+            public var disabled: LeadTrail {
+                return LeadTrail(type: type, item: item, constant: constant, multiplier: multiplier, isActive: false)
+            }
+            
         }
         
         public final class LeftRight: Attribute {
@@ -120,6 +125,10 @@ public struct ConvienceLayout<T: UILayoutable> {
             
             public func priority(_ _priority: Float) -> LeftRight {
                 return LeftRight(type: type, item: item, constant: constant, multiplier: multiplier, priority: UILayoutPriority(_priority))
+            }
+            
+            public var disabled: LeftRight {
+                return LeftRight(type: type, item: item, constant: constant, multiplier: multiplier, isActive: false)
             }
             
         }
@@ -134,6 +143,10 @@ public struct ConvienceLayout<T: UILayoutable> {
                 return CenterX(type: type, item: item, constant: constant, multiplier: multiplier, priority: UILayoutPriority(_priority))
             }
             
+            public var disabled: CenterX {
+                return CenterX(type: type, item: item, constant: constant, multiplier: multiplier, isActive: false)
+            }
+            
         }
         
         public final class Vertical: Attribute {
@@ -144,6 +157,10 @@ public struct ConvienceLayout<T: UILayoutable> {
             
             public func priority(_ _priority: Float) -> Vertical {
                 return Vertical(type: type, item: item, constant: constant, multiplier: multiplier, priority: UILayoutPriority(_priority))
+            }
+            
+            public var disabled: Vertical {
+                return Vertical(type: type, item: item, constant: constant, multiplier: multiplier, isActive: false)
             }
             
         }
@@ -158,15 +175,20 @@ public struct ConvienceLayout<T: UILayoutable> {
                 return Size(type: type, item: item, constant: constant, multiplier: multiplier, priority: UILayoutPriority(_priority))
             }
             
+            public var disabled: Size {
+                return Size(type: type, item: item, constant: constant, multiplier: multiplier, isActive: false)
+            }
+            
         }
         
     }
     
 }
 
-fileprivate func setup<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute, _ rhs: ConvienceLayout<B>.Attribute, relation: NSLayoutConstraint.Relation, active: Bool = true) -> NSLayoutConstraint {
+fileprivate func setup<A: UILayoutable, B: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute, _ rhs: ConvienceLayout<B>.Attribute, relation: NSLayoutConstraint.Relation) -> NSLayoutConstraint {
     let result = NSLayoutConstraint(item: lhs.item as Any, attribute: lhs.type, relatedBy: relation, toItem: rhs.item, attribute: rhs.type, multiplier: rhs.multiplier / lhs.multiplier, constant: rhs.constant - lhs.constant)
     result.priority = min(lhs.priority, rhs.priority)
+    let active = lhs.isActive && rhs.isActive
     if active {
         removeConflicts(lhs, rhs, with: result)
     }
@@ -183,8 +205,9 @@ fileprivate func removeConflicts<A: UILayoutable, B: UILayoutable>(_ lhs: Convie
     }
 }
 
-fileprivate func setup<A: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation, active: Bool = true) -> NSLayoutConstraint {
+fileprivate func setup<A: UILayoutable>(_ lhs: ConvienceLayout<A>.Attribute, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> NSLayoutConstraint {
     let result: NSLayoutConstraint
+    let active = lhs.isActive
     defer {
         result.priority = lhs.priority
         if active {
