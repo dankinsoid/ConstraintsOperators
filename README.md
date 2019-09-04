@@ -22,6 +22,9 @@ view1.layout.height.priority(.defaultLow) =| 0
 view1.layout.height.priority(900) =| 10
 ...
 let constraint = view1.layout.height.disabled =| 200
+...
+view1.layout.height =| view1.superview
+view1.layout.centerX =| view2
 ```
 
 Supported operators: `=|`, `<=|`, `>=|`
