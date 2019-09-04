@@ -111,7 +111,7 @@ public struct ConvienceLayout<T: UILayoutable> {
             return Attribute<A>(type: type, item: item, constant: constant, multiplier: multiplier, priority: UILayoutPriority(_priority))
         }
         
-        public var disabled: Attribute<A> {
+        public var deactivated: Attribute<A> {
             return Attribute<A>(type: type, item: item, constant: constant, multiplier: multiplier, isActive: false)
         }
     }
