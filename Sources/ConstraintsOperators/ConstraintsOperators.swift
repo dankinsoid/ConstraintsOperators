@@ -480,3 +480,97 @@ extension NSLayoutConstraint.Relation {
     }
     
 }
+
+public enum LayoutValue: LayoutValueConvertible, LayoutValueProtocol {
+    case view(UILayoutable, size: Number?), number(Number)
+    
+    fileprivate var asLayoutValue: LayoutValue { return self }
+    
+    fileprivate init?(_ value: LayoutValueProtocol) {
+        if let layout = value as? LayoutValueConvertible {
+            self = layout.asLayoutValue
+            return
+        }
+        return nil
+    }
+    
+    public enum Number {
+        case value(CGFloat), range(min: CGFloat?, max: CGFloat?)
+    }
+}
+
+private protocol LayoutValueConvertible {
+    var asLayoutValue: LayoutValue { get }
+}
+
+public protocol LayoutValueProtocol {}
+
+extension CGFloat: LayoutValueConvertible, LayoutValueProtocol {
+    fileprivate var asLayoutValue: LayoutValue { return .number(.value(self)) }
+}
+extension Double: LayoutValueConvertible, LayoutValueProtocol {
+    fileprivate var asLayoutValue: LayoutValue { return .number(.value(CGFloat(self))) }
+}
+extension Int: LayoutValueConvertible, LayoutValueProtocol {
+    fileprivate var asLayoutValue: LayoutValue { return .number(.value(CGFloat(self))) }
+}
+extension UIView: LayoutValueConvertible, LayoutValueProtocol {
+    fileprivate var asLayoutValue: LayoutValue { return .view(self, size: nil) }
+}
+extension UILayoutGuide: LayoutValueConvertible, LayoutValueProtocol {
+    fileprivate var asLayoutValue: LayoutValue { return .view(self, size: nil) }
+}
+extension UILayoutable {
+    public func fixed(_ size: CGFloat) -> LayoutValue {
+        return .view(self, size: .value(size))
+    }
+    public func fixed(_ size: ClosedRange<CGFloat>) -> LayoutValue {
+        return .view(self, size: .range(min: size.lowerBound, max: size.upperBound))
+    }
+    public func fixed(_ size: PartialRangeThrough<CGFloat>) -> LayoutValue {
+        return .view(self, size: .range(min: nil, max: size.upperBound))
+    }
+    public func fixed(_ size: PartialRangeFrom<CGFloat>) -> LayoutValue {
+        return .view(self, size: .range(min: size.lowerBound, max: nil))
+    }
+}
+
+extension ClosedRange: LayoutValueConvertible, LayoutValueProtocol where Bound == CGFloat {
+    fileprivate var asLayoutValue: LayoutValue { return .number(.range(min: lowerBound, max: upperBound)) }
+}
+
+extension PartialRangeThrough: LayoutValueConvertible, LayoutValueProtocol where Bound == CGFloat {
+    fileprivate var asLayoutValue: LayoutValue { return .number(.range(min: nil, max: upperBound)) }
+}
+
+extension PartialRangeFrom: LayoutValueConvertible, LayoutValueProtocol where Bound == CGFloat {
+    fileprivate var asLayoutValue: LayoutValue { return .number(.range(min: lowerBound, max: nil)) }
+}
+
+public typealias Axis = NSLayoutConstraint.Axis
+
+@discardableResult
+public func =|(_ lhs: NSLayoutConstraint.Axis, _ rhs: [LayoutValueProtocol]) -> [NSLayoutConstraint] {
+    guard rhs.count > 1 else { return [] }
+    Axis.vertical =| [0, UIView(), 0...10]
+    Axis.horizontal =| []
+    var result: [NSLayoutConstraint] = []
+    var lastOffset: LayoutValue.Number = .value(0)
+    var prevView: UILayoutable?
+    for value in rhs {
+        guard let val = LayoutValue(value) else { continue }
+        switch val {
+        case .view(let view, let size):
+            prevView = view
+            
+        case .number(let number):
+            switch number {
+            case .value(let size):
+                break
+            case .range(let min, let max):
+                break
+            }
+        }
+    }
+    return []
+}
