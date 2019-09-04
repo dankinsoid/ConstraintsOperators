@@ -20,6 +20,8 @@ view1.layout.height =| view2.layout.height / 2 + 20
 view1.layout.height.priority(.defaultLow) =| 0
 ...
 view1.layout.height.priority(900) =| 10
+...
+let constraint = view1.layout.height.disabled =| 200
 ```
 
 Supported operators: `=|`, `<=|`, `>=|`
