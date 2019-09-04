@@ -53,6 +53,14 @@ public struct ConvienceLayout<T: UILayoutable> {
     public var centerXWithinMargins: Attribute<CenterX>  { return Attribute(type: .centerXWithinMargins, item: item) }
     public var centerYWithinMargins: Attribute<Vertical> { return Attribute(type: .centerYWithinMargins, item: item) }
     
+    fileprivate func attribute<B: UILayoutable, T>(as other: ConvienceLayout<B>.Attribute<T>) -> Attribute<T> {
+        return Attribute(type: other.type, item: item)
+    }
+    
+    fileprivate func attribute<T>(type: NSLayoutConstraint.Attribute) -> Attribute<T> {
+        return Attribute(type: type, item: item)
+    }
+    
     public init(_ item: T) {
         self.item = item
     }
@@ -117,6 +125,13 @@ public struct ConvienceLayout<T: UILayoutable> {
 
 public protocol CenterXAttributeCompatible {}
 
+fileprivate func _setup<A: UILayoutable, B: UILayoutable, C, D>(_ lhs: ConvienceLayout<A>.Attribute<C>?, _ rhs: ConvienceLayout<B>.Attribute<D>?, relation: NSLayoutConstraint.Relation) -> NSLayoutConstraint? {
+    guard let l = lhs, let r = rhs else {
+        return nil
+    }
+    return setup(l, r, relation: relation)
+}
+
 fileprivate func setup<A: UILayoutable, B: UILayoutable, C, D>(_ lhs: ConvienceLayout<A>.Attribute<C>, _ rhs: ConvienceLayout<B>.Attribute<D>, relation: NSLayoutConstraint.Relation) -> NSLayoutConstraint {
     let result = NSLayoutConstraint(item: lhs.item as Any, attribute: lhs.type, relatedBy: relation, toItem: rhs.item, attribute: rhs.type, multiplier: rhs.multiplier / lhs.multiplier, constant: rhs.constant - lhs.constant)
     result.priority = min(lhs.priority, rhs.priority)
@@ -135,6 +150,13 @@ fileprivate func removeConflicts<A: UILayoutable, B: UILayoutable, C, D>(_ lhs: 
     constraints.filter({ constraint.willConflict(with: $0) }).forEach {
         $0.isActive = false
     }
+}
+
+fileprivate func _setup<A: UILayoutable, N>(_ lhs: ConvienceLayout<A>.Attribute<N>?, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> NSLayoutConstraint? {
+    guard let l = lhs else {
+        return nil
+    }
+    return setup(l, rhs, relation: relation)
 }
 
 fileprivate func setup<A: UILayoutable, N>(_ lhs: ConvienceLayout<A>.Attribute<N>, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> NSLayoutConstraint {
@@ -174,6 +196,11 @@ public func =|<A: UILayoutable, B: UILayoutable, T>(_ lhs: ConvienceLayout<A>.At
 }
 
 @discardableResult
+public func =|<A: UILayoutable, B: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>, _ rhs: B) -> NSLayoutConstraint {
+    return setup(lhs, rhs.layout.attribute(as: lhs), relation: .equal)
+}
+
+@discardableResult
 public func =|<A: UILayoutable, B: UILayoutable, T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout<A>.Attribute<ConvienceLayout<A>.CenterX>, _ rhs: ConvienceLayout<B>.Attribute<T>) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .equal)
 }
@@ -189,8 +216,42 @@ public func =|<A: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>, _ rhs
 }
 
 @discardableResult
+public func =|<A: UILayoutable, B: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>?, _ rhs: ConvienceLayout<B>.Attribute<T>?) -> NSLayoutConstraint? {
+    return _setup(lhs, rhs, relation: .equal)
+}
+
+@discardableResult
+public func =|<A: UILayoutable, B: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>?, _ rhs: B?) -> NSLayoutConstraint? {
+    var r: ConvienceLayout<B>.Attribute<T>?
+    if let l = lhs {
+        r = rhs?.layout.attribute(as: l)
+    }
+    return _setup(lhs, r, relation: .equal)
+}
+
+@discardableResult
+public func =|<A: UILayoutable, B: UILayoutable, T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout<A>.Attribute<ConvienceLayout<A>.CenterX>?, _ rhs: ConvienceLayout<B>.Attribute<T>?) -> NSLayoutConstraint? {
+    return _setup(lhs, rhs, relation: .equal)
+}
+
+@discardableResult
+public func =|<A: UILayoutable, B: UILayoutable, T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout<A>.Attribute<T>?, _ rhs: ConvienceLayout<B>.Attribute<ConvienceLayout<B>.CenterX>?) -> NSLayoutConstraint? {
+    return _setup(lhs, rhs, relation: .equal)
+}
+
+@discardableResult
+public func =|<A: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>?, _ rhs: CGFloat) -> NSLayoutConstraint? {
+    return _setup(lhs, rhs, relation: .equal)
+}
+
+@discardableResult
 public func <=|<A: UILayoutable, B: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>, _ rhs: ConvienceLayout<B>.Attribute<T>) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
+}
+
+@discardableResult
+public func <=|<A: UILayoutable, B: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>, _ rhs: B) -> NSLayoutConstraint {
+    return setup(lhs, rhs.layout.attribute(as: lhs), relation: .lessThanOrEqual)
 }
 
 @discardableResult
@@ -209,8 +270,42 @@ public func <=|<A: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>, _ rh
 }
 
 @discardableResult
+public func <=|<A: UILayoutable, B: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>?, _ rhs: ConvienceLayout<B>.Attribute<T>?) -> NSLayoutConstraint? {
+    return _setup(lhs, rhs, relation: .lessThanOrEqual)
+}
+
+@discardableResult
+public func <=|<A: UILayoutable, B: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>?, _ rhs: B?) -> NSLayoutConstraint? {
+    var r: ConvienceLayout<B>.Attribute<T>?
+    if let l = lhs {
+        r = rhs?.layout.attribute(as: l)
+    }
+    return _setup(lhs, r, relation: .lessThanOrEqual)
+}
+
+@discardableResult
+public func <=|<A: UILayoutable, B: UILayoutable, T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout<A>.Attribute<T>?, _ rhs: ConvienceLayout<B>.Attribute<ConvienceLayout<B>.CenterX>?) -> NSLayoutConstraint? {
+    return _setup(lhs, rhs, relation: .lessThanOrEqual)
+}
+
+@discardableResult
+public func <=|<A: UILayoutable, B: UILayoutable, T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout<A>.Attribute<ConvienceLayout<A>.CenterX>?, _ rhs: ConvienceLayout<B>.Attribute<T>?) -> NSLayoutConstraint? {
+    return _setup(lhs, rhs, relation: .lessThanOrEqual)
+}
+
+@discardableResult
+public func <=|<A: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>?, _ rhs: CGFloat) -> NSLayoutConstraint? {
+    return _setup(lhs, rhs, relation: .lessThanOrEqual)
+}
+
+@discardableResult
 public func >=|<A: UILayoutable, B: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>, _ rhs: ConvienceLayout<B>.Attribute<T>) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
+}
+
+@discardableResult
+public func >=|<A: UILayoutable, B: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>, _ rhs: B) -> NSLayoutConstraint {
+    return setup(lhs, rhs.layout.attribute(as: lhs), relation: .greaterThanOrEqual)
 }
 
 @discardableResult
@@ -226,6 +321,35 @@ public func >=|<A: UILayoutable, B: UILayoutable, T: CenterXAttributeCompatible>
 @discardableResult
 public func >=|<A: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>, _ rhs: CGFloat) -> NSLayoutConstraint {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
+}
+
+@discardableResult
+public func >=|<A: UILayoutable, B: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>?, _ rhs: ConvienceLayout<B>.Attribute<T>?) -> NSLayoutConstraint? {
+    return _setup(lhs, rhs, relation: .greaterThanOrEqual)
+}
+
+@discardableResult
+public func >=|<A: UILayoutable, B: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>?, _ rhs: B?) -> NSLayoutConstraint? {
+    var r: ConvienceLayout<B>.Attribute<T>?
+    if let l = lhs {
+        r = rhs?.layout.attribute(as: l)
+    }
+    return _setup(lhs, r, relation: .greaterThanOrEqual)
+}
+
+@discardableResult
+public func >=|<A: UILayoutable, B: UILayoutable, T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout<A>.Attribute<ConvienceLayout<A>.CenterX>?, _ rhs: ConvienceLayout<B>.Attribute<T>?) -> NSLayoutConstraint? {
+    return _setup(lhs, rhs, relation: .greaterThanOrEqual)
+}
+
+@discardableResult
+public func >=|<A: UILayoutable, B: UILayoutable, T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout<A>.Attribute<T>?, _ rhs: ConvienceLayout<B>.Attribute<ConvienceLayout<B>.CenterX>?) -> NSLayoutConstraint? {
+    return _setup(lhs, rhs, relation: .greaterThanOrEqual)
+}
+
+@discardableResult
+public func >=|<A: UILayoutable, T>(_ lhs: ConvienceLayout<A>.Attribute<T>?, _ rhs: CGFloat) -> NSLayoutConstraint? {
+    return _setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 public func *<A: UILayoutable, T>(_ lhs: CGFloat, _ rhs: ConvienceLayout<A>.Attribute<T>) -> ConvienceLayout<A>.Attribute<T> {
@@ -265,6 +389,46 @@ public func -<A: UILayoutable, T>(_ lhs: CGFloat, _ rhs: ConvienceLayout<A>.Attr
 public func -<A: UILayoutable, T>(_ rhs: ConvienceLayout<A>.Attribute<T>, _ lhs: CGFloat) -> ConvienceLayout<A>.Attribute<T> {
     var result = rhs
     result.constant -= lhs
+    return result
+}
+
+public func *<A: UILayoutable, T>(_ lhs: CGFloat, _ rhs: ConvienceLayout<A>.Attribute<T>?) -> ConvienceLayout<A>.Attribute<T>? {
+    var result = rhs
+    result?.multiplier = lhs
+    return result
+}
+
+public func *<A: UILayoutable, T>(_ rhs: ConvienceLayout<A>.Attribute<T>?, _ lhs: CGFloat) -> ConvienceLayout<A>.Attribute<T>? {
+    var result = rhs
+    result?.multiplier *= lhs
+    return result
+}
+
+public func /<A: UILayoutable, T>(_ rhs: ConvienceLayout<A>.Attribute<T>?, _ lhs: CGFloat) -> ConvienceLayout<A>.Attribute<T>? {
+    var result = rhs
+    result?.multiplier /= lhs
+    return result
+}
+
+public func +<A: UILayoutable, T>(_ lhs: CGFloat, _ rhs: ConvienceLayout<A>.Attribute<T>?) -> ConvienceLayout<A>.Attribute<T>? {
+    var result = rhs
+    result?.constant += lhs
+    return result
+}
+
+public func +<A: UILayoutable, T>(_ rhs: ConvienceLayout<A>.Attribute<T>?, _ lhs: CGFloat) -> ConvienceLayout<A>.Attribute<T>? {
+    var result = rhs
+    result?.constant += lhs
+    return result
+}
+
+public func -<A: UILayoutable, T>(_ lhs: CGFloat, _ rhs: ConvienceLayout<A>.Attribute<T>?) -> ConvienceLayout<A>.Attribute<T>? {
+    return lhs + rhs * (-1)
+}
+
+public func -<A: UILayoutable, T>(_ rhs: ConvienceLayout<A>.Attribute<T>?, _ lhs: CGFloat) -> ConvienceLayout<A>.Attribute<T>? {
+    var result = rhs
+    result?.constant -= lhs
     return result
 }
 
