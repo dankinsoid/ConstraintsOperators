@@ -553,7 +553,6 @@ public typealias Axis = NSLayoutConstraint.Axis
 public func =|(_ lhs: NSLayoutConstraint.Axis, _ rhs: [LayoutValueProtocol]) -> [NSLayoutConstraint] {
     guard rhs.count > 1 else { return [] }
     Axis.vertical =| [0, UIView(), 0...10]
-    Axis.horizontal =| []
     var result: [NSLayoutConstraint] = []
     var lastOffset: LayoutValue.Number = .value(0)
     var prevView: UILayoutable?
