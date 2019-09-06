@@ -617,22 +617,27 @@ extension Array: LayoutValueProtocol, AxisLayoutable where Element == UILayoutab
     
 }
 
-public enum Axis {
-    public static let vertical = VerticalAxe()
-    public static let horizontal = HorizontalAxe()
+extension ConvienceLayout {
     
-    public struct VerticalAxe { fileprivate init() {} }
-    public struct HorizontalAxe { fileprivate init() {} }
-}
-
-@discardableResult
-public func =|(_ lhs: Axis.HorizontalAxe, _ rhs: [HorizontalLayoutable]) -> [NSLayoutConstraint] {
-    return setByAxe(.horizontal, rhs)
-}
-
-@discardableResult
-public func =|(_ lhs: Axis.VerticalAxe, _ rhs: [VerticalLayoutable]) -> [NSLayoutConstraint] {
-    return setByAxe(.vertical, rhs)
+    @discardableResult
+    public static func vertical(_ array: [VerticalLayoutable]) -> [NSLayoutConstraint] {
+        return setByAxe(.vertical, array)
+    }
+    
+    @discardableResult
+    public static func vertical(_ elements: VerticalLayoutable...) -> [NSLayoutConstraint] {
+        return vertical(elements)
+    }
+    
+    @discardableResult
+    public static func horizontal(_ array: [HorizontalLayoutable]) -> [NSLayoutConstraint] {
+        return setByAxe(.horizontal, array)
+    }
+    
+    @discardableResult
+    public static func horizontal(_ elements: HorizontalLayoutable...) -> [NSLayoutConstraint] {
+        return horizontal(elements)
+    }
 }
 
 fileprivate func setByAxe(_ lhs: NSLayoutConstraint.Axis, _ rhs: [LayoutValueProtocol]) -> [NSLayoutConstraint] {
