@@ -25,8 +25,25 @@ extension UILayoutable {
     public var layout: ConvienceLayout<Self> { return ConvienceLayout(self) }
 }
 
+public protocol ConstraintCompetable {}
+
+extension NSLayoutConstraint: ConstraintCompetable {}
+extension Array: ConstraintCompetable where Element: NSLayoutConstraint {}
+
+public protocol ConstraintCreator {
+    associatedtype A
+    associatedtype C: ConstraintCompetable
+    func createConstraints<T: ConstraintCreator>(with other: T) -> C where T.C == C
+}
+
+public protocol ConstraintCreatorByValue {
+    associatedtype Value
+    associatedtype C: ConstraintCompetable
+    func createConstraints(with value: Value) -> C
+}
+
 public struct ConvienceLayout<T: UILayoutable> {
-    private weak var item: T?
+    private let item: T
     
     public var width:                Attribute<Size> { return Attribute(type: .width, item: item) }
     public var height:               Attribute<Size> { return Attribute(type: .height, item: item) }
@@ -58,6 +75,10 @@ public struct ConvienceLayout<T: UILayoutable> {
     }
     
     fileprivate func attribute<T>(type: NSLayoutConstraint.Attribute) -> Attribute<T> {
+        return Attribute(type: type, item: item)
+    }
+    
+    fileprivate func anyAttribute(type: NSLayoutConstraint.Attribute) -> Attribute<Void> {
         return Attribute(type: type, item: item)
     }
     
@@ -93,13 +114,13 @@ public struct ConvienceLayout<T: UILayoutable> {
     
     public struct Attribute<A> {
         fileprivate var type: NSLayoutConstraint.Attribute
-        fileprivate weak var item: T?
+        fileprivate var item: T
         fileprivate var constant: CGFloat
         fileprivate var multiplier: CGFloat
         fileprivate var priority: UILayoutPriority
         fileprivate var isActive = true
         
-        fileprivate init(type: NSLayoutConstraint.Attribute, item: T?, constant: CGFloat = 0, multiplier: CGFloat = 1, priority: UILayoutPriority = .required, isActive: Bool = true) {
+        fileprivate init(type: NSLayoutConstraint.Attribute, item: T, constant: CGFloat = 0, multiplier: CGFloat = 1, priority: UILayoutPriority = .required, isActive: Bool = true) {
             self.type = type
             self.item = item
             self.constant = constant
@@ -114,11 +135,12 @@ public struct ConvienceLayout<T: UILayoutable> {
         public var deactivated: Attribute<A> {
             return Attribute<A>(type: type, item: item, constant: constant, multiplier: multiplier, isActive: false)
         }
+        
     }
     
-    public enum LeadTrail: CenterXAttributeCompatible {}
+    public enum LeadTrail: CenterXAttributeCompatible, HorizontalLayoutableAttribute {}
     public enum LeftRight: CenterXAttributeCompatible {}
-    public enum CenterX {}
+    public enum CenterX: HorizontalLayoutableAttribute {}
     public enum Vertical {}
     public enum Size {}
 }
@@ -481,95 +503,220 @@ extension NSLayoutConstraint.Relation {
     
 }
 
-public enum LayoutValue: LayoutValueConvertible, LayoutValueProtocol {
-    case view(UILayoutable, size: Number?), number(Number)
+
+public protocol LayoutValueProtocol {
+    var _asLayoutValue: LayoutValue { get }
+}
+public protocol HorizontalLayoutableAttribute {}
+public protocol HorizontalLayoutable: LayoutValueProtocol {}
+public protocol VerticalLayoutable: LayoutValueProtocol {}
+public typealias AxisLayoutable = VerticalLayoutable & HorizontalLayoutable
+
+public struct ViewAndAttribute {
+    fileprivate weak var view: UILayoutable?
+    fileprivate let attribute: NSLayoutConstraint.Attribute
+    fileprivate init(_ view: UILayoutable?, _ attribute: NSLayoutConstraint.Attribute) {
+        self.view = view
+        self.attribute = attribute
+    }
+}
+
+public struct ViewAndSize: AxisLayoutable {
+    public var _asLayoutValue: LayoutValue { return .view([self]) }
+    fileprivate let view: UILayoutable
+
+    fileprivate let size: LayoutValue.Number?
+    fileprivate init(_ view: UILayoutable, _ size: LayoutValue.Number?) {
+        self.view = view
+        self.size = size
+    }
+}
+
+public enum LayoutValue {
+    case view([ViewAndSize]), number(Number), attribute([ViewAndAttribute])
     
-    fileprivate var asLayoutValue: LayoutValue { return self }
+    fileprivate var asNumber: Number? {
+        if case .number(let n) = self { return n }
+        return nil
+    }
     
-    fileprivate init?(_ value: LayoutValueProtocol) {
-        if let layout = value as? LayoutValueConvertible {
-            self = layout.asLayoutValue
-            return
-        }
+    fileprivate var asView: [ViewAndSize]? {
+        if case .view(let n) = self { return n }
         return nil
     }
     
     public enum Number {
         case value(CGFloat), range(min: CGFloat?, max: CGFloat?)
+        
+        static func +(_ lhs: Number, _ rhs: Number) -> Number {
+            switch (lhs, rhs) {
+            case (.value(let l), .value(let r)):
+                return .value(l + r)
+            case (.value(let l), .range(let min, let max)):
+                return .range(min: min == nil ? nil : min! + l, max: max == nil ? nil : max! + l)
+            case (.range, .value):
+                return rhs + lhs
+            case (.range(let lmin, let lmax), .range(let rmin, let rmax)):
+                var _min: CGFloat?
+                if lmin != nil || rmin != nil {
+                    _min = (lmin ?? 0) + (rmin ?? 0)
+                }
+                var _max: CGFloat?
+                if lmax != nil || rmax != nil {
+                    _max = (lmax ?? 0) + (rmax ?? 0)
+                }
+                return .range(min: _min, max: _max)
+            }
+        }
     }
 }
 
-private protocol LayoutValueConvertible {
-    var asLayoutValue: LayoutValue { get }
+extension CGFloat: AxisLayoutable {
+    public var _asLayoutValue: LayoutValue { return .number(.value(self)) }
 }
-
-public protocol LayoutValueProtocol {}
-
-extension CGFloat: LayoutValueConvertible, LayoutValueProtocol {
-    fileprivate var asLayoutValue: LayoutValue { return .number(.value(self)) }
+extension Double: AxisLayoutable {
+    public var _asLayoutValue: LayoutValue { return .number(.value(CGFloat(self))) }
 }
-extension Double: LayoutValueConvertible, LayoutValueProtocol {
-    fileprivate var asLayoutValue: LayoutValue { return .number(.value(CGFloat(self))) }
+extension Int: AxisLayoutable {
+    public var _asLayoutValue: LayoutValue { return .number(.value(CGFloat(self))) }
 }
-extension Int: LayoutValueConvertible, LayoutValueProtocol {
-    fileprivate var asLayoutValue: LayoutValue { return .number(.value(CGFloat(self))) }
+extension UIView: AxisLayoutable {
+    public var _asLayoutValue: LayoutValue { return .view([ViewAndSize(self, nil)]) }
 }
-extension UIView: LayoutValueConvertible, LayoutValueProtocol {
-    fileprivate var asLayoutValue: LayoutValue { return .view(self, size: nil) }
-}
-extension UILayoutGuide: LayoutValueConvertible, LayoutValueProtocol {
-    fileprivate var asLayoutValue: LayoutValue { return .view(self, size: nil) }
+extension UILayoutGuide: AxisLayoutable {
+    public var _asLayoutValue: LayoutValue { return .view([ViewAndSize(self, nil)]) }
 }
 extension UILayoutable {
     public func fixed(_ size: CGFloat) -> LayoutValue {
-        return .view(self, size: .value(size))
+        return .view([ViewAndSize(self, .value(size))])
     }
     public func fixed(_ size: ClosedRange<CGFloat>) -> LayoutValue {
-        return .view(self, size: .range(min: size.lowerBound, max: size.upperBound))
+        return .view([ViewAndSize(self, .range(min: size.lowerBound, max: size.upperBound))])
     }
     public func fixed(_ size: PartialRangeThrough<CGFloat>) -> LayoutValue {
-        return .view(self, size: .range(min: nil, max: size.upperBound))
+        return .view([ViewAndSize(self, .range(min: nil, max: size.upperBound))])
     }
     public func fixed(_ size: PartialRangeFrom<CGFloat>) -> LayoutValue {
-        return .view(self, size: .range(min: size.lowerBound, max: nil))
+        return .view([ViewAndSize(self, .range(min: size.lowerBound, max: nil))])
     }
 }
 
-extension ClosedRange: LayoutValueConvertible, LayoutValueProtocol where Bound == CGFloat {
-    fileprivate var asLayoutValue: LayoutValue { return .number(.range(min: lowerBound, max: upperBound)) }
+extension ClosedRange: LayoutValueProtocol, AxisLayoutable where Bound == CGFloat {
+    public var _asLayoutValue: LayoutValue { return .number(.range(min: lowerBound, max: upperBound)) }
 }
 
-extension PartialRangeThrough: LayoutValueConvertible, LayoutValueProtocol where Bound == CGFloat {
-    fileprivate var asLayoutValue: LayoutValue { return .number(.range(min: nil, max: upperBound)) }
+extension PartialRangeThrough: LayoutValueProtocol, AxisLayoutable where Bound == CGFloat {
+    public var _asLayoutValue: LayoutValue { return .number(.range(min: nil, max: upperBound)) }
 }
 
-extension PartialRangeFrom: LayoutValueConvertible, LayoutValueProtocol where Bound == CGFloat {
-    fileprivate var asLayoutValue: LayoutValue { return .number(.range(min: lowerBound, max: nil)) }
+extension PartialRangeFrom: LayoutValueProtocol, AxisLayoutable where Bound == CGFloat {
+    public var _asLayoutValue: LayoutValue { return .number(.range(min: lowerBound, max: nil)) }
 }
 
-public typealias Axis = NSLayoutConstraint.Axis
+extension Array: LayoutValueProtocol, AxisLayoutable where Element == UILayoutable {
+    public var _asLayoutValue: LayoutValue { return .view(map { ViewAndSize($0, nil) }) }
+    
+    public func fixed(_ size: CGFloat) -> LayoutValue {
+        return .view(map { ViewAndSize($0, .value(size)) })
+    }
+    public func fixed(_ size: ClosedRange<CGFloat>) -> LayoutValue {
+        return .view(map { ViewAndSize($0, .range(min: size.lowerBound, max: size.upperBound)) })
+    }
+    public func fixed(_ size: PartialRangeThrough<CGFloat>) -> LayoutValue {
+        return .view(map { ViewAndSize($0, .range(min: nil, max: size.upperBound)) })
+    }
+    public func fixed(_ size: PartialRangeFrom<CGFloat>) -> LayoutValue {
+        return .view(map { ViewAndSize($0, .range(min: size.lowerBound, max: nil)) })
+    }
+    
+}
+
+public enum Axis {
+    public static let vertical = VerticalAxe()
+    public static let horizontal = HorizontalAxe()
+    
+    public struct VerticalAxe { fileprivate init() {} }
+    public struct HorizontalAxe { fileprivate init() {} }
+}
 
 @discardableResult
-public func =|(_ lhs: NSLayoutConstraint.Axis, _ rhs: [LayoutValueProtocol]) -> [NSLayoutConstraint] {
-    guard rhs.count > 1 else { return [] }
-    Axis.vertical =| [0, UIView(), 0...10]
+public func =|(_ lhs: Axis.HorizontalAxe, _ rhs: [HorizontalLayoutable]) -> [NSLayoutConstraint] {
+}
+
+@discardableResult
+public func =|(_ lhs: Axis.VerticalAxe, _ rhs: [VerticalLayoutable]) -> [NSLayoutConstraint] {
+}
+
+fileprivate func =|(_ lhs: NSLayoutConstraint.Axis, _ rhs: [LayoutValueProtocol]) -> [NSLayoutConstraint] {
+    guard let first = rhs.first?._asLayoutValue else { return [] }
+    guard rhs.count > 1 else {
+        if case .view(let views) = first {
+            return Array(views.map { $0.size == nil ? [] : $0.0.setConstraint(lhs, number: $0.size!) }.joined())
+        }
+        return []
+    }
     var result: [NSLayoutConstraint] = []
-    var lastOffset: LayoutValue.Number = .value(0)
-    var prevView: UILayoutable?
-    for value in rhs {
-        guard let val = LayoutValue(value) else { continue }
-        switch val {
-        case .view(let view, let size):
-            prevView = view
-            
-        case .number(let number):
-            switch number {
-            case .value(let size):
-                break
-            case .range(let min, let max):
-                break
+    var array: [LayoutValue] = rhs.reduce([]) {
+        guard let last = $0.last else { return [$1._asLayoutValue] }
+        var result = $0
+        if let prev = last.asNumber, let curr = $1.asNumber {
+            result[result.count - 1] = .number(prev + curr)
+        } else {
+            if let _ = last.asView, let _ = $1.asView {
+                result.append(.number(.value(0)))
             }
+            result.append($1)
+        }
+        return result
+    }
+    guard !array.isEmpty else { return [] }
+    guard array.count > 1 else {
+        if case .view(let view, let _size) = array[0], let size = _size {
+            return view.setConstraint(lhs, number: size)
+        }
+        return []
+    }
+    for i in stride(from: 0, to: array.count, by: 2) {
+        switch array[i] {
+        case .view(let view, size: let _size):
+            break
+        case .number(let number):
+            break
         }
     }
     return []
 }
+
+extension UILayoutable {
+    
+    fileprivate func setConstraint(_ axis: NSLayoutConstraint.Axis, number: LayoutValue.Number) -> [NSLayoutConstraint] {
+        let att = axis == .vertical ? layout.height : layout.width
+        return setConstraint(att, number: number)
+    }
+    
+    fileprivate func setConstraint<S>(_ att: ConvienceLayout<Self>.Attribute<S>, number: LayoutValue.Number) -> [NSLayoutConstraint] {
+        switch number {
+        case .value(let value):
+            return [setup(att, value, relation: .equal)]
+        case .range(let min, let max):
+            var result: [NSLayoutConstraint] = []
+            if let value = min {
+                result.append(setup(att, value, relation: .greaterThanOrEqual))
+            }
+            if let value = max {
+                result.append(setup(att, value, relation: .lessThanOrEqual))
+            }
+            return result
+        }
+    }
+    
+}
+
+extension ConvienceLayout.Attribute: LayoutValueProtocol {
+    public var _asLayoutValue: LayoutValue {
+        return .attribute([ViewAndAttribute(item, type)])
+    }
+}
+
+extension ConvienceLayout.Attribute: VerticalLayoutable where A == ConvienceLayout.Vertical {}
+extension ConvienceLayout.Attribute: HorizontalLayoutable where A: HorizontalLayoutableAttribute {}
