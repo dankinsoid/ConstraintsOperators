@@ -16,44 +16,141 @@ public protocol UILayoutable: class {}
 
 extension UIView: UILayoutable {
     @available(iOS 11.0, *)
-    public var safeAreaLayout: ConvienceLayout { return safeAreaLayoutGuide.layout }
+    public var safeAreaLayout: ConvienceLayout<ConstraintBuilder> { return safeAreaLayoutGuide.layout }
 }
 
 extension UILayoutGuide: UILayoutable {}
 
 extension UILayoutable {
-    public var layout: ConvienceLayout { return ConvienceLayout(self) }
+    public var layout: ConvienceLayout<ConstraintBuilder> { return ConvienceLayout(self) }
 }
 
-public struct ConvienceLayout {
-    private let item: UILayoutable
+extension Array where Element == UILayoutable {
+    public var layout: ConvienceLayout<ConstraintsBuilder> { return ConvienceLayout(self) }
+}
+
+public protocol ConstraintProtocol {
+    var isActive: Bool { get set }
+    var priority: UILayoutPriority { get set }
+}
+
+extension NSLayoutConstraint: ConstraintProtocol {}
+
+public protocol ConstraintsCreator {
+    associatedtype First
+    associatedtype Second
+    associatedtype Constraint: ConstraintProtocol
+    static func make(item: First, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, toItem: Second?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> Constraint
+    static func constraints(for view: First) -> [NSLayoutConstraint]
+    static func constraints(for view: Second) -> [NSLayoutConstraint]
+    static func willConflict(_ constraint: Constraint, with other: NSLayoutConstraint) -> Bool
+    static func makeToParent(item: First, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> Constraint
+}
+
+public struct ConstraintsBuilder: ConstraintsCreator {
     
-    public var width:                Attribute<Size> { return Attribute(type: .width, item: item) }
-    public var height:               Attribute<Size> { return Attribute(type: .height, item: item) }
+    public static func make(item: [UILayoutable], attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, toItem: UILayoutable?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> [NSLayoutConstraint] {
+        var result: [NSLayoutConstraint] = []
+        for first in item {
+            result.append(NSLayoutConstraint(item: first, attribute: attribute1, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant))
+        }
+        return result
+    }
     
-    public var top:                  Attribute<Vertical> { return Attribute(type: .top, item: item) }
-    public var bottom:               Attribute<Vertical> { return Attribute(type: .bottom, item: item) }
-    public var lastBaseline:         Attribute<Vertical> { return Attribute(type: .lastBaseline, item: item) }
-    public var firstBaseline:        Attribute<Vertical> { return Attribute(type: .firstBaseline, item: item) }
-    public var topMargin:            Attribute<Vertical> { return Attribute(type: .topMargin, item: item) }
-    public var bottomMargin:         Attribute<Vertical> { return Attribute(type: .bottomMargin, item: item) }
+    public static func makeToParent(item: [UILayoutable], attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> [NSLayoutConstraint] {
+        var result: [NSLayoutConstraint] = []
+        item.forEach {
+            result += make(item: [$0], attribute: attribute1, relatedBy: relatedBy, toItem: $0.parent, attribute: attribute2, multiplier: multiplier, constant: constant)
+        }
+        return result
+    }
     
-    public var leading:              Attribute<LeadTrail> { return Attribute(type: .leading, item: item) }
-    public var trailing:             Attribute<LeadTrail> { return Attribute(type: .trailing, item: item) }
-    public var leadingMargin:        Attribute<LeadTrail> { return Attribute(type: .leadingMargin, item: item) }
-    public var trailingMargin:       Attribute<LeadTrail> { return Attribute(type: .trailingMargin, item: item) }
+    public static func constraints(for view: [UILayoutable]) -> [NSLayoutConstraint] {
+        return Array(view.map { $0.constraints }.joined())
+    }
     
-    public var left:                 Attribute<LeftRight> { return Attribute(type: .left, item: item) }
-    public var right:                Attribute<LeftRight> { return Attribute(type: .right, item: item) }
-    public var leftMargin:           Attribute<LeftRight> { return Attribute(type: .leftMargin, item: item) }
-    public var rightMargin:          Attribute<LeftRight> { return Attribute(type: .rightMargin, item: item) }
+    public static func constraints(for view: UILayoutable) -> [NSLayoutConstraint] {
+        return view.constraints
+    }
     
-    public var centerX:              Attribute<CenterX>  { return Attribute(type: .centerX, item: item) }
-    public var centerY:              Attribute<Vertical> { return Attribute(type: .centerY, item: item) }
-    public var centerXWithinMargins: Attribute<CenterX>  { return Attribute(type: .centerXWithinMargins, item: item) }
-    public var centerYWithinMargins: Attribute<Vertical> { return Attribute(type: .centerYWithinMargins, item: item) }
+    public static func willConflict(_ constraint: [NSLayoutConstraint], with other: NSLayoutConstraint) -> Bool {
+        for c in constraint {
+            if c.willConflict(with: other) {
+                return true
+            }
+        }
+        return false
+    }
     
-    fileprivate func attribute<T>(as other: ConvienceLayout.Attribute<T>) -> Attribute<T> {
+}
+
+public struct ConstraintBuilder: ConstraintsCreator {
+    public static func make(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, toItem: UILayoutable?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
+        return NSLayoutConstraint(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant)
+    }
+    
+    public static func makeToParent(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
+        return make(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: item.parent, attribute: attribute2, multiplier: multiplier, constant: constant)
+    }
+    
+    public static func constraints(for view: UILayoutable) -> [NSLayoutConstraint] {
+        return view.constraints
+    }
+    
+    public static func willConflict(_ constraint: NSLayoutConstraint, with other: NSLayoutConstraint) -> Bool {
+        return constraint.willConflict(with: other)
+    }
+    
+}
+
+extension Array: ConstraintProtocol where Element == NSLayoutConstraint {
+    
+    public var isActive: Bool {
+        get { return reduce(false, { $0 || $1.isActive }) }
+        set { forEach { $0.isActive = newValue } }
+    }
+    
+    public var priority: UILayoutPriority {
+        get { return UILayoutPriority(rawValue: self.reduce(0.0, { Swift.max($0, $1.priority.rawValue) })) }
+        set { forEach { $0.priority = newValue } }
+    }
+    
+}
+
+public struct ConvienceLayout<C: ConstraintsCreator> {
+    public typealias L = C.First
+    private let item: L
+    
+    public var width:                Attribute<AttributeType.Size> { return Attribute(type: .width, item: item) }
+    public var height:               Attribute<AttributeType.Size> { return Attribute(type: .height, item: item) }
+    
+    public var top:                  Attribute<AttributeType.Vertical> { return Attribute(type: .top, item: item) }
+    public var bottom:               Attribute<AttributeType.Vertical> { return Attribute(type: .bottom, item: item) }
+    public var lastBaseline:         Attribute<AttributeType.Vertical> { return Attribute(type: .lastBaseline, item: item) }
+    public var firstBaseline:        Attribute<AttributeType.Vertical> { return Attribute(type: .firstBaseline, item: item) }
+    public var topMargin:            Attribute<AttributeType.Vertical> { return Attribute(type: .topMargin, item: item) }
+    public var bottomMargin:         Attribute<AttributeType.Vertical> { return Attribute(type: .bottomMargin, item: item) }
+    
+    public var leading:              Attribute<AttributeType.LeadTrail> { return Attribute(type: .leading, item: item) }
+    public var trailing:             Attribute<AttributeType.LeadTrail> { return Attribute(type: .trailing, item: item) }
+    public var leadingMargin:        Attribute<AttributeType.LeadTrail> { return Attribute(type: .leadingMargin, item: item) }
+    public var trailingMargin:       Attribute<AttributeType.LeadTrail> { return Attribute(type: .trailingMargin, item: item) }
+    
+    public var left:                 Attribute<AttributeType.LeftRight> { return Attribute(type: .left, item: item) }
+    public var right:                Attribute<AttributeType.LeftRight> { return Attribute(type: .right, item: item) }
+    public var leftMargin:           Attribute<AttributeType.LeftRight> { return Attribute(type: .leftMargin, item: item) }
+    public var rightMargin:          Attribute<AttributeType.LeftRight> { return Attribute(type: .rightMargin, item: item) }
+    
+    public var centerX:              Attribute<AttributeType.CenterX>  { return Attribute(type: .centerX, item: item) }
+    public var centerY:              Attribute<AttributeType.Vertical> { return Attribute(type: .centerY, item: item) }
+    public var centerXWithinMargins: Attribute<AttributeType.CenterX>  { return Attribute(type: .centerXWithinMargins, item: item) }
+    public var centerYWithinMargins: Attribute<AttributeType.Vertical> { return Attribute(type: .centerYWithinMargins, item: item) }
+    
+    public func edges(_ edges: Edge.Set = .all) -> EdgeAttribute {
+        return EdgeAttribute(type: edges.attributes, item: item)
+    }
+    
+    fileprivate func attribute<T>(as other: ConvienceLayout<C>.Attribute<T>) -> Attribute<T> {
         return Attribute(type: other.type, item: item)
     }
     
@@ -61,7 +158,7 @@ public struct ConvienceLayout {
         return Attribute(type: type, item: item)
     }
     
-    public init(_ item: UILayoutable) {
+    public init(_ item: L) {
         self.item = item
     }
     
@@ -89,15 +186,15 @@ public struct ConvienceLayout {
         }
     }
     
-    public struct Attribute<A> {
-        fileprivate var type: NSLayoutConstraint.Attribute
-        fileprivate var item: UILayoutable
+    public struct Attributes<A, T, I> {
+        fileprivate var type: T
+        fileprivate var item: I
         fileprivate var constant: CGFloat
         fileprivate var multiplier: CGFloat
         fileprivate var priority: UILayoutPriority
         fileprivate var isActive = true
         
-        fileprivate init(type: NSLayoutConstraint.Attribute, item: UILayoutable, constant: CGFloat = 0, multiplier: CGFloat = 1, priority: UILayoutPriority = .required, isActive: Bool = true) {
+        fileprivate init(type: T, item: I, constant: CGFloat = 0, multiplier: CGFloat = 1, priority: UILayoutPriority = .required, isActive: Bool = true) {
             self.type = type
             self.item = item
             self.constant = constant
@@ -105,38 +202,66 @@ public struct ConvienceLayout {
             self.priority = priority
         }
         
-        fileprivate func asAny() -> Attribute<Void> {
-            return Attribute<Void>(type: type, item: item, constant: constant, multiplier: multiplier, priority: priority, isActive: isActive)
+        fileprivate func asAny() -> Attributes<Void, T, I> {
+            return Attributes<Void, T, I>(type: type, item: item, constant: constant, multiplier: multiplier, priority: priority, isActive: isActive)
         }
         
-        public func priority(_ _priority: Float) -> Attribute<A> {
-            return Attribute<A>(type: type, item: item, constant: constant, multiplier: multiplier, priority: UILayoutPriority(_priority))
+        public func priority(_ _priority: UILayoutPriority) -> Attributes {
+            return map(\.priority, _priority)
         }
         
-        public var deactivated: Attribute<A> {
-            return Attribute<A>(type: type, item: item, constant: constant, multiplier: multiplier, isActive: false)
+        public func priority(_ _priority: Float) -> Attributes {
+            return priority(UILayoutPriority(_priority))
+        }
+        
+        public var deactivated: Attributes {
+            return map(\.isActive, false)
+        }
+        
+        fileprivate func type(_ _type: T) -> Attributes {
+            return map(\.type, _type)
+        }
+        
+        private func map<R>(_ keyPath: WritableKeyPath<Attributes, R>, _ value: R) -> Attributes {
+            var result = self
+            result[keyPath: keyPath] = value
+            return result
         }
         
     }
     
+    public typealias Attribute<A> = Attributes<A, NSLayoutConstraint.Attribute, L>
+    fileprivate typealias Attribute2<A> = Attributes<A, NSLayoutConstraint.Attribute, C.Second>
+    public typealias EdgeAttribute = Attributes<AttributeType.Edges, [NSLayoutConstraint.Attribute], L>
+    
+    fileprivate struct Properties {
+        var constant: CGFloat
+        var multiplier: CGFloat
+        var priority: UILayoutPriority
+        var isActive = true
+    }
+}
+
+public enum AttributeType {
     public enum LeadTrail: CenterXAttributeCompatible, HorizontalLayoutableAttribute {}
     public enum LeftRight: CenterXAttributeCompatible {}
     public enum CenterX: HorizontalLayoutableAttribute {}
     public enum Vertical {}
     public enum Size {}
+    public enum Edges {}
 }
 
 public protocol CenterXAttributeCompatible {}
 
-fileprivate func _setup<C, D>(_ lhs: ConvienceLayout.Attribute<C>?, _ rhs: ConvienceLayout.Attribute<D>?, relation: NSLayoutConstraint.Relation) -> NSLayoutConstraint? {
+fileprivate func _setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>?, _ rhs: ConvienceLayout<K>.Attribute<D>?, relation: NSLayoutConstraint.Relation) -> C.Constraint? where C.Second == K.First {
     guard let l = lhs, let r = rhs else {
         return nil
     }
     return setup(l, r, relation: relation)
 }
 
-fileprivate func setup<C, D>(_ lhs: ConvienceLayout.Attribute<C>, _ rhs: ConvienceLayout.Attribute<D>, relation: NSLayoutConstraint.Relation) -> NSLayoutConstraint {
-    let result = NSLayoutConstraint(item: lhs.item as Any, attribute: lhs.type, relatedBy: relation, toItem: rhs.item, attribute: rhs.type, multiplier: rhs.multiplier / lhs.multiplier, constant: rhs.constant - lhs.constant)
+fileprivate func setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>, _ rhs: ConvienceLayout<K>.Attribute<D>, relation: NSLayoutConstraint.Relation) -> C.Constraint where C.Second == K.First {
+    var result = C.make(item: lhs.item, attribute: lhs.type, relatedBy: relation, toItem: rhs.item, attribute: rhs.type, multiplier: rhs.multiplier / lhs.multiplier, constant: rhs.constant - lhs.constant)
     result.priority = min(lhs.priority, rhs.priority)
     let active = lhs.isActive && rhs.isActive
     if active {
@@ -146,293 +271,387 @@ fileprivate func setup<C, D>(_ lhs: ConvienceLayout.Attribute<C>, _ rhs: Convien
     return result
 }
 
-fileprivate func removeConflicts<C, D>(_ lhs: ConvienceLayout.Attribute<C>, _ rhs: ConvienceLayout.Attribute<D>?, with constraint: NSLayoutConstraint) {
-    let lConstraints = (lhs.item as? UIView)?.constraints ?? []
-    let rConstraints = (rhs?.item as? UIView)?.constraints ?? []
-    let constraints = lConstraints + rConstraints
-    constraints.filter({ constraint.willConflict(with: $0) }).forEach {
-        $0.isActive = false
-    }
+fileprivate func _setup<A, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>?, _ rhs: C.Second?, relation: NSLayoutConstraint.Relation) -> C.Constraint? where C.Second == UILayoutable {
+    guard let l = lhs, let r = rhs else { return nil }
+    return setup(l, r, relation: relation)
 }
 
-fileprivate func _setup<N>(_ lhs: ConvienceLayout.Attribute<N>?, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> NSLayoutConstraint? {
+fileprivate func setup<A, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>, _ rhs: C.Second, relation: NSLayoutConstraint.Relation) -> C.Constraint where C.Second == UILayoutable {
+    var result = C.make(item: lhs.item, attribute: lhs.type, relatedBy: relation, toItem: rhs, attribute: lhs.type, multiplier: 1 / lhs.multiplier, constant: -lhs.constant)
+    result.priority = lhs.priority
+    let active = lhs.isActive
+    if active {
+        let attr: ConvienceLayout<ConstraintBuilder>.Attribute<Void> = ConvienceLayout<ConstraintBuilder>(rhs).attribute(type: lhs.type)
+        removeConflicts(lhs, attr, with: result)
+    }
+    result.isActive = active
+    return result
+}
+
+fileprivate func removeConflicts<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>, _ rhs: ConvienceLayout<K>.Attribute<D>?, with constraint: C.Constraint) {
+    let lConstraints = C.constraints(for: lhs.item)
+    let rConstraints = rhs == nil ? [] : K.constraints(for: rhs!.item)
+    let constraints = lConstraints + rConstraints
+    constraints.filter({ C.willConflict(constraint, with: $0) }).forEach {
+        $0.isActive = false
+    }
+    
+}
+
+fileprivate func _setup<N, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<N>?, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> C.Constraint? {
     guard let l = lhs else {
         return nil
     }
     return setup(l, rhs, relation: relation)
 }
 
-fileprivate func setup<N>(_ lhs: ConvienceLayout.Attribute<N>, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> NSLayoutConstraint {
-    let result: NSLayoutConstraint
+fileprivate func _setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute?, _ rhs: C.Second?, relation: NSLayoutConstraint.Relation) -> [C.Constraint]? where C.Second == UILayoutable {
+    guard let l = lhs, let r = rhs else { return nil }
+    return setup(l, r, relation: relation)
+}
+
+fileprivate func setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute, _ rhs: C.Second, relation: NSLayoutConstraint.Relation) -> [C.Constraint] where C.Second == UILayoutable {
+    var result: [C.Constraint] = []
+    let l = ConvienceLayout<C>.Attribute<AttributeType.Edges>(type: .notAnAttribute, item: lhs.item, constant: lhs.constant, multiplier: lhs.multiplier, priority: lhs.priority, isActive: lhs.isActive)
+    lhs.type.forEach {
+        result.append(setup(l.type($0), rhs, relation: relation))
+    }
+    return result
+}
+
+fileprivate func _setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute?, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> [C.Constraint]? where C.Second == UILayoutable {
+    guard let l = lhs else { return nil }
+    return setup(l, rhs, relation: relation)
+}
+
+fileprivate func setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> [C.Constraint] where C.Second == UILayoutable {
+    var result: [C.Constraint] = []
+    let l = ConvienceLayout<C>.Attribute<AttributeType.Edges>(type: .notAnAttribute, item: lhs.item, constant: lhs.constant, multiplier: lhs.multiplier, priority: lhs.priority, isActive: lhs.isActive)
+    lhs.type.forEach {
+        result.append(setup(l.type($0), rhs, relation: relation))
+    }
+    return result
+}
+
+fileprivate func setup<N, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<N>, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> C.Constraint {
+    var result: C.Constraint
     let active = lhs.isActive
     defer {
         result.priority = lhs.priority
         if active {
-            removeConflicts(lhs, nil as ConvienceLayout.Attribute<N>?, with: result)
+            removeConflicts(lhs, nil as ConvienceLayout<C>.Attribute<N>?, with: result)
         }
         result.isActive = active
     }
     switch lhs.type {
     case .width, .height:
-        result = NSLayoutConstraint(item: lhs.item, attribute: lhs.type, relatedBy: relation, toItem: nil, attribute: .notAnAttribute, multiplier: 1 / lhs.multiplier, constant: max(0, rhs - lhs.constant))
+        result = C.make(item: lhs.item, attribute: lhs.type, relatedBy: relation, toItem: nil, attribute: .notAnAttribute, multiplier: 1 / lhs.multiplier, constant: max(0, rhs - lhs.constant))
     case .notAnAttribute:
-        result = NSLayoutConstraint(item: lhs.item, attribute: lhs.type, relatedBy: relation, toItem: nil, attribute: lhs.type, multiplier: 1 / lhs.multiplier, constant: rhs - lhs.constant)
+        result = C.make(item: lhs.item, attribute: lhs.type, relatedBy: relation, toItem: nil, attribute: lhs.type, multiplier: 1 / lhs.multiplier, constant: rhs - lhs.constant)
     case .bottom, .trailing, .bottomMargin, .trailingMargin, .lastBaseline, .right, .rightMargin:
-        result = NSLayoutConstraint(item: lhs.item, attribute: lhs.type, relatedBy: relation, toItem: lhs.item.parent, attribute: lhs.type, multiplier: 1 / lhs.multiplier, constant: -rhs - lhs.constant)
+        result = C.makeToParent(item: lhs.item, attribute: lhs.type, relatedBy: relation, attribute: lhs.type, multiplier: 1 / lhs.multiplier, constant: lhs.constant - rhs)
     default:
-        result = NSLayoutConstraint(item: lhs.item, attribute: lhs.type, relatedBy: relation, toItem: lhs.item.parent, attribute: lhs.type, multiplier: 1 / lhs.multiplier, constant: rhs - lhs.constant)
+        result = C.makeToParent(item: lhs.item, attribute: lhs.type, relatedBy: relation, attribute: lhs.type, multiplier: 1 / lhs.multiplier, constant: rhs - lhs.constant)
     }
     return result
 }
 
 @discardableResult
-public func =|<T>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: ConvienceLayout.Attribute<T>) -> NSLayoutConstraint {
+public func =|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: ConvienceLayout<K>.Attribute<T>) -> C.Constraint where C.Second == K.First {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: UILayoutable) -> NSLayoutConstraint {
-    return setup(lhs, rhs.layout.attribute(as: lhs), relation: .equal)
-}
-
-@discardableResult
-public func =|<T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout.Attribute<ConvienceLayout.CenterX>, _ rhs: ConvienceLayout.Attribute<T>) -> NSLayoutConstraint {
+public func =|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: C.Second) -> C.Constraint where C.Second == UILayoutable {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: ConvienceLayout.Attribute<ConvienceLayout.CenterX>) -> NSLayoutConstraint {
+public func =|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<AttributeType.CenterX>, _ rhs: ConvienceLayout<K>.Attribute<T>) -> C.Constraint where C.Second == K.First {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: CGFloat) -> NSLayoutConstraint {
+public func =|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: ConvienceLayout<K>.Attribute<AttributeType.CenterX>) -> C.Constraint where C.Second == K.First {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: ClosedRange<CGFloat>) -> [NSLayoutConstraint] {
+public func =|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: CGFloat) -> C.Constraint {
+    return setup(lhs, rhs, relation: .equal)
+}
+
+@discardableResult
+public func =|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: ClosedRange<CGFloat>) -> [C.Constraint] {
     return [setup(lhs, rhs.lowerBound, relation: .greaterThanOrEqual), setup(lhs, rhs.upperBound, relation: .lessThanOrEqual)]
 }
 
 @discardableResult
-public func =|<T>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: ClosedRange<CGFloat>) -> [NSLayoutConstraint]? {
+public func =|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: ClosedRange<CGFloat>) -> [C.Constraint]? {
     guard let lhs = lhs else { return nil }
     return [setup(lhs, rhs.lowerBound, relation: .greaterThanOrEqual), setup(lhs, rhs.upperBound, relation: .lessThanOrEqual)]
 }
 
 @discardableResult
-public func =|<T>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: ConvienceLayout.Attribute<T>?) -> NSLayoutConstraint? {
+public func =|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: ConvienceLayout<K>.Attribute<T>?) -> C.Constraint? where C.Second == K.First {
     return _setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: UILayoutable?) -> NSLayoutConstraint? {
-    var r: ConvienceLayout.Attribute<T>?
-    if let l = lhs {
-        r = rhs?.layout.attribute(as: l)
-    }
-    return _setup(lhs, r, relation: .equal)
-}
-
-@discardableResult
-public func =|<T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout.Attribute<ConvienceLayout.CenterX>?, _ rhs: ConvienceLayout.Attribute<T>?) -> NSLayoutConstraint? {
+public func =|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: C.Second?) -> C.Constraint? where C.Second == UILayoutable {
     return _setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: ConvienceLayout.Attribute<ConvienceLayout.CenterX>?) -> NSLayoutConstraint? {
+public func =|<T: CenterXAttributeCompatible, C, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<AttributeType.CenterX>?, _ rhs: ConvienceLayout<K>.Attribute<T>?) -> C.Constraint? where C.Second == K.First {
     return _setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: CGFloat) -> NSLayoutConstraint? {
+public func =|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: ConvienceLayout<K>.Attribute<AttributeType.CenterX>?) -> C.Constraint? where C.Second == K.First {
     return _setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func <=|<T>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: ConvienceLayout.Attribute<T>) -> NSLayoutConstraint {
+public func =|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: CGFloat) -> C.Constraint? {
+    return _setup(lhs, rhs, relation: .equal)
+}
+
+@discardableResult
+public func =|<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute, _ rhs: C.Second) -> [C.Constraint] where C.Second == UILayoutable {
+    return setup(lhs, rhs, relation: .equal)
+}
+
+@discardableResult
+public func =|<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute, _ rhs: CGFloat) -> [C.Constraint] where C.Second == UILayoutable {
+    return setup(lhs, rhs, relation: .equal)
+}
+
+@discardableResult
+public func =|<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute?, _ rhs: C.Second?) -> [C.Constraint]? where C.Second == UILayoutable {
+    return _setup(lhs, rhs, relation: .equal)
+}
+
+@discardableResult
+public func =|<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute?, _ rhs: CGFloat) -> [C.Constraint]? where C.Second == UILayoutable {
+    return _setup(lhs, rhs, relation: .equal)
+}
+
+@discardableResult
+public func <=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: ConvienceLayout<K>.Attribute<T>) -> C.Constraint where C.Second == K.First, C.Second == UILayoutable {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: UILayoutable) -> NSLayoutConstraint {
-    return setup(lhs, rhs.layout.attribute(as: lhs), relation: .lessThanOrEqual)
-}
-
-@discardableResult
-public func <=|<T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: ConvienceLayout.Attribute<ConvienceLayout.CenterX>) -> NSLayoutConstraint {
+public func <=|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: C.Second) -> C.Constraint where C.Second == UILayoutable {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout.Attribute<ConvienceLayout.CenterX>, _ rhs: ConvienceLayout.Attribute<T>) -> NSLayoutConstraint {
+public func <=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: ConvienceLayout<K>.Attribute<AttributeType.CenterX>) -> C.Constraint where C.Second == K.First {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: CGFloat) -> NSLayoutConstraint {
+public func <=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<AttributeType.CenterX>, _ rhs: ConvienceLayout<K>.Attribute<T>) -> C.Constraint where C.Second == K.First {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: ConvienceLayout.Attribute<T>?) -> NSLayoutConstraint? {
+public func <=|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: CGFloat) -> C.Constraint {
+    return setup(lhs, rhs, relation: .lessThanOrEqual)
+}
+
+@discardableResult
+public func <=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: ConvienceLayout<K>.Attribute<T>?) -> C.Constraint? where C.Second == K.First {
     return _setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: UILayoutable?) -> NSLayoutConstraint? {
-    var r: ConvienceLayout.Attribute<T>?
-    if let l = lhs {
-        r = rhs?.layout.attribute(as: l)
-    }
-    return _setup(lhs, r, relation: .lessThanOrEqual)
-}
-
-@discardableResult
-public func <=|<T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: ConvienceLayout.Attribute<ConvienceLayout.CenterX>?) -> NSLayoutConstraint? {
+public func <=|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: C.Second?) -> C.Constraint? where C.Second == UILayoutable {
     return _setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout.Attribute<ConvienceLayout.CenterX>?, _ rhs: ConvienceLayout.Attribute<T>?) -> NSLayoutConstraint? {
+public func <=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: ConvienceLayout<K>.Attribute<AttributeType.CenterX>?) -> C.Constraint? where C.Second == K.First {
     return _setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: CGFloat) -> NSLayoutConstraint? {
+public func <=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<AttributeType.CenterX>?, _ rhs: ConvienceLayout<K>.Attribute<T>?) -> C.Constraint? where C.Second == K.First {
     return _setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: ConvienceLayout.Attribute<T>) -> NSLayoutConstraint {
+public func <=|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: CGFloat) -> C.Constraint? {
+    return _setup(lhs, rhs, relation: .lessThanOrEqual)
+}
+
+@discardableResult
+public func <=|<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute, _ rhs: C.Second) -> [C.Constraint] where C.Second == UILayoutable {
+    return setup(lhs, rhs, relation: .lessThanOrEqual)
+}
+
+@discardableResult
+public func <=|<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute, _ rhs: CGFloat) -> [C.Constraint] where C.Second == UILayoutable {
+    return setup(lhs, rhs, relation: .lessThanOrEqual)
+}
+
+@discardableResult
+public func <=|<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute?, _ rhs: C.Second?) -> [C.Constraint]? where C.Second == UILayoutable {
+    return _setup(lhs, rhs, relation: .lessThanOrEqual)
+}
+
+@discardableResult
+public func <=|<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute?, _ rhs: CGFloat) -> [C.Constraint]? where C.Second == UILayoutable {
+    return _setup(lhs, rhs, relation: .lessThanOrEqual)
+}
+
+@discardableResult
+public func >=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: ConvienceLayout<K>.Attribute<T>) -> C.Constraint where C.Second == K.First {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: UILayoutable) -> NSLayoutConstraint {
-    return setup(lhs, rhs.layout.attribute(as: lhs), relation: .greaterThanOrEqual)
-}
-
-@discardableResult
-public func >=|<T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout.Attribute<ConvienceLayout.CenterX>, _ rhs: ConvienceLayout.Attribute<T>) -> NSLayoutConstraint {
+public func >=|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: C.Second) -> C.Constraint where C.Second == UILayoutable {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: ConvienceLayout.Attribute<ConvienceLayout.CenterX>) -> NSLayoutConstraint {
+public func >=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<AttributeType.CenterX>, _ rhs: ConvienceLayout<K>.Attribute<T>) -> C.Constraint where C.Second == K.First {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T>(_ lhs: ConvienceLayout.Attribute<T>, _ rhs: CGFloat) -> NSLayoutConstraint {
+public func >=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: ConvienceLayout<K>.Attribute<AttributeType.CenterX>) -> C.Constraint where C.Second == K.First {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: ConvienceLayout.Attribute<T>?) -> NSLayoutConstraint? {
+public func >=|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>, _ rhs: CGFloat) -> C.Constraint {
+    return setup(lhs, rhs, relation: .greaterThanOrEqual)
+}
+
+@discardableResult
+public func >=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: ConvienceLayout<K>.Attribute<T>?) -> C.Constraint? where C.Second == K.First {
     return _setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: UILayoutable?) -> NSLayoutConstraint? {
-    var r: ConvienceLayout.Attribute<T>?
-    if let l = lhs {
-        r = rhs?.layout.attribute(as: l)
-    }
-    return _setup(lhs, r, relation: .greaterThanOrEqual)
-}
-
-@discardableResult
-public func >=|<T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout.Attribute<ConvienceLayout.CenterX>?, _ rhs: ConvienceLayout.Attribute<T>?) -> NSLayoutConstraint? {
+public func >=|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: C.Second?) -> C.Constraint? where C.Second == UILayoutable {
     return _setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T: CenterXAttributeCompatible>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: ConvienceLayout.Attribute<ConvienceLayout.CenterX>?) -> NSLayoutConstraint? {
+public func >=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<AttributeType.CenterX>?, _ rhs: ConvienceLayout<K>.Attribute<T>?) -> C.Constraint? where C.Second == K.First {
     return _setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T>(_ lhs: ConvienceLayout.Attribute<T>?, _ rhs: CGFloat) -> NSLayoutConstraint? {
+public func >=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: ConvienceLayout<K>.Attribute<AttributeType.CenterX>?) -> C.Constraint? where C.Second == K.First {
     return _setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
-public func *<T>(_ lhs: CGFloat, _ rhs: ConvienceLayout.Attribute<T>) -> ConvienceLayout.Attribute<T> {
+@discardableResult
+public func >=|<T, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<T>?, _ rhs: CGFloat) -> C.Constraint? {
+    return _setup(lhs, rhs, relation: .greaterThanOrEqual)
+}
+
+@discardableResult
+public func >=|<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute, _ rhs: C.Second) -> [C.Constraint] where C.Second == UILayoutable {
+    return setup(lhs, rhs, relation: .greaterThanOrEqual)
+}
+
+@discardableResult
+public func >=|<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute, _ rhs: CGFloat) -> [C.Constraint] where C.Second == UILayoutable {
+    return setup(lhs, rhs, relation: .greaterThanOrEqual)
+}
+
+@discardableResult
+public func >=|<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute?, _ rhs: C.Second?) -> [C.Constraint]? where C.Second == UILayoutable {
+    return _setup(lhs, rhs, relation: .greaterThanOrEqual)
+}
+
+@discardableResult
+public func >=|<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute?, _ rhs: CGFloat) -> [C.Constraint]? where C.Second == UILayoutable {
+    return _setup(lhs, rhs, relation: .greaterThanOrEqual)
+}
+
+public func *<A, T, C: ConstraintsCreator, L>(_ lhs: CGFloat, _ rhs: ConvienceLayout<C>.Attributes<A, T, L>) -> ConvienceLayout<C>.Attributes<A, T, L> {
     var result = rhs
     result.multiplier = lhs
     return result
 }
 
-public func *<T>(_ rhs: ConvienceLayout.Attribute<T>, _ lhs: CGFloat) -> ConvienceLayout.Attribute<T> {
+public func *<A, T, C: ConstraintsCreator, L>(_ rhs: ConvienceLayout<C>.Attributes<A, T, L>, _ lhs: CGFloat) -> ConvienceLayout<C>.Attributes<A, T, L> {
     var result = rhs
     result.multiplier *= lhs
     return result
 }
 
-public func /<T>(_ rhs: ConvienceLayout.Attribute<T>, _ lhs: CGFloat) -> ConvienceLayout.Attribute<T> {
+public func /<A, T, C: ConstraintsCreator, L>(_ rhs: ConvienceLayout<C>.Attributes<A, T, L>, _ lhs: CGFloat) -> ConvienceLayout<C>.Attributes<A, T, L> {
     var result = rhs
     result.multiplier /= lhs
     return result
 }
 
-public func +<T>(_ lhs: CGFloat, _ rhs: ConvienceLayout.Attribute<T>) -> ConvienceLayout.Attribute<T> {
+public func +<A, T, C: ConstraintsCreator, L>(_ lhs: CGFloat, _ rhs: ConvienceLayout<C>.Attributes<A, T, L>) -> ConvienceLayout<C>.Attributes<A, T, L> {
     var result = rhs
     result.constant += lhs
     return result
 }
 
-public func +<T>(_ rhs: ConvienceLayout.Attribute<T>, _ lhs: CGFloat) -> ConvienceLayout.Attribute<T> {
+public func +<A, T, C: ConstraintsCreator, L>(_ rhs: ConvienceLayout<C>.Attributes<A, T, L>, _ lhs: CGFloat) -> ConvienceLayout<C>.Attributes<A, T, L> {
     var result = rhs
     result.constant += lhs
     return result
 }
 
-public func -<T>(_ lhs: CGFloat, _ rhs: ConvienceLayout.Attribute<T>) -> ConvienceLayout.Attribute<T> {
+public func -<A, T, C: ConstraintsCreator, L>(_ lhs: CGFloat, _ rhs: ConvienceLayout<C>.Attributes<A, T, L>) -> ConvienceLayout<C>.Attributes<A, T, L> {
     return lhs + rhs * (-1)
 }
 
-public func -<T>(_ rhs: ConvienceLayout.Attribute<T>, _ lhs: CGFloat) -> ConvienceLayout.Attribute<T> {
+public func -<A, T, C: ConstraintsCreator, L>(_ rhs: ConvienceLayout<C>.Attributes<A, T, L>, _ lhs: CGFloat) -> ConvienceLayout<C>.Attributes<A, T, L> {
     var result = rhs
     result.constant -= lhs
     return result
 }
 
-public func *<T>(_ lhs: CGFloat, _ rhs: ConvienceLayout.Attribute<T>?) -> ConvienceLayout.Attribute<T>? {
+public func *<A, T, C: ConstraintsCreator, L>(_ lhs: CGFloat, _ rhs: ConvienceLayout<C>.Attributes<A, T, L>?) -> ConvienceLayout<C>.Attributes<A, T, L>? {
     var result = rhs
     result?.multiplier = lhs
     return result
 }
 
-public func *<T>(_ rhs: ConvienceLayout.Attribute<T>?, _ lhs: CGFloat) -> ConvienceLayout.Attribute<T>? {
+public func *<A, T, C: ConstraintsCreator, L>(_ rhs: ConvienceLayout<C>.Attributes<A, T, L>?, _ lhs: CGFloat) -> ConvienceLayout<C>.Attributes<A, T, L>? {
     var result = rhs
     result?.multiplier *= lhs
     return result
 }
 
-public func /<T>(_ rhs: ConvienceLayout.Attribute<T>?, _ lhs: CGFloat) -> ConvienceLayout.Attribute<T>? {
+public func /<A, T, C: ConstraintsCreator, L>(_ rhs: ConvienceLayout<C>.Attributes<A, T, L>?, _ lhs: CGFloat) -> ConvienceLayout<C>.Attributes<A, T, L>? {
     var result = rhs
     result?.multiplier /= lhs
     return result
 }
 
-public func +<T>(_ lhs: CGFloat, _ rhs: ConvienceLayout.Attribute<T>?) -> ConvienceLayout.Attribute<T>? {
+public func +<A, T, C: ConstraintsCreator, L>(_ lhs: CGFloat, _ rhs: ConvienceLayout<C>.Attributes<A, T, L>?) -> ConvienceLayout<C>.Attributes<A, T, L>? {
     var result = rhs
     result?.constant += lhs
     return result
 }
 
-public func +<T>(_ rhs: ConvienceLayout.Attribute<T>?, _ lhs: CGFloat) -> ConvienceLayout.Attribute<T>? {
+public func +<A, T, C: ConstraintsCreator, L>(_ rhs: ConvienceLayout<C>.Attributes<A, T, L>?, _ lhs: CGFloat) -> ConvienceLayout<C>.Attributes<A, T, L>? {
     var result = rhs
     result?.constant += lhs
     return result
 }
 
-public func -<T>(_ lhs: CGFloat, _ rhs: ConvienceLayout.Attribute<T>?) -> ConvienceLayout.Attribute<T>? {
+public func -<A, T, C: ConstraintsCreator, L>(_ lhs: CGFloat, _ rhs: ConvienceLayout<C>.Attributes<A, T, L>?) -> ConvienceLayout<C>.Attributes<A, T, L>? {
     return lhs + rhs * (-1)
 }
 
-public func -<T>(_ rhs: ConvienceLayout.Attribute<T>?, _ lhs: CGFloat) -> ConvienceLayout.Attribute<T>? {
+public func -<A, T, C: ConstraintsCreator, L>(_ rhs: ConvienceLayout<C>.Attributes<A, T, L>?, _ lhs: CGFloat) -> ConvienceLayout<C>.Attributes<A, T, L>? {
     var result = rhs
     result?.constant -= lhs
     return result
@@ -449,11 +668,11 @@ extension NSLayoutConstraint {
             (first == rhs.second && second == rhs.first) && relation.isOpposite(to: rhs.relation)
     }
     
-    fileprivate struct Item: Equatable {
+    public struct Item: Equatable {
         let attribute: NSLayoutConstraint.Attribute
         let view: AnyObject?
         
-        static func ==(lhs: NSLayoutConstraint.Item, rhs: NSLayoutConstraint.Item) -> Bool {
+        public static func ==(lhs: NSLayoutConstraint.Item, rhs: NSLayoutConstraint.Item) -> Bool {
             if let left = lhs.view, let right = rhs.view {
                 return left === right && lhs.attribute == rhs.attribute
             }
@@ -516,7 +735,7 @@ public struct ViewAndSize: AxisLayoutable {
 public enum LayoutValue: AxisLayoutable {
     public var _asLayoutValue: LayoutValue { return self }
     
-    case view([ViewAndSize]), number(Number), attribute([ConvienceLayout.Attribute<Void>])
+    case view([ViewAndSize]), number(Number), attribute([ConvienceLayout<ConstraintBuilder>.Attribute<Void>])
     
     fileprivate var asNumber: Number? {
         if case .number(let n) = self { return n }
@@ -602,7 +821,7 @@ extension Array: LayoutValueProtocol, AxisLayoutable where Element == UILayoutab
     public func fixed(_ size: CGFloat) -> LayoutValue {
         return .view(map { ViewAndSize($0, .value(size)) })
     }
-//    public func fixed(_ size: ConvienceLayout.Attribute<ConvienceLayout.Size>) -> LayoutValue {
+//    public func fixed(_ size: ConvienceLayout<C>.Attribute<ConvienceLayout<C>.Size>) -> LayoutValue {
 //        return .view(map { ViewAndSize($0, .value(size)) })
 //    }
     public func fixed(_ size: ClosedRange<CGFloat>) -> LayoutValue {
@@ -617,6 +836,23 @@ extension Array: LayoutValueProtocol, AxisLayoutable where Element == UILayoutab
     
 }
 
+public enum Axis {
+    public static let vertical = VerticalAxe()
+    public static let horizontal = HorizontalAxe()
+    public struct VerticalAxe { fileprivate init() {} }
+    public struct HorizontalAxe { fileprivate init() {} }
+}
+    
+@discardableResult
+public func =|(_ lhs: Axis.HorizontalAxe, _ rhs: [HorizontalLayoutable]) -> [NSLayoutConstraint] {
+    return setByAxe(.horizontal, rhs)
+}
+    
+@discardableResult
+public func =|(_ lhs: Axis.VerticalAxe, _ rhs: [VerticalLayoutable]) -> [NSLayoutConstraint] {
+    return setByAxe(.vertical, rhs)
+}
+    
 extension ConvienceLayout {
     
     @discardableResult
@@ -649,24 +885,24 @@ fileprivate func setByAxe(_ lhs: NSLayoutConstraint.Axis, _ rhs: [LayoutValuePro
         return []
     }
     var result: [NSLayoutConstraint] = []
-    var last: [ConvienceLayout.Attribute<Void>]?
+    var last: [ConvienceLayout<ConstraintBuilder>.Attribute<Void>]?
     var offset: LayoutValue.Number?
     let prevAtt: NSLayoutConstraint.Attribute = lhs == .vertical ? .top : .leading
     let nextAtt: NSLayoutConstraint.Attribute = lhs == .vertical ? .bottom : .trailing
     for i in 0..<rhs.count {
         switch rhs[i]._asLayoutValue {
         case .view(let array):
-            let next = array.map { ConvienceLayout.Attribute<Void>(type: prevAtt, item: $0.view) }
+            let next = array.map { ConvienceLayout<ConstraintBuilder>.Attribute<Void>(type: prevAtt, item: $0.view) }
             if let _last = last {
                 result += set(next, _last, offset: offset ?? .value(0))
             } else if let value = offset {
                 let views = array.map({ $0.view }).parents
-                result += set(next, views.map { ConvienceLayout.Attribute<Void>(type: prevAtt, item: $0) }, offset: value)
+                result += set(next, views.map { ConvienceLayout<ConstraintBuilder>.Attribute<Void>(type: prevAtt, item: $0) }, offset: value)
             }
             let sizes = Array(array.compactMap({ $0.get(lhs) }).joined())
             result += sizes
             offset = nil
-            last = array.map { ConvienceLayout.Attribute(type: nextAtt, item: $0.view) }
+            last = array.map { ConvienceLayout<ConstraintBuilder>.Attribute(type: nextAtt, item: $0.view) }
         case .number(let number):
             offset = (offset ?? .value(0)) + number
         case .attribute(let array):
@@ -676,12 +912,12 @@ fileprivate func setByAxe(_ lhs: NSLayoutConstraint.Axis, _ rhs: [LayoutValuePro
         }
     }
     if let value = offset, let views = last?.map({ $0.item }).parents {
-        result += set(views.map { ConvienceLayout.Attribute<Void>(type: nextAtt, item: $0) }, last ?? [], offset: value)
+        result += set(views.map { ConvienceLayout<ConstraintBuilder>.Attribute<Void>(type: nextAtt, item: $0) }, last ?? [], offset: value)
     }
     return result
 }
 
-fileprivate func set(_ lhs: [ConvienceLayout.Attribute<Void>], _ rhs: [ConvienceLayout.Attribute<Void>], offset: LayoutValue.Number) -> [NSLayoutConstraint] {
+fileprivate func set(_ lhs: [ConvienceLayout<ConstraintBuilder>.Attribute<Void>], _ rhs: [ConvienceLayout<ConstraintBuilder>.Attribute<Void>], offset: LayoutValue.Number) -> [NSLayoutConstraint] {
     guard !lhs.isEmpty && !rhs.isEmpty else { return [] }
     var result: [NSLayoutConstraint] = []
     lhs.forEach { l in
@@ -692,7 +928,6 @@ fileprivate func set(_ lhs: [ConvienceLayout.Attribute<Void>], _ rhs: [Convience
                 r.constant += value
                 result.append(setup(l, r, relation: .equal))
             case .range(let min, let max):
-                var result: [NSLayoutConstraint] = []
                 if let value = min {
                     r.constant += value
                     result.append(setup(l, r, relation: .greaterThanOrEqual))
@@ -714,7 +949,7 @@ extension UILayoutable {
         return setConstraint(att, number: number)
     }
     
-    fileprivate func setConstraint<S>(_ att: ConvienceLayout.Attribute<S>, number: LayoutValue.Number) -> [NSLayoutConstraint] {
+    fileprivate func setConstraint<S>(_ att: ConvienceLayout<ConstraintBuilder>.Attribute<S>, number: LayoutValue.Number) -> [NSLayoutConstraint] {
         switch number {
         case .value(let value):
             return [setup(att, value, relation: .equal)]
@@ -732,7 +967,7 @@ extension UILayoutable {
     
 }
 
-extension ConvienceLayout.Attribute: LayoutValueProtocol {
+extension ConvienceLayout.Attributes: LayoutValueProtocol where T == NSLayoutConstraint.Attribute, C == ConstraintBuilder, I == UILayoutable {
     public var _asLayoutValue: LayoutValue {
         return .attribute([asAny()])
     }
@@ -745,6 +980,9 @@ extension UILayoutable {
         } else {
             return (self as? UIView)?.superview
         }
+    }
+    fileprivate var constraints: [NSLayoutConstraint] {
+        return (self as? UIView)?.constraints ?? (self as? UILayoutGuide)?.owningView?.constraints ?? []
     }
 }
 
@@ -762,7 +1000,8 @@ extension Array where Element == UILayoutable {
         }
         return result
     }
+    
 }
 
-extension ConvienceLayout.Attribute: VerticalLayoutable where A == ConvienceLayout.Vertical {}
-extension ConvienceLayout.Attribute: HorizontalLayoutable where A: HorizontalLayoutableAttribute {}
+extension ConvienceLayout.Attributes: VerticalLayoutable where A == AttributeType.Vertical, T == NSLayoutConstraint.Attribute, C == ConstraintBuilder, I == UILayoutable {}
+extension ConvienceLayout.Attributes: HorizontalLayoutable where A: HorizontalLayoutableAttribute, T == NSLayoutConstraint.Attribute, C == ConstraintBuilder, I == UILayoutable {}
