@@ -41,8 +41,7 @@ public protocol ConstraintsCreator {
     associatedtype Second
     associatedtype Constraint: ConstraintProtocol
     static func make(item: First, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, toItem: Second?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> Constraint
-    static func constraints(for view: First) -> [NSLayoutConstraint]
-    static func constraints(for view: Second) -> [NSLayoutConstraint]
+    static func constraints(for constraint: Constraint) -> [NSLayoutConstraint]
     static func willConflict(_ constraint: Constraint, with other: NSLayoutConstraint) -> Bool
     static func makeToParent(item: First, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> Constraint
 }
@@ -65,12 +64,8 @@ public struct ConstraintsBuilder: ConstraintsCreator {
         return result
     }
     
-    public static func constraints(for view: [UILayoutable]) -> [NSLayoutConstraint] {
-        return Array(view.map { $0.constraints }.joined())
-    }
-    
-    public static func constraints(for view: UILayoutable) -> [NSLayoutConstraint] {
-        return view.constraints
+    public static func constraints(for constraint: [NSLayoutConstraint]) -> [NSLayoutConstraint] {
+        return Array(constraint.map(ConstraintBuilder.constraints).joined())
     }
     
     public static func willConflict(_ constraint: [NSLayoutConstraint], with other: NSLayoutConstraint) -> Bool {
@@ -93,8 +88,9 @@ public struct ConstraintBuilder: ConstraintsCreator {
         return make(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: item.parent, attribute: attribute2, multiplier: multiplier, constant: constant)
     }
     
-    public static func constraints(for view: UILayoutable) -> [NSLayoutConstraint] {
-        return view.constraints
+    public static func constraints(for constraint: NSLayoutConstraint) -> [NSLayoutConstraint] {
+        return ((constraint.firstItem as? UILayoutable)?.constraints ?? []) +
+        ((constraint.secondItem as? UILayoutable)?.constraints ?? [])
     }
     
     public static func willConflict(_ constraint: NSLayoutConstraint, with other: NSLayoutConstraint) -> Bool {
@@ -160,30 +156,6 @@ public struct ConvienceLayout<C: ConstraintsCreator> {
     
     public init(_ item: L) {
         self.item = item
-    }
-    
-    public func setEdges<D: UILayoutable>(to view: D?, leading: CGFloat? = 0, trailing: CGFloat? = 0, top: CGFloat? = 0, bottom: CGFloat? = 0, priority: UILayoutPriority = .required) {
-        (item as? UIView)?.translatesAutoresizingMaskIntoConstraints = false
-        if let lead = leading {
-            let constr = NSLayoutConstraint(item: item as Any, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: lead)
-            constr.priority = priority
-            constr.isActive = true
-        }
-        if let trail = trailing {
-            let constr = NSLayoutConstraint(item: item as Any, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: trail)
-            constr.priority = priority
-            constr.isActive = true
-        }
-        if let top = top {
-            let constr = NSLayoutConstraint(item: item as Any, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: top)
-            constr.priority = priority
-            constr.isActive = true
-        }
-        if let bottom = bottom {
-            let constr = NSLayoutConstraint(item: item as Any, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: bottom)
-            constr.priority = priority
-            constr.isActive = true
-        }
     }
     
     public struct Attributes<A, T, I> {
@@ -265,7 +237,7 @@ fileprivate func setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs
     result.priority = min(lhs.priority, rhs.priority)
     let active = lhs.isActive && rhs.isActive
     if active {
-        removeConflicts(lhs, rhs, with: result)
+        removeConflicts(C.self, with: result)
     }
     result.isActive = active
     return result
@@ -281,27 +253,21 @@ fileprivate func setup<A, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attri
     result.priority = lhs.priority
     let active = lhs.isActive
     if active {
-        let attr: ConvienceLayout<ConstraintBuilder>.Attribute<Void> = ConvienceLayout<ConstraintBuilder>(rhs).attribute(type: lhs.type)
-        removeConflicts(lhs, attr, with: result)
+        removeConflicts(C.self, with: result)
     }
     result.isActive = active
     return result
 }
 
-fileprivate func removeConflicts<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>, _ rhs: ConvienceLayout<K>.Attribute<D>?, with constraint: C.Constraint) {
-    let lConstraints = C.constraints(for: lhs.item)
-    let rConstraints = rhs == nil ? [] : K.constraints(for: rhs!.item)
-    let constraints = lConstraints + rConstraints
+fileprivate func removeConflicts<C: ConstraintsCreator>(_ lhs: C.Type, with constraint: C.Constraint) {
+    let constraints = C.constraints(for: constraint)
     constraints.filter({ C.willConflict(constraint, with: $0) }).forEach {
         $0.isActive = false
     }
-    
 }
 
 fileprivate func _setup<N, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<N>?, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> C.Constraint? {
-    guard let l = lhs else {
-        return nil
-    }
+    guard let l = lhs else { return nil }
     return setup(l, rhs, relation: relation)
 }
 
@@ -339,7 +305,7 @@ fileprivate func setup<N, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attri
     defer {
         result.priority = lhs.priority
         if active {
-            removeConflicts(lhs, nil as ConvienceLayout<C>.Attribute<N>?, with: result)
+            removeConflicts(C.self, with: result)
         }
         result.isActive = active
     }
@@ -852,29 +818,6 @@ public func =|(_ lhs: Axis.HorizontalAxe, _ rhs: [HorizontalLayoutable]) -> [NSL
 public func =|(_ lhs: Axis.VerticalAxe, _ rhs: [VerticalLayoutable]) -> [NSLayoutConstraint] {
     return setByAxe(.vertical, rhs)
 }
-    
-extension ConvienceLayout {
-    
-    @discardableResult
-    public static func vertical(_ array: [VerticalLayoutable]) -> [NSLayoutConstraint] {
-        return setByAxe(.vertical, array)
-    }
-    
-    @discardableResult
-    public static func vertical(_ elements: VerticalLayoutable...) -> [NSLayoutConstraint] {
-        return vertical(elements)
-    }
-    
-    @discardableResult
-    public static func horizontal(_ array: [HorizontalLayoutable]) -> [NSLayoutConstraint] {
-        return setByAxe(.horizontal, array)
-    }
-    
-    @discardableResult
-    public static func horizontal(_ elements: HorizontalLayoutable...) -> [NSLayoutConstraint] {
-        return horizontal(elements)
-    }
-}
 
 fileprivate func setByAxe(_ lhs: NSLayoutConstraint.Axis, _ rhs: [LayoutValueProtocol]) -> [NSLayoutConstraint] {
     guard let first = rhs.first?._asLayoutValue else { return [] }
@@ -896,8 +839,7 @@ fileprivate func setByAxe(_ lhs: NSLayoutConstraint.Axis, _ rhs: [LayoutValuePro
             if let _last = last {
                 result += set(next, _last, offset: offset ?? .value(0))
             } else if let value = offset {
-                let views = array.map({ $0.view }).parents
-                result += set(next, views.map { ConvienceLayout<ConstraintBuilder>.Attribute<Void>(type: prevAtt, item: $0) }, offset: value)
+                result += set(array.compactMap({ $0.view.layout.attribute(type: prevAtt) }), value: value, type: prevAtt)
             }
             let sizes = Array(array.compactMap({ $0.get(lhs) }).joined())
             result += sizes
@@ -906,13 +848,28 @@ fileprivate func setByAxe(_ lhs: NSLayoutConstraint.Axis, _ rhs: [LayoutValuePro
         case .number(let number):
             offset = (offset ?? .value(0)) + number
         case .attribute(let array):
-            result += set(array, last ?? [], offset: offset ?? .value(0))
+            if let _last = last {
+                result += set(array, _last, offset: offset ?? .value(0))
+            } else if let value = offset {
+                result += set(array, value: value, type: prevAtt)
+            }
             last = array
             offset = nil
         }
     }
-    if let value = offset, let views = last?.map({ $0.item }).parents {
-        result += set(views.map { ConvienceLayout<ConstraintBuilder>.Attribute<Void>(type: nextAtt, item: $0) }, last ?? [], offset: value)
+    if let value = offset, let array = last {
+        result += set(array, value: value, type: nextAtt)
+    }
+    return result
+}
+
+
+fileprivate func set(_ array: [ConvienceLayout<ConstraintBuilder>.Attribute<Void>], value: LayoutValue.Number, type: NSLayoutConstraint.Attribute) -> [NSLayoutConstraint] {
+    var result: [NSLayoutConstraint] = []
+    array.forEach {
+        guard let parent = $0.item.parent else { return }
+        let att: ConvienceLayout<ConstraintBuilder>.Attribute<Void> = parent.layout.attribute(type: type)
+        result += set([att], [$0.item.layout.attribute(type: type)], offset: value)
     }
     return result
 }
