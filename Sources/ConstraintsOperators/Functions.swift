@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension ConvienceLayout.Attributes where T == NSLayoutConstraint.Attribute, I == C.First {
+extension LayoutAttribute where T == NSLayoutConstraint.Attribute, I == C.First {
     
     @discardableResult
     public func equal<K: ConstraintsCreator>(to rhs: ConvienceLayout<K>.Attribute<A>) -> C.Constraint where C.Second == K.First {
@@ -62,7 +62,7 @@ extension ConvienceLayout.Attributes where T == NSLayoutConstraint.Attribute, I 
 
 }
 
-extension ConvienceLayout.Attributes where T == NSLayoutConstraint.Attribute, I == C.First, C.Second == UILayoutable {
+extension LayoutAttribute where T == NSLayoutConstraint.Attribute, I == C.First, C.Second == UILayoutable {
     
     @discardableResult
     public func equal(to rhs: C.Second) -> C.Constraint {
@@ -96,7 +96,7 @@ extension ConvienceLayout.Attributes where T == NSLayoutConstraint.Attribute, I 
     
 }
 
-extension ConvienceLayout.Attributes where T == NSLayoutConstraint.Attribute, I == C.First, A == AttributeType.CenterX {
+extension LayoutAttribute where T == NSLayoutConstraint.Attribute, I == C.First, A == AttributeType.CenterX {
 
     @discardableResult
     public func equal<K: ConstraintsCreator>(to rhs: ConvienceLayout<K>.Attribute<A>) -> C.Constraint where C.Second == K.First {
@@ -130,7 +130,7 @@ extension ConvienceLayout.Attributes where T == NSLayoutConstraint.Attribute, I 
     
 }
 
-extension ConvienceLayout.Attributes where T == NSLayoutConstraint.Attribute, I == C.First, A: CenterXAttributeCompatible {
+extension LayoutAttribute where T == NSLayoutConstraint.Attribute, I == C.First, A: CenterXAttributeCompatible {
     
     @discardableResult
     public func equal<K: ConstraintsCreator>(to rhs: ConvienceLayout<K>.Attribute<AttributeType.CenterX>) -> C.Constraint where C.Second == K.First {
@@ -164,7 +164,7 @@ extension ConvienceLayout.Attributes where T == NSLayoutConstraint.Attribute, I 
     
 }
 
-extension ConvienceLayout.Attributes where T == [NSLayoutConstraint.Attribute], I == C.First, A == AttributeType.Edges, C.Second == UILayoutable {
+extension LayoutAttribute where T == [NSLayoutConstraint.Attribute], I == C.First, A == AttributeType.Edges, C.Second == UILayoutable {
     
     @discardableResult
     public func equal(to rhs: C.Second) -> [C.Constraint] {
