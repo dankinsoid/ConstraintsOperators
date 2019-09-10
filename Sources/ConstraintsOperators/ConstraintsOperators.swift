@@ -42,6 +42,7 @@ public protocol ConstraintsCreator {
     associatedtype Constraint: ConstraintProtocol
     static func make(item: First, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, toItem: Second?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> Constraint
     static func constraints(for constraint: Constraint) -> [NSLayoutConstraint]
+    static func array(for constraint: [Constraint]) -> [NSLayoutConstraint]
     static func willConflict(_ constraint: Constraint, with other: NSLayoutConstraint) -> Bool
     static func makeToParent(item: First, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> Constraint
 }
@@ -66,6 +67,10 @@ public struct ConstraintsBuilder: ConstraintsCreator {
     
     public static func constraints(for constraint: [NSLayoutConstraint]) -> [NSLayoutConstraint] {
         return Array(constraint.map(ConstraintBuilder.constraints).joined())
+    }
+    
+    public static func array(for constraints: [[NSLayoutConstraint]]) -> [NSLayoutConstraint] {
+        return Array(constraints.joined())
     }
     
     public static func willConflict(_ constraint: [NSLayoutConstraint], with other: NSLayoutConstraint) -> Bool {
@@ -93,6 +98,10 @@ public struct ConstraintBuilder: ConstraintsCreator {
         ((constraint.secondItem as? UILayoutable)?.constraints ?? [])
     }
     
+    public static func array(for constraints: [NSLayoutConstraint]) -> [NSLayoutConstraint] {
+        return constraints
+    }
+    
     public static func willConflict(_ constraint: NSLayoutConstraint, with other: NSLayoutConstraint) -> Bool {
         return constraint.willConflict(with: other)
     }
@@ -113,7 +122,7 @@ extension Array: ConstraintProtocol where Element == NSLayoutConstraint {
     
 }
 
-public struct ConvienceLayout<C: ConstraintsCreator> {
+public struct ConvienceLayout<C: ConstraintsCreator>: Attributable {
     public typealias L = C.First
     private let item: L
     
@@ -158,69 +167,10 @@ public struct ConvienceLayout<C: ConstraintsCreator> {
         self.item = item
     }
     
-    public struct Attributes<A, T, I> {
-        fileprivate var type: T
-        fileprivate var item: I
-        fileprivate var constant: CGFloat
-        fileprivate var multiplier: CGFloat
-        fileprivate var priority: UILayoutPriority
-        fileprivate var isActive = true
-        
-        fileprivate init(type: T, item: I, constant: CGFloat = 0, multiplier: CGFloat = 1, priority: UILayoutPriority = .required, isActive: Bool = true) {
-            self.type = type
-            self.item = item
-            self.constant = constant
-            self.multiplier = multiplier
-            self.priority = priority
-        }
-        
-        fileprivate func asAny() -> Attributes<Void, T, I> {
-            return Attributes<Void, T, I>(type: type, item: item, constant: constant, multiplier: multiplier, priority: priority, isActive: isActive)
-        }
-        
-        public func priority(_ _priority: UILayoutPriority) -> Attributes {
-            return map(\.priority, _priority)
-        }
-        
-        public func priority(_ _priority: Float) -> Attributes {
-            return priority(UILayoutPriority(_priority))
-        }
-        
-        public var deactivated: Attributes {
-            return map(\.isActive, false)
-        }
-        
-        fileprivate func type(_ _type: T) -> Attributes {
-            return map(\.type, _type)
-        }
-        
-        private func map<R>(_ keyPath: WritableKeyPath<Attributes, R>, _ value: R) -> Attributes {
-            var result = self
-            result[keyPath: keyPath] = value
-            return result
-        }
-        
-    }
-    
     public typealias Attribute<A> = Attributes<A, NSLayoutConstraint.Attribute, L>
     fileprivate typealias Attribute2<A> = Attributes<A, NSLayoutConstraint.Attribute, C.Second>
     public typealias EdgeAttribute = Attributes<AttributeType.Edges, [NSLayoutConstraint.Attribute], L>
-    
-    fileprivate struct Properties {
-        var constant: CGFloat
-        var multiplier: CGFloat
-        var priority: UILayoutPriority
-        var isActive = true
-    }
-}
 
-public enum AttributeType {
-    public enum LeadTrail: CenterXAttributeCompatible, HorizontalLayoutableAttribute {}
-    public enum LeftRight: CenterXAttributeCompatible {}
-    public enum CenterX: HorizontalLayoutableAttribute {}
-    public enum Vertical {}
-    public enum Size {}
-    public enum Edges {}
 }
 
 public protocol CenterXAttributeCompatible {}
@@ -869,7 +819,11 @@ fileprivate func set(_ array: [ConvienceLayout<ConstraintBuilder>.Attribute<Void
     array.forEach {
         guard let parent = $0.item.parent else { return }
         let att: ConvienceLayout<ConstraintBuilder>.Attribute<Void> = parent.layout.attribute(type: type)
-        result += set([att], [$0.item.layout.attribute(type: type)], offset: value)
+        if type == .leading || type == .top {
+            result += set([$0.item.layout.attribute(type: type)], [att], offset: value)
+        } else {
+            result += set([att], [$0.item.layout.attribute(type: type)], offset: value)
+        }
     }
     return result
 }
