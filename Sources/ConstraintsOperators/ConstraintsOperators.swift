@@ -225,14 +225,14 @@ public enum AttributeType {
 
 public protocol CenterXAttributeCompatible {}
 
-fileprivate func _setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>?, _ rhs: ConvienceLayout<K>.Attribute<D>?, relation: NSLayoutConstraint.Relation) -> C.Constraint? where C.Second == K.First {
+func _setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>?, _ rhs: ConvienceLayout<K>.Attribute<D>?, relation: NSLayoutConstraint.Relation) -> C.Constraint? where C.Second == K.First {
     guard let l = lhs, let r = rhs else {
         return nil
     }
     return setup(l, r, relation: relation)
 }
 
-fileprivate func setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>, _ rhs: ConvienceLayout<K>.Attribute<D>, relation: NSLayoutConstraint.Relation) -> C.Constraint where C.Second == K.First {
+func setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>, _ rhs: ConvienceLayout<K>.Attribute<D>, relation: NSLayoutConstraint.Relation) -> C.Constraint where C.Second == K.First {
     var result = C.make(item: lhs.item, attribute: lhs.type, relatedBy: relation, toItem: rhs.item, attribute: rhs.type, multiplier: rhs.multiplier / lhs.multiplier, constant: rhs.constant - lhs.constant)
     result.priority = min(lhs.priority, rhs.priority)
     let active = lhs.isActive && rhs.isActive
@@ -243,12 +243,12 @@ fileprivate func setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs
     return result
 }
 
-fileprivate func _setup<A, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>?, _ rhs: C.Second?, relation: NSLayoutConstraint.Relation) -> C.Constraint? where C.Second == UILayoutable {
+func _setup<A, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>?, _ rhs: C.Second?, relation: NSLayoutConstraint.Relation) -> C.Constraint? where C.Second == UILayoutable {
     guard let l = lhs, let r = rhs else { return nil }
     return setup(l, r, relation: relation)
 }
 
-fileprivate func setup<A, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>, _ rhs: C.Second, relation: NSLayoutConstraint.Relation) -> C.Constraint where C.Second == UILayoutable {
+func setup<A, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<A>, _ rhs: C.Second, relation: NSLayoutConstraint.Relation) -> C.Constraint where C.Second == UILayoutable {
     var result = C.make(item: lhs.item, attribute: lhs.type, relatedBy: relation, toItem: rhs, attribute: lhs.type, multiplier: 1 / lhs.multiplier, constant: -lhs.constant)
     result.priority = lhs.priority
     let active = lhs.isActive
@@ -271,12 +271,12 @@ fileprivate func _setup<N, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attr
     return setup(l, rhs, relation: relation)
 }
 
-fileprivate func _setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute?, _ rhs: C.Second?, relation: NSLayoutConstraint.Relation) -> [C.Constraint]? where C.Second == UILayoutable {
+func _setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute?, _ rhs: C.Second?, relation: NSLayoutConstraint.Relation) -> [C.Constraint]? where C.Second == UILayoutable {
     guard let l = lhs, let r = rhs else { return nil }
     return setup(l, r, relation: relation)
 }
 
-fileprivate func setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute, _ rhs: C.Second, relation: NSLayoutConstraint.Relation) -> [C.Constraint] where C.Second == UILayoutable {
+func setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute, _ rhs: C.Second, relation: NSLayoutConstraint.Relation) -> [C.Constraint] where C.Second == UILayoutable {
     var result: [C.Constraint] = []
     let l = ConvienceLayout<C>.Attribute<AttributeType.Edges>(type: .notAnAttribute, item: lhs.item, constant: lhs.constant, multiplier: lhs.multiplier, priority: lhs.priority, isActive: lhs.isActive)
     lhs.type.forEach {
@@ -285,12 +285,12 @@ fileprivate func setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttr
     return result
 }
 
-fileprivate func _setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute?, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> [C.Constraint]? where C.Second == UILayoutable {
+func _setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute?, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> [C.Constraint]? where C.Second == UILayoutable {
     guard let l = lhs else { return nil }
     return setup(l, rhs, relation: relation)
 }
 
-fileprivate func setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> [C.Constraint] where C.Second == UILayoutable {
+func setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttribute, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> [C.Constraint] where C.Second == UILayoutable {
     var result: [C.Constraint] = []
     let l = ConvienceLayout<C>.Attribute<AttributeType.Edges>(type: .notAnAttribute, item: lhs.item, constant: lhs.constant, multiplier: lhs.multiplier, priority: lhs.priority, isActive: lhs.isActive)
     lhs.type.forEach {
@@ -299,7 +299,7 @@ fileprivate func setup<C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.EdgeAttr
     return result
 }
 
-fileprivate func setup<N, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<N>, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> C.Constraint {
+func setup<N, C: ConstraintsCreator>(_ lhs: ConvienceLayout<C>.Attribute<N>, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> C.Constraint {
     var result: C.Constraint
     let active = lhs.isActive
     defer {
