@@ -33,7 +33,7 @@ view1.layout.centerX =| view2
 view1.layout[.centerX, .centerY] =| 0
 view1.layout.edges(.vertical) =| 0
 ...
-Axis.vertical =| [10, view1, 0..., view2.fixed(200), 0...5]
+Axis.vertical =| [10, view1, 0..., view2.fixed(200), 0...5, view3.layout.centerY, 10]
 ...
 view1.layout.top =| view1.layout.leading //compile error, you cannot combine incompatible attributes
 ```
