@@ -96,7 +96,7 @@ extension LayoutAttribute where C.Second == UILayoutable {
     
 }
 
-extension LayoutAttribute where A == AttributeType.CenterX {
+extension LayoutAttribute where A == Attributes.CenterX {
 
     @discardableResult
     public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<A, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
@@ -133,32 +133,32 @@ extension LayoutAttribute where A == AttributeType.CenterX {
 extension LayoutAttribute where A: CenterXAttributeCompatible {
     
     @discardableResult
-    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<AttributeType.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<Attributes.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
         return setup(self, rhs, relation: .equal)
     }
     
     @discardableResult
-    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<AttributeType.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<Attributes.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
         return _setup(self, rhs, relation: .equal)
     }
     
     @discardableResult
-    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<AttributeType.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
         return setup(self, rhs, relation: .lessThanOrEqual)
     }
     
     @discardableResult
-    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<AttributeType.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
         return _setup(self, rhs, relation: .lessThanOrEqual)
     }
     
     @discardableResult
-    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<AttributeType.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
         return setup(self, rhs, relation: .greaterThanOrEqual)
     }
     
     @discardableResult
-    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<AttributeType.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
         return _setup(self, rhs, relation: .greaterThanOrEqual)
     }
 }

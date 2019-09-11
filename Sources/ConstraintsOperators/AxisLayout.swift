@@ -269,5 +269,5 @@ extension LayoutAttribute: LayoutValueProtocol where C == ConstraintBuilder {
     }
 }
 
-extension LayoutAttribute: VerticalLayoutable where A == AttributeType.Vertical, C == ConstraintBuilder {}
+extension LayoutAttribute: VerticalLayoutable where A == Attributes.Vertical, C == ConstraintBuilder {}
 extension LayoutAttribute: HorizontalLayoutable where A: HorizontalLayoutableAttribute, C == ConstraintBuilder {}
