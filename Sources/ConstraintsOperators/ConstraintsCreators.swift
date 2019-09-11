@@ -70,7 +70,7 @@ public struct ConstraintBuilder: ConstraintsCreator {
         return constraint.willConflict(with: other)
     }
     
-    public static func makeWithOffset(item: First, attribute: NSLayoutConstraint.Attribute, relatedBy relation: NSLayoutConstraint.Relation, multiplier: CGFloat, constant: CGFloat, offset: CGFloat) -> Constraint {
+    public static func makeWithOffset(item: UILayoutable, attribute: NSLayoutConstraint.Attribute, relatedBy relation: NSLayoutConstraint.Relation, multiplier: CGFloat, constant: CGFloat, offset: CGFloat) -> NSLayoutConstraint {
         let result: Constraint
         switch attribute {
         case .width, .height:
