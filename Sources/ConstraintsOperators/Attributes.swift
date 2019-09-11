@@ -29,19 +29,13 @@ extension Array: AttributeConvertable where Element == NSLayoutConstraint.Attrib
     }
 }
 
-protocol ItemedType {
-    associatedtype T
-    var item: T { get }
-}
-
 public struct LayoutAttribute<A, C: ConstraintsCreator> {
-    var type: C.A//NSLayoutConstraint.Attribute
+    var type: C.A
     var item: C.First
     var constant: CGFloat
     var multiplier: CGFloat
     var priority: UILayoutPriority
     var isActive = true
-    //var _attributes: [NSLayoutConstraint.Attribute]
     
     init(type: C.A, item: C.First, constant: CGFloat = 0, multiplier: CGFloat = 1, priority: UILayoutPriority = .required, isActive: Bool = true) {
         self.type = type
@@ -49,7 +43,6 @@ public struct LayoutAttribute<A, C: ConstraintsCreator> {
         self.constant = constant
         self.multiplier = multiplier
         self.priority = priority
-//        self._attributes = [type] + ((item as? AttributesConvertable)?._attributes ?? [])
     }
     
     func asAny() -> LayoutAttribute<Void, C> {
