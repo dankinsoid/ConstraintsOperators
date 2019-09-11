@@ -30,7 +30,7 @@ view1.layout.centerX =| view2
 view1.layout[.centerX, .centerY] =| 0
 view1.layout.edges(.vertiacal) =| 0
 ...
-Axis.vertical =| [10, view1, 12, view2.fixed(200), 10]
+Axis.vertical =| [10, view1, 10..., view2.fixed(200), 0...5]
 ```
 
 Supported operators: `=|`, `<=|`, `>=|`
