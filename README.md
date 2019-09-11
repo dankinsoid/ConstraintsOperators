@@ -18,7 +18,7 @@ view1.layout.width >=| 100
 view1.layout.height =| view2.layout.height / 2 + 20
 ...
 view.layout.width =| 100
-view.layou.width =| 200 //automatically removes previuos width constraint
+view.layou.width =| 200 //automatically replaces previuos width constraint
 ...
 view.layout.width =| 10...100
 view1.layout.height.priority(.defaultLow) =| 0
