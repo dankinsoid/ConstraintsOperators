@@ -19,6 +19,11 @@ extension UIView: UILayoutable {
     public var safeAreaLayout: ConvienceLayout<ConstraintBuilder> { return safeAreaLayoutGuide.layout }
 }
 
+extension Array where Element: UIView {
+    @available(iOS 11.0, *)
+    public var safeAreaLayout: ConvienceLayout<ConstraintsBuilder> { return ConvienceLayout(map({ $0.safeAreaLayoutGuide })) }
+}
+
 extension UILayoutGuide: UILayoutable {}
 
 extension UILayoutable {
