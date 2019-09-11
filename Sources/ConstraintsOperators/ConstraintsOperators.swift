@@ -150,14 +150,14 @@ public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: CG
 }
 
 @discardableResult
-public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: ClosedRange<CGFloat>) -> [C.Constraint] {
-    return [setup(lhs, rhs.lowerBound, relation: .greaterThanOrEqual), setup(lhs, rhs.upperBound, relation: .lessThanOrEqual)]
+public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: ClosedRange<CGFloat>) -> [NSLayoutConstraint] {
+    return C.array(for: [setup(lhs, rhs.lowerBound, relation: .greaterThanOrEqual), setup(lhs, rhs.upperBound, relation: .lessThanOrEqual)])
 }
 
 @discardableResult
-public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: ClosedRange<CGFloat>) -> [C.Constraint]? {
+public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: ClosedRange<CGFloat>) -> [NSLayoutConstraint]? {
     guard let lhs = lhs else { return nil }
-    return [setup(lhs, rhs.lowerBound, relation: .greaterThanOrEqual), setup(lhs, rhs.upperBound, relation: .lessThanOrEqual)]
+    return C.array(for: [setup(lhs, rhs.lowerBound, relation: .greaterThanOrEqual), setup(lhs, rhs.upperBound, relation: .lessThanOrEqual)])
 }
 
 @discardableResult

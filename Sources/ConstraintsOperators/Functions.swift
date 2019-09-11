@@ -21,8 +21,8 @@ extension LayoutAttribute {
     }
     
     @discardableResult
-    public func within(_ rhs: ClosedRange<CGFloat>) -> [C.Constraint] {
-        return [setup(self, rhs.lowerBound, relation: .greaterThanOrEqual), setup(self, rhs.upperBound, relation: .lessThanOrEqual)]
+    public func within(_ rhs: ClosedRange<CGFloat>) -> [NSLayoutConstraint] {
+        return C.array(for: [setup(self, rhs.lowerBound, relation: .greaterThanOrEqual), setup(self, rhs.upperBound, relation: .lessThanOrEqual)])
     }
     
     @discardableResult
