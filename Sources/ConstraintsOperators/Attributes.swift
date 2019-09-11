@@ -87,6 +87,7 @@ public struct LayoutAttribute<A, I, C: ConstraintsCreator> {
 public typealias Attribute<A, C> = LayoutAttribute<A, C.First, C> where C: ConstraintsCreator
 typealias Attribute2<A, C> = LayoutAttribute<A, C.Second, C> where C: ConstraintsCreator
 public typealias EdgeAttribute = LayoutAttribute<AttributeType.Edges, [UILayoutable], ConstraintsBuilder>
+public typealias SizeAttribute = LayoutAttribute<AttributeType.Size, [UILayoutable], ConstraintsBuilder>
 
 extension Attributable {
     public var width:                Attribute<AttributeType.Size, B> { return Attribute(type: B.A(.width), item: target) }
@@ -130,20 +131,20 @@ extension Attributable where B.First == [UILayoutable] {
         return EdgeAttribute(type: edges.attributes, item: target)
     }
     
-    public var size: EdgeAttribute {
-        return EdgeAttribute(type: [.width, .height], item: target)
+    public var size: SizeAttribute {
+        return SizeAttribute(type: [.width, .height], item: target)
     }
     
 }
 
 extension Attributable where B.First == UILayoutable {
     
-    public func edges(_ edges: Edge.Set = .all) -> EdgeAttribute {
-        return EdgeAttribute(type: edges.attributes, item: [target])
+    public func edges(_ edges: Edge.Set = .all) -> SizeAttribute {
+        return SizeAttribute(type: edges.attributes, item: [target])
     }
     
-    public var size: EdgeAttribute {
-        return EdgeAttribute(type: [.width, .height], item: [target])
+    public var size: SizeAttribute {
+        return SizeAttribute(type: [.width, .height], item: [target])
     }
     
 }
