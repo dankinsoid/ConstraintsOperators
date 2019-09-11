@@ -102,6 +102,10 @@ extension UILayoutable {
     public func fixed(_ size: PartialRangeFrom<CGFloat>) -> LayoutValue {
         return .view([ViewAndSize(self, .range(min: size.lowerBound, max: nil))])
     }
+    
+    public func fixed(_ size: LayoutAttribute<Attributes.Size, ConstraintBuilder>) -> LayoutValue {
+        return .attribute([size.asAny()])
+    }
 }
 
 extension ClosedRange: LayoutValueProtocol, AxisLayoutable where Bound == CGFloat {
@@ -122,9 +126,11 @@ extension Array: LayoutValueProtocol, AxisLayoutable where Element == UILayoutab
     public func fixed(_ size: CGFloat) -> LayoutValue {
         return .view(map { ViewAndSize($0, .value(size)) })
     }
-    //    public func fixed(_ size: LayoutAttribute<Size>) -> LayoutValue {
-    //        return .view(map { ViewAndSize($0, .value(size)) })
-    //    }
+    
+    public func fixed(_ size: LayoutAttribute<Attributes.Size, ConstraintBuilder>) -> LayoutValue {
+        return .attribute( map { size.map(\.item, $0).asAny() })
+    }
+    
     public func fixed(_ size: ClosedRange<CGFloat>) -> LayoutValue {
         return .view(map { ViewAndSize($0, .range(min: size.lowerBound, max: size.upperBound)) })
     }
