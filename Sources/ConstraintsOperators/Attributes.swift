@@ -127,8 +127,7 @@ extension Attributable {
 extension Attributable where B.First == [UILayoutable] {
     
     public func edges(_ edges: Edge.Set = .all) -> EdgeAttribute {
-        let attributes = edges.attributes
-        return EdgeAttribute(type: attributes, item: target)
+        return EdgeAttribute(type: edges.attributes, item: target)
     }
     
 }
@@ -136,8 +135,7 @@ extension Attributable where B.First == [UILayoutable] {
 extension Attributable where B.First == UILayoutable {
     
     public func edges(_ edges: Edge.Set = .all) -> EdgeAttribute {
-        let attributes = edges.attributes
-        return EdgeAttribute(type: attributes, item: [target])
+        return EdgeAttribute(type: edges.attributes, item: [target])
     }
     
 }

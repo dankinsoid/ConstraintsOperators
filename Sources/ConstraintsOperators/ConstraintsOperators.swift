@@ -32,14 +32,9 @@ extension Array where Element == UILayoutable {
 public struct ConvienceLayout<B: ConstraintsCreator>: Attributable {
     public let target: B.First
     
-//    public func edges(_ edges: Edge.Set = .all) -> EdgeAttribute<C> {
-//        return EdgeAttribute<C>(type: edges.attributes, item: target)
-//    }
-//
     public init(_ item: B.First) {
         target = item
     }
-
 }
 
 extension ConvienceLayout where B.First == UILayoutable {
