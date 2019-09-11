@@ -25,6 +25,12 @@ let constraint = view1.layout.height.deactivated =| 200
 ...
 view1.layout.height =| view1.superview
 view1.layout.centerX =| view2
+...
+[view1, view2].layout.height =| 200
+view1.layout[.centerX, .centerY] =| 0
+view1.layout.edges(.vertiacal) =| 0
+...
+Axis.vertical =| [10, view1, 12, view2.fixed(200), 10]
 ```
 
 Supported operators: `=|`, `<=|`, `>=|`
