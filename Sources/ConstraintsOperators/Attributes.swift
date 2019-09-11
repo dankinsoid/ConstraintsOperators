@@ -34,16 +34,16 @@ protocol ItemedType {
     var item: T { get }
 }
 
-public struct LayoutAttribute<A, I, C: ConstraintsCreator> {
+public struct LayoutAttribute<A, C: ConstraintsCreator> {
     var type: C.A//NSLayoutConstraint.Attribute
-    var item: I
+    var item: C.First
     var constant: CGFloat
     var multiplier: CGFloat
     var priority: UILayoutPriority
     var isActive = true
     //var _attributes: [NSLayoutConstraint.Attribute]
     
-    init(type: C.A, item: I, constant: CGFloat = 0, multiplier: CGFloat = 1, priority: UILayoutPriority = .required, isActive: Bool = true) {
+    init(type: C.A, item: C.First, constant: CGFloat = 0, multiplier: CGFloat = 1, priority: UILayoutPriority = .required, isActive: Bool = true) {
         self.type = type
         self.item = item
         self.constant = constant
@@ -52,8 +52,8 @@ public struct LayoutAttribute<A, I, C: ConstraintsCreator> {
 //        self._attributes = [type] + ((item as? AttributesConvertable)?._attributes ?? [])
     }
     
-    func asAny() -> LayoutAttribute<Void, I, C> {
-        return LayoutAttribute<Void, I, C>(type: type, item: item, constant: constant, multiplier: multiplier, priority: priority, isActive: isActive)
+    func asAny() -> LayoutAttribute<Void, C> {
+        return LayoutAttribute<Void, C>(type: type, item: item, constant: constant, multiplier: multiplier, priority: priority, isActive: isActive)
     }
     
     public func priority(_ _priority: UILayoutPriority) -> LayoutAttribute {
@@ -78,49 +78,47 @@ public struct LayoutAttribute<A, I, C: ConstraintsCreator> {
         return result
     }
     
-    func asType<T>(_ _type: T.Type) -> LayoutAttribute<T, I, C> {
-        return LayoutAttribute<T, I, C>(type: type, item: item, constant: constant, multiplier: multiplier, priority: priority, isActive: isActive)
+    func asType<T>(_ _type: T.Type) -> LayoutAttribute<T, C> {
+        return LayoutAttribute<T, C>(type: type, item: item, constant: constant, multiplier: multiplier, priority: priority, isActive: isActive)
     }
     
 }
 
-public typealias Attribute<A, C> = LayoutAttribute<A, C.First, C> where C: ConstraintsCreator
-typealias Attribute2<A, C> = LayoutAttribute<A, C.Second, C> where C: ConstraintsCreator
-public typealias EdgeAttribute = LayoutAttribute<AttributeType.Edges, [UILayoutable], ConstraintsBuilder>
-public typealias SizeAttribute = LayoutAttribute<AttributeType.Size, [UILayoutable], ConstraintsBuilder>
+public typealias EdgeAttribute = LayoutAttribute<AttributeType.Edges, ConstraintsBuilder>
+public typealias SizeAttribute = LayoutAttribute<AttributeType.Size, ConstraintsBuilder>
 
 extension Attributable {
-    public var width:                Attribute<AttributeType.Size, B> { return Attribute(type: B.A(.width), item: target) }
-    public var height:               Attribute<AttributeType.Size, B> { return Attribute(type: B.A(.height), item: target) }
+    public var width:                LayoutAttribute<AttributeType.Size, B> { return LayoutAttribute(type: B.A(.width), item: target) }
+    public var height:               LayoutAttribute<AttributeType.Size, B> { return LayoutAttribute(type: B.A(.height), item: target) }
     
-    public var top:                  Attribute<AttributeType.Vertical, B> { return Attribute(type: B.A(.top), item: target) }
-    public var bottom:               Attribute<AttributeType.Vertical, B> { return Attribute(type: B.A(.bottom), item: target) }
-    public var lastBaseline:         Attribute<AttributeType.Vertical, B> { return Attribute(type: B.A(.lastBaseline), item: target) }
-    public var firstBaseline:        Attribute<AttributeType.Vertical, B> { return Attribute(type: B.A(.firstBaseline), item: target) }
-    public var topMargin:            Attribute<AttributeType.Vertical, B> { return Attribute(type: B.A(.topMargin), item: target) }
-    public var bottomMargin:         Attribute<AttributeType.Vertical, B> { return Attribute(type: B.A(.bottomMargin), item: target) }
+    public var top:                  LayoutAttribute<AttributeType.Vertical, B> { return LayoutAttribute(type: B.A(.top), item: target) }
+    public var bottom:               LayoutAttribute<AttributeType.Vertical, B> { return LayoutAttribute(type: B.A(.bottom), item: target) }
+    public var lastBaseline:         LayoutAttribute<AttributeType.Vertical, B> { return LayoutAttribute(type: B.A(.lastBaseline), item: target) }
+    public var firstBaseline:        LayoutAttribute<AttributeType.Vertical, B> { return LayoutAttribute(type: B.A(.firstBaseline), item: target) }
+    public var topMargin:            LayoutAttribute<AttributeType.Vertical, B> { return LayoutAttribute(type: B.A(.topMargin), item: target) }
+    public var bottomMargin:         LayoutAttribute<AttributeType.Vertical, B> { return LayoutAttribute(type: B.A(.bottomMargin), item: target) }
     
-    public var leading:              Attribute<AttributeType.LeadTrail, B> { return Attribute(type: B.A(.leading), item: target) }
-    public var trailing:             Attribute<AttributeType.LeadTrail, B> { return Attribute(type: B.A(.trailing), item: target) }
-    public var leadingMargin:        Attribute<AttributeType.LeadTrail, B> { return Attribute(type: B.A(.leadingMargin), item: target) }
-    public var trailingMargin:       Attribute<AttributeType.LeadTrail, B> { return Attribute(type: B.A(.trailingMargin), item: target) }
+    public var leading:              LayoutAttribute<AttributeType.LeadTrail, B> { return LayoutAttribute(type: B.A(.leading), item: target) }
+    public var trailing:             LayoutAttribute<AttributeType.LeadTrail, B> { return LayoutAttribute(type: B.A(.trailing), item: target) }
+    public var leadingMargin:        LayoutAttribute<AttributeType.LeadTrail, B> { return LayoutAttribute(type: B.A(.leadingMargin), item: target) }
+    public var trailingMargin:       LayoutAttribute<AttributeType.LeadTrail, B> { return LayoutAttribute(type: B.A(.trailingMargin), item: target) }
     
-    public var left:                 Attribute<AttributeType.LeftRight, B> { return Attribute(type: B.A(.left), item: target) }
-    public var right:                Attribute<AttributeType.LeftRight, B> { return Attribute(type: B.A(.right), item: target) }
-    public var leftMargin:           Attribute<AttributeType.LeftRight, B> { return Attribute(type: B.A(.leftMargin), item: target) }
-    public var rightMargin:          Attribute<AttributeType.LeftRight, B> { return Attribute(type: B.A(.rightMargin), item: target) }
+    public var left:                 LayoutAttribute<AttributeType.LeftRight, B> { return LayoutAttribute(type: B.A(.left), item: target) }
+    public var right:                LayoutAttribute<AttributeType.LeftRight, B> { return LayoutAttribute(type: B.A(.right), item: target) }
+    public var leftMargin:           LayoutAttribute<AttributeType.LeftRight, B> { return LayoutAttribute(type: B.A(.leftMargin), item: target) }
+    public var rightMargin:          LayoutAttribute<AttributeType.LeftRight, B> { return LayoutAttribute(type: B.A(.rightMargin), item: target) }
     
-    public var centerX:              Attribute<AttributeType.CenterX, B>  { return Attribute(type: B.A(.centerX), item: target) }
-    public var centerY:              Attribute<AttributeType.Vertical, B> { return Attribute(type: B.A(.centerY), item: target) }
-    public var centerXWithinMargins: Attribute<AttributeType.CenterX, B>  { return Attribute(type: B.A(.centerXWithinMargins), item: target) }
-    public var centerYWithinMargins: Attribute<AttributeType.Vertical, B> { return Attribute(type: B.A(.centerYWithinMargins), item: target) }
+    public var centerX:              LayoutAttribute<AttributeType.CenterX, B>  { return LayoutAttribute(type: B.A(.centerX), item: target) }
+    public var centerY:              LayoutAttribute<AttributeType.Vertical, B> { return LayoutAttribute(type: B.A(.centerY), item: target) }
+    public var centerXWithinMargins: LayoutAttribute<AttributeType.CenterX, B>  { return LayoutAttribute(type: B.A(.centerXWithinMargins), item: target) }
+    public var centerYWithinMargins: LayoutAttribute<AttributeType.Vertical, B> { return LayoutAttribute(type: B.A(.centerYWithinMargins), item: target) }
     
-    func attribute<T>(as other: Attribute<T, B>) -> Attribute<T, B> {
-        return Attribute(type: other.type, item: target)
+    func attribute<T>(as other: LayoutAttribute<T, B>) -> LayoutAttribute<T, B> {
+        return LayoutAttribute(type: other.type, item: target)
     }
     
-    func attribute<T>(type: NSLayoutConstraint.Attribute) -> Attribute<T, B> {
-        return Attribute(type: B.A(type), item: target)
+    func attribute<T>(type: NSLayoutConstraint.Attribute) -> LayoutAttribute<T, B> {
+        return LayoutAttribute(type: B.A(type), item: target)
     }
     
 }

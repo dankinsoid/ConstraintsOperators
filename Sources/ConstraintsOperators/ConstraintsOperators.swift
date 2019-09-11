@@ -62,14 +62,14 @@ extension ConvienceLayout where B.First == [UILayoutable] {
 
 public protocol CenterXAttributeCompatible {}
 
-func _setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<A, C>?, _ rhs: Attribute<D, K>?, relation: NSLayoutConstraint.Relation) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+func _setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<A, C>?, _ rhs: LayoutAttribute<D, K>?, relation: NSLayoutConstraint.Relation) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     guard let l = lhs, let r = rhs else {
         return nil
     }
     return setup(l, r, relation: relation)
 }
 
-func setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<A, C>, _ rhs: Attribute<D, K>, relation: NSLayoutConstraint.Relation) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+func setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<A, C>, _ rhs: LayoutAttribute<D, K>, relation: NSLayoutConstraint.Relation) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     let result = C.make(item: lhs.item, attribute: lhs.type, relatedBy: relation, toItem: rhs.item, attribute: rhs.type, multiplier: rhs.multiplier / lhs.multiplier, constant: rhs.constant - lhs.constant)
     result.priority = min(lhs.priority, rhs.priority)
     let active = lhs.isActive && rhs.isActive
@@ -80,12 +80,12 @@ func setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<
     return result
 }
 
-func _setup<A, C: ConstraintsCreator>(_ lhs: Attribute<A, C>?, _ rhs: C.Second?, relation: NSLayoutConstraint.Relation) -> C.Constraint? where C.Second == UILayoutable {
+func _setup<A, C: ConstraintsCreator>(_ lhs: LayoutAttribute<A, C>?, _ rhs: C.Second?, relation: NSLayoutConstraint.Relation) -> C.Constraint? where C.Second == UILayoutable {
     guard let l = lhs, let r = rhs else { return nil }
     return setup(l, r, relation: relation)
 }
 
-func setup<A, C: ConstraintsCreator>(_ lhs: Attribute<A, C>, _ rhs: C.Second, relation: NSLayoutConstraint.Relation) -> C.Constraint where C.Second == UILayoutable {
+func setup<A, C: ConstraintsCreator>(_ lhs: LayoutAttribute<A, C>, _ rhs: C.Second, relation: NSLayoutConstraint.Relation) -> C.Constraint where C.Second == UILayoutable {
     let result = C.makeToView(item: lhs.item, attribute: lhs.type, relatedBy: relation, itemTo: rhs, multiplier: 1 / lhs.multiplier, constant: -lhs.constant)
     result.priority = lhs.priority
     let active = lhs.isActive
@@ -103,12 +103,12 @@ fileprivate func removeConflicts<C: ConstraintsCreator>(_ lhs: C.Type, with cons
     }
 }
 
-fileprivate func _setup<N, C: ConstraintsCreator>(_ lhs: Attribute<N, C>?, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> C.Constraint? {
+fileprivate func _setup<N, C: ConstraintsCreator>(_ lhs: LayoutAttribute<N, C>?, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> C.Constraint? {
     guard let l = lhs else { return nil }
     return setup(l, rhs, relation: relation)
 }
 
-func setup<N, C: ConstraintsCreator>(_ lhs: Attribute<N, C>, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> C.Constraint {
+func setup<N, C: ConstraintsCreator>(_ lhs: LayoutAttribute<N, C>, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> C.Constraint {
     let result = C.makeWithOffset(item: lhs.item, attribute: lhs.type, relatedBy: relation, multiplier: lhs.multiplier, constant: lhs.constant, offset: rhs)
     let active = lhs.isActive
     result.priority = lhs.priority
@@ -120,241 +120,241 @@ func setup<N, C: ConstraintsCreator>(_ lhs: Attribute<N, C>, _ rhs: CGFloat, rel
 }
 
 @discardableResult
-public func =|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: Attribute<T, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func =|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: LayoutAttribute<T, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: C.Second) -> C.Constraint where C.Second == UILayoutable {
+public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: C.Second) -> C.Constraint where C.Second == UILayoutable {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<AttributeType.CenterX, C>, _ rhs: Attribute<T, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func =|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<AttributeType.CenterX, C>, _ rhs: LayoutAttribute<T, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: Attribute<AttributeType.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func =|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: LayoutAttribute<AttributeType.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: CGFloat) -> C.Constraint {
+public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: CGFloat) -> C.Constraint {
     return setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: ClosedRange<CGFloat>) -> [C.Constraint] {
+public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: ClosedRange<CGFloat>) -> [C.Constraint] {
     return [setup(lhs, rhs.lowerBound, relation: .greaterThanOrEqual), setup(lhs, rhs.upperBound, relation: .lessThanOrEqual)]
 }
 
 @discardableResult
-public func =|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: ClosedRange<CGFloat>) -> [C.Constraint]? {
+public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: ClosedRange<CGFloat>) -> [C.Constraint]? {
     guard let lhs = lhs else { return nil }
     return [setup(lhs, rhs.lowerBound, relation: .greaterThanOrEqual), setup(lhs, rhs.upperBound, relation: .lessThanOrEqual)]
 }
 
 @discardableResult
-public func =|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: Attribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func =|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: LayoutAttribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return _setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: C.Second?) -> C.Constraint? where C.Second == UILayoutable {
+public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: C.Second?) -> C.Constraint? where C.Second == UILayoutable {
     return _setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<AttributeType.CenterX, C>?, _ rhs: Attribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func =|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<AttributeType.CenterX, C>?, _ rhs: LayoutAttribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return _setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: Attribute<AttributeType.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func =|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: LayoutAttribute<AttributeType.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return _setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func =|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: CGFloat) -> C.Constraint? {
+public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: CGFloat) -> C.Constraint? {
     return _setup(lhs, rhs, relation: .equal)
 }
 
 @discardableResult
-public func <=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: Attribute<T, K>) -> C.Constraint where C.Second == K.First, C.Second == UILayoutable, K.A == NSLayoutConstraint.Attribute {
+public func <=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: LayoutAttribute<T, K>) -> C.Constraint where C.Second == K.First, C.Second == UILayoutable, K.A == NSLayoutConstraint.Attribute {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: C.Second) -> C.Constraint where C.Second == UILayoutable {
+public func <=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: C.Second) -> C.Constraint where C.Second == UILayoutable {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: Attribute<AttributeType.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func <=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: LayoutAttribute<AttributeType.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<AttributeType.CenterX, C>, _ rhs: Attribute<T, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func <=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<AttributeType.CenterX, C>, _ rhs: LayoutAttribute<T, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: CGFloat) -> C.Constraint {
+public func <=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: CGFloat) -> C.Constraint {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: Attribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func <=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: LayoutAttribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return _setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: C.Second?) -> C.Constraint? where C.Second == UILayoutable {
+public func <=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: C.Second?) -> C.Constraint? where C.Second == UILayoutable {
     return _setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: Attribute<AttributeType.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func <=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: LayoutAttribute<AttributeType.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return _setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<AttributeType.CenterX, C>?, _ rhs: Attribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func <=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<AttributeType.CenterX, C>?, _ rhs: LayoutAttribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return _setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: CGFloat) -> C.Constraint? {
+public func <=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: CGFloat) -> C.Constraint? {
     return _setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: Attribute<T, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func >=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: LayoutAttribute<T, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: C.Second) -> C.Constraint where C.Second == UILayoutable {
+public func >=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: C.Second) -> C.Constraint where C.Second == UILayoutable {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<AttributeType.CenterX, C>, _ rhs: Attribute<T, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func >=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<AttributeType.CenterX, C>, _ rhs: LayoutAttribute<T, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: Attribute<AttributeType.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func >=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: LayoutAttribute<AttributeType.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>, _ rhs: CGFloat) -> C.Constraint {
+public func >=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: CGFloat) -> C.Constraint {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: Attribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func >=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: LayoutAttribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return _setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: C.Second?) -> C.Constraint? where C.Second == UILayoutable {
+public func >=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: C.Second?) -> C.Constraint? where C.Second == UILayoutable {
     return _setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<AttributeType.CenterX, C>?, _ rhs: Attribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func >=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<AttributeType.CenterX, C>?, _ rhs: LayoutAttribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return _setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: Attribute<AttributeType.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+public func >=|<T: CenterXAttributeCompatible, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: LayoutAttribute<AttributeType.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
     return _setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
 @discardableResult
-public func >=|<T, C: ConstraintsCreator>(_ lhs: Attribute<T, C>?, _ rhs: CGFloat) -> C.Constraint? {
+public func >=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: CGFloat) -> C.Constraint? {
     return _setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
-public func *<A, C: ConstraintsCreator, L>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, L, C>) -> LayoutAttribute<A, L, C> {
+public func *<A, C: ConstraintsCreator>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, C>) -> LayoutAttribute<A, C> {
     var result = rhs
     result.multiplier = lhs
     return result
 }
 
-public func *<A, C: ConstraintsCreator, L>(_ rhs: LayoutAttribute<A, L, C>, _ lhs: CGFloat) -> LayoutAttribute<A, L, C> {
+public func *<A, C: ConstraintsCreator>(_ rhs: LayoutAttribute<A, C>, _ lhs: CGFloat) -> LayoutAttribute<A, C> {
     var result = rhs
     result.multiplier *= lhs
     return result
 }
 
-public func /<A, C: ConstraintsCreator, L>(_ rhs: LayoutAttribute<A, L, C>, _ lhs: CGFloat) -> LayoutAttribute<A, L, C> {
+public func /<A, C: ConstraintsCreator>(_ rhs: LayoutAttribute<A, C>, _ lhs: CGFloat) -> LayoutAttribute<A, C> {
     var result = rhs
     result.multiplier /= lhs
     return result
 }
 
-public func +<A, C: ConstraintsCreator, L>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, L, C>) -> LayoutAttribute<A, L, C> {
+public func +<A, C: ConstraintsCreator>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, C>) -> LayoutAttribute<A, C> {
     var result = rhs
     result.constant += lhs
     return result
 }
 
-public func +<A, C: ConstraintsCreator, L>(_ rhs: LayoutAttribute<A, L, C>, _ lhs: CGFloat) -> LayoutAttribute<A, L, C> {
+public func +<A, C: ConstraintsCreator>(_ rhs: LayoutAttribute<A, C>, _ lhs: CGFloat) -> LayoutAttribute<A, C> {
     var result = rhs
     result.constant += lhs
     return result
 }
 
-public func -<A, C: ConstraintsCreator, L>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, L, C>) -> LayoutAttribute<A, L, C> {
+public func -<A, C: ConstraintsCreator>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, C>) -> LayoutAttribute<A, C> {
     return lhs + rhs * (-1)
 }
 
-public func -<A, C: ConstraintsCreator, L>(_ rhs: LayoutAttribute<A, L, C>, _ lhs: CGFloat) -> LayoutAttribute<A, L, C> {
+public func -<A, C: ConstraintsCreator>(_ rhs: LayoutAttribute<A, C>, _ lhs: CGFloat) -> LayoutAttribute<A, C> {
     var result = rhs
     result.constant -= lhs
     return result
 }
 
-public func *<A, C: ConstraintsCreator, L>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, L, C>?) -> LayoutAttribute<A, L, C>? {
+public func *<A, C: ConstraintsCreator>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, C>?) -> LayoutAttribute<A, C>? {
     var result = rhs
     result?.multiplier = lhs
     return result
 }
 
-public func *<A, C: ConstraintsCreator, L>(_ rhs: LayoutAttribute<A, L, C>?, _ lhs: CGFloat) -> LayoutAttribute<A, L, C>? {
+public func *<A, C: ConstraintsCreator>(_ rhs: LayoutAttribute<A, C>?, _ lhs: CGFloat) -> LayoutAttribute<A, C>? {
     var result = rhs
     result?.multiplier *= lhs
     return result
 }
 
-public func /<A, C: ConstraintsCreator, L>(_ rhs: LayoutAttribute<A, L, C>?, _ lhs: CGFloat) -> LayoutAttribute<A, L, C>? {
+public func /<A, C: ConstraintsCreator>(_ rhs: LayoutAttribute<A, C>?, _ lhs: CGFloat) -> LayoutAttribute<A, C>? {
     var result = rhs
     result?.multiplier /= lhs
     return result
 }
 
-public func +<A, C: ConstraintsCreator, L>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, L, C>?) -> LayoutAttribute<A, L, C>? {
+public func +<A, C: ConstraintsCreator>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, C>?) -> LayoutAttribute<A, C>? {
     var result = rhs
     result?.constant += lhs
     return result
 }
 
-public func +<A, C: ConstraintsCreator, L>(_ rhs: LayoutAttribute<A, L, C>?, _ lhs: CGFloat) -> LayoutAttribute<A, L, C>? {
+public func +<A, C: ConstraintsCreator>(_ rhs: LayoutAttribute<A, C>?, _ lhs: CGFloat) -> LayoutAttribute<A, C>? {
     var result = rhs
     result?.constant += lhs
     return result
 }
 
-public func -<A, C: ConstraintsCreator, L>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, L, C>?) -> LayoutAttribute<A, L, C>? {
+public func -<A, C: ConstraintsCreator>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, C>?) -> LayoutAttribute<A, C>? {
     return lhs + rhs * (-1)
 }
 
-public func -<A, C: ConstraintsCreator, L>(_ rhs: LayoutAttribute<A, L, C>?, _ lhs: CGFloat) -> LayoutAttribute<A, L, C>? {
+public func -<A, C: ConstraintsCreator>(_ rhs: LayoutAttribute<A, C>?, _ lhs: CGFloat) -> LayoutAttribute<A, C>? {
     var result = rhs
     result?.constant -= lhs
     return result

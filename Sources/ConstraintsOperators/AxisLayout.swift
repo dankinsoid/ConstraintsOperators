@@ -36,7 +36,7 @@ public struct ViewAndSize: AxisLayoutable {
 public enum LayoutValue: AxisLayoutable {
     public var _asLayoutValue: LayoutValue { return self }
     
-    case view([ViewAndSize]), number(Number), attribute([Attribute<Void, ConstraintBuilder>])
+    case view([ViewAndSize]), number(Number), attribute([LayoutAttribute<Void, ConstraintBuilder>])
     
     fileprivate var asNumber: Number? {
         if case .number(let n) = self { return n }
@@ -122,7 +122,7 @@ extension Array: LayoutValueProtocol, AxisLayoutable where Element == UILayoutab
     public func fixed(_ size: CGFloat) -> LayoutValue {
         return .view(map { ViewAndSize($0, .value(size)) })
     }
-    //    public func fixed(_ size: Attribute<Size>) -> LayoutValue {
+    //    public func fixed(_ size: LayoutAttribute<Size>) -> LayoutValue {
     //        return .view(map { ViewAndSize($0, .value(size)) })
     //    }
     public func fixed(_ size: ClosedRange<CGFloat>) -> LayoutValue {
@@ -163,14 +163,14 @@ fileprivate func setByAxe(_ lhs: NSLayoutConstraint.Axis, _ rhs: [LayoutValuePro
         return []
     }
     var result: [NSLayoutConstraint] = []
-    var last: [Attribute<Void, ConstraintBuilder>]?
+    var last: [LayoutAttribute<Void, ConstraintBuilder>]?
     var offset: LayoutValue.Number?
     let prevAtt: NSLayoutConstraint.Attribute = lhs == .vertical ? .top : .leading
     let nextAtt: NSLayoutConstraint.Attribute = lhs == .vertical ? .bottom : .trailing
     for i in 0..<rhs.count {
         switch rhs[i]._asLayoutValue {
         case .view(let array):
-            let next = array.map { Attribute<Void, ConstraintBuilder>(type: prevAtt, item: $0.view) }
+            let next = array.map { LayoutAttribute<Void, ConstraintBuilder>(type: prevAtt, item: $0.view) }
             if let _last = last {
                 result += set(next, _last, offset: offset ?? .value(0))
             } else if let value = offset {
@@ -199,11 +199,11 @@ fileprivate func setByAxe(_ lhs: NSLayoutConstraint.Axis, _ rhs: [LayoutValuePro
 }
 
 
-fileprivate func set(_ array: [Attribute<Void, ConstraintBuilder>], value: LayoutValue.Number, type: NSLayoutConstraint.Attribute) -> [NSLayoutConstraint] {
+fileprivate func set(_ array: [LayoutAttribute<Void, ConstraintBuilder>], value: LayoutValue.Number, type: NSLayoutConstraint.Attribute) -> [NSLayoutConstraint] {
     var result: [NSLayoutConstraint] = []
     array.forEach {
         guard let parent = $0.item.parent else { return }
-        let att: Attribute<Void, ConstraintBuilder> = parent.layout.attribute(type: type)
+        let att: LayoutAttribute<Void, ConstraintBuilder> = parent.layout.attribute(type: type)
         if type == .leading || type == .top {
             result += set([$0.item.layout.attribute(type: type)], [att], offset: value)
         } else {
@@ -213,7 +213,7 @@ fileprivate func set(_ array: [Attribute<Void, ConstraintBuilder>], value: Layou
     return result
 }
 
-fileprivate func set(_ lhs: [Attribute<Void, ConstraintBuilder>], _ rhs: [Attribute<Void, ConstraintBuilder>], offset: LayoutValue.Number) -> [NSLayoutConstraint] {
+fileprivate func set(_ lhs: [LayoutAttribute<Void, ConstraintBuilder>], _ rhs: [LayoutAttribute<Void, ConstraintBuilder>], offset: LayoutValue.Number) -> [NSLayoutConstraint] {
     guard !lhs.isEmpty && !rhs.isEmpty else { return [] }
     var result: [NSLayoutConstraint] = []
     lhs.forEach { l in
@@ -245,7 +245,7 @@ extension UILayoutable {
         return setConstraint(att, number: number)
     }
     
-    fileprivate func setConstraint<S>(_ att: Attribute<S, ConstraintBuilder>, number: LayoutValue.Number) -> [NSLayoutConstraint] {
+    fileprivate func setConstraint<S>(_ att: LayoutAttribute<S, ConstraintBuilder>, number: LayoutValue.Number) -> [NSLayoutConstraint] {
         switch number {
         case .value(let value):
             return [setup(att, value, relation: .equal)]
@@ -263,11 +263,11 @@ extension UILayoutable {
     
 }
 
-extension LayoutAttribute: LayoutValueProtocol where C == ConstraintBuilder, I == UILayoutable {
+extension LayoutAttribute: LayoutValueProtocol where C == ConstraintBuilder {
     public var _asLayoutValue: LayoutValue {
         return .attribute([asAny()])
     }
 }
 
-extension LayoutAttribute: VerticalLayoutable where A == AttributeType.Vertical, C == ConstraintBuilder, I == UILayoutable {}
-extension LayoutAttribute: HorizontalLayoutable where A: HorizontalLayoutableAttribute, C == ConstraintBuilder, I == UILayoutable {}
+extension LayoutAttribute: VerticalLayoutable where A == AttributeType.Vertical, C == ConstraintBuilder {}
+extension LayoutAttribute: HorizontalLayoutable where A: HorizontalLayoutableAttribute, C == ConstraintBuilder {}
