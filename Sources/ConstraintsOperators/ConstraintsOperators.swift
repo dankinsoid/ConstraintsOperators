@@ -51,12 +51,12 @@ extension ConvienceLayout where B.First == UILayoutable {
 
 extension ConvienceLayout where B.First == [UILayoutable] {
     
-    public subscript(_ attributes: NSLayoutConstraint.Attribute...) -> EdgeAttribute {
+    public subscript(_ attributes: NSLayoutConstraint.Attribute...) -> LayoutAttribute<Void, ConstraintsBuilder> {
         return self[attributes]
     }
     
-    public subscript(_ attributes: [NSLayoutConstraint.Attribute]) -> EdgeAttribute {
-        return EdgeAttribute(type: attributes, item: target)
+    public subscript(_ attributes: [NSLayoutConstraint.Attribute]) -> LayoutAttribute<Void, ConstraintsBuilder> {
+        return LayoutAttribute(type: attributes, item: target)
     }
 }
 
