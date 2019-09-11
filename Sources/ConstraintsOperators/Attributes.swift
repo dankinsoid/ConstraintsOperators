@@ -130,12 +130,20 @@ extension Attributable where B.First == [UILayoutable] {
         return EdgeAttribute(type: edges.attributes, item: target)
     }
     
+    public var size: EdgeAttribute {
+        return EdgeAttribute(type: [.width, .height], item: target)
+    }
+    
 }
 
 extension Attributable where B.First == UILayoutable {
     
     public func edges(_ edges: Edge.Set = .all) -> EdgeAttribute {
         return EdgeAttribute(type: edges.attributes, item: [target])
+    }
+    
+    public var size: EdgeAttribute {
+        return EdgeAttribute(type: [.width, .height], item: [target])
     }
     
 }
