@@ -19,7 +19,7 @@ public enum Edge: Int8, CaseIterable {
         public static let leading = Set(.leading)
         public static let bottom = Set(.bottom)
         public static let trailing = Set(.trailing)
-        public static let all: Edge.Set = [.leading, .trailing, .top, .bottom]
+        public static let all = Edge.Set(Edge.allCases)
         public static let horizontal: Edge.Set = [.leading, .trailing]
         public static let vertical: Edge.Set = [.top, .bottom]
         
@@ -27,6 +27,10 @@ public enum Edge: Int8, CaseIterable {
         
         public init(_ e: Edge) {
             rawValue = e.rawValue
+        }
+        
+        public init(_ e: [Edge]) {
+            self = Edge.Set(e.map(Set.init))
         }
         
         public init(rawValue: Int8) {
