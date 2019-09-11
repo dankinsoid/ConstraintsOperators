@@ -8,27 +8,6 @@
 
 import UIKit
 
-public protocol Attributable {
-    associatedtype B: ConstraintsCreator
-    var target: B.First { get }
-}
-
-public protocol AttributeConvertable {
-    init(_ attribute: NSLayoutConstraint.Attribute)
-}
-
-extension NSLayoutConstraint.Attribute: AttributeConvertable {
-    public init(_ attribute: NSLayoutConstraint.Attribute) {
-        self = attribute
-    }
-}
-
-extension Array: AttributeConvertable where Element == NSLayoutConstraint.Attribute {
-    public init(_ attribute: NSLayoutConstraint.Attribute) {
-        self = [attribute]
-    }
-}
-
 public struct LayoutAttribute<A, C: ConstraintsCreator> {
     var type: C.A
     var item: C.First
@@ -80,6 +59,27 @@ public struct LayoutAttribute<A, C: ConstraintsCreator> {
 public typealias EdgeAttribute = LayoutAttribute<Attributes.Edges, ConstraintsBuilder>
 public typealias SizeAttribute = LayoutAttribute<Attributes.Size, ConstraintsBuilder>
 
+public protocol Attributable {
+    associatedtype B: ConstraintsCreator
+    var target: B.First { get }
+}
+
+public protocol AttributeConvertable {
+    init(_ attribute: NSLayoutConstraint.Attribute)
+}
+
+extension NSLayoutConstraint.Attribute: AttributeConvertable {
+    public init(_ attribute: NSLayoutConstraint.Attribute) {
+        self = attribute
+    }
+}
+
+extension Array: AttributeConvertable where Element == NSLayoutConstraint.Attribute {
+    public init(_ attribute: NSLayoutConstraint.Attribute) {
+        self = [attribute]
+    }
+}
+
 extension Attributable {
     public var width:                LayoutAttribute<Attributes.Size, B> { return LayoutAttribute(type: B.A(.width), item: target) }
     public var height:               LayoutAttribute<Attributes.Size, B> { return LayoutAttribute(type: B.A(.height), item: target) }
@@ -126,6 +126,9 @@ extension Attributable where B.First == [UILayoutable] {
         return SizeAttribute(type: [.width, .height], item: target)
     }
     
+    public var center: LayoutAttribute<Void, ConstraintsBuilder> {
+        return LayoutAttribute(type: [.centerX, .centerY], item: target)
+    }
 }
 
 extension Attributable where B.First == UILayoutable {
@@ -138,7 +141,13 @@ extension Attributable where B.First == UILayoutable {
         return SizeAttribute(type: [.width, .height], item: [target])
     }
     
+    public var center: LayoutAttribute<Void, ConstraintsBuilder> {
+        return LayoutAttribute(type: [.centerX, .centerY], item: [target])
+    }
+    
 }
+
+public protocol CenterXAttributeCompatible {}
 
 public enum Attributes {
     public enum LeadTrail: CenterXAttributeCompatible, HorizontalLayoutableAttribute {}

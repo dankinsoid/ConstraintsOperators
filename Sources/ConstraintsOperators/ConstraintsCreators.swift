@@ -15,6 +15,20 @@ public protocol ConstraintProtocol {
 
 extension NSLayoutConstraint: ConstraintProtocol {}
 
+extension Array: ConstraintProtocol where Element: ConstraintProtocol {
+    
+    public var isActive: Bool {
+        get { return reduce(false, { $0 || $1.isActive }) }
+        nonmutating set { forEach { $0.isActive = newValue } }
+    }
+    
+    public var priority: UILayoutPriority {
+        get { return UILayoutPriority(rawValue: self.reduce(0.0, { Swift.max($0, $1.priority.rawValue) })) }
+        nonmutating set { forEach { $0.priority = newValue } }
+    }
+    
+}
+
 public protocol ConstraintsCreator {
     associatedtype First
     associatedtype Second
@@ -29,7 +43,32 @@ public protocol ConstraintsCreator {
     static func makeToView(item: First, attribute attribute1: A, relatedBy: NSLayoutConstraint.Relation, itemTo: Second?, multiplier: CGFloat, constant: CGFloat) -> Constraint
 }
 
-extension ConstraintsCreator where A == NSLayoutConstraint.Attribute {
+public struct ConstraintBuilder: ConstraintsCreator {
+    
+    public static func make(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, toItem: UILayoutable?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
+        return NSLayoutConstraint(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant)
+    }
+    
+    public static func makeToParent(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
+        return make(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: item.parent, attribute: attribute2, multiplier: multiplier, constant: constant)
+    }
+    
+    public static func makeToView(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, itemTo: UILayoutable?, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
+        return make(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: item, attribute: attribute1, multiplier: multiplier, constant: constant)
+    }
+    
+    public static func constraints(for constraint: NSLayoutConstraint) -> [NSLayoutConstraint] {
+        return ((constraint.firstItem as? UILayoutable)?.constraints ?? []) +
+            ((constraint.secondItem as? UILayoutable)?.constraints ?? [])
+    }
+    
+    public static func array(for constraints: [NSLayoutConstraint]) -> [NSLayoutConstraint] {
+        return constraints
+    }
+    
+    public static func willConflict(_ constraint: NSLayoutConstraint, with other: NSLayoutConstraint) -> Bool {
+        return constraint.willConflict(with: other)
+    }
     
     public static func makeWithOffset(item: First, attribute: NSLayoutConstraint.Attribute, relatedBy relation: NSLayoutConstraint.Relation, multiplier: CGFloat, constant: CGFloat, offset: CGFloat) -> Constraint {
         let result: Constraint
@@ -54,7 +93,7 @@ public struct ConstraintsBuilder: ConstraintsCreator {
         var result: [NSLayoutConstraint] = []
         for first in item {
             for attribute in attribute1 {
-            result.append(NSLayoutConstraint(item: first, attribute: attribute, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant))
+                result.append(NSLayoutConstraint(item: first, attribute: attribute, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant))
             }
         }
         return result
@@ -103,48 +142,6 @@ public struct ConstraintsBuilder: ConstraintsCreator {
             }
         }
         return false
-    }
-    
-}
-
-public struct ConstraintBuilder: ConstraintsCreator {
-    
-    public static func make(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, toItem: UILayoutable?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
-        return NSLayoutConstraint(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant)
-    }
-    
-    public static func makeToParent(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
-        return make(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: item.parent, attribute: attribute2, multiplier: multiplier, constant: constant)
-    }
-    
-    public static func makeToView(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, itemTo: UILayoutable?, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
-        return make(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: item, attribute: attribute1, multiplier: multiplier, constant: constant)
-    }
-    
-    public static func constraints(for constraint: NSLayoutConstraint) -> [NSLayoutConstraint] {
-        return ((constraint.firstItem as? UILayoutable)?.constraints ?? []) +
-            ((constraint.secondItem as? UILayoutable)?.constraints ?? [])
-    }
-    
-    public static func array(for constraints: [NSLayoutConstraint]) -> [NSLayoutConstraint] {
-        return constraints
-    }
-    
-    public static func willConflict(_ constraint: NSLayoutConstraint, with other: NSLayoutConstraint) -> Bool {
-        return constraint.willConflict(with: other)
-    }
-}
-
-extension Array: ConstraintProtocol where Element: ConstraintProtocol {
-    
-    public var isActive: Bool {
-        get { return reduce(false, { $0 || $1.isActive }) }
-        nonmutating set { forEach { $0.isActive = newValue } }
-    }
-    
-    public var priority: UILayoutPriority {
-        get { return UILayoutPriority(rawValue: self.reduce(0.0, { Swift.max($0, $1.priority.rawValue) })) }
-        nonmutating set { forEach { $0.priority = newValue } }
     }
     
 }
