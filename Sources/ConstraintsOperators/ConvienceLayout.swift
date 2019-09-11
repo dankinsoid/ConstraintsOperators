@@ -26,7 +26,7 @@ extension UILayoutable {
     public var layout: ConvienceLayout<ConstraintBuilder> { return ConvienceLayout(self) }
 }
 
-extension Array where Element == UILayoutable {
+extension Array where Element: UILayoutable {
     public var layout: ConvienceLayout<ConstraintsBuilder> { return ConvienceLayout(self) }
 }
 

@@ -36,8 +36,8 @@ public enum Edge: Int8, CaseIterable {
         public init(rawValue: Int8) {
             self.rawValue = rawValue
         }
-        
     }
+    
 }
 #endif
 
