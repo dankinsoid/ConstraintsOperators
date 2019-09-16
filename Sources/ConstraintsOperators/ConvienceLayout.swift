@@ -48,7 +48,12 @@ extension ConvienceLayout where B.First == UILayoutable {
         return LayoutAttribute(type: attributes, item: [target])
     }
     
+    public func ignoreAutoresizingMask() {
+        (target as? UIView)?.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
 }
+
 
 extension ConvienceLayout where B.First == [UILayoutable] {
     
@@ -59,4 +64,9 @@ extension ConvienceLayout where B.First == [UILayoutable] {
     public subscript(_ attributes: [NSLayoutConstraint.Attribute]) -> LayoutAttribute<Void, ConstraintsBuilder> {
         return LayoutAttribute(type: attributes, item: target)
     }
+    
+    public func ignoreAutoresizingMask() {
+        target.compactMap { $0 as? UIView }.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+    }
+    
 }

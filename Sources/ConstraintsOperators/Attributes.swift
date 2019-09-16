@@ -15,6 +15,7 @@ public struct LayoutAttribute<A, C: ConstraintsCreator> {
     var multiplier: CGFloat
     var priority: UILayoutPriority
     var isActive = true
+    var _ignoreSafeArea = false
     
     init(type: C.A, item: C.First, constant: CGFloat = 0, multiplier: CGFloat = 1, priority: UILayoutPriority = .required, isActive: Bool = true) {
         self.type = type
@@ -27,6 +28,10 @@ public struct LayoutAttribute<A, C: ConstraintsCreator> {
     func asAny() -> LayoutAttribute<Void, C> {
         return LayoutAttribute<Void, C>(type: type, item: item, constant: constant, multiplier: multiplier, priority: priority, isActive: isActive)
     }
+    
+//    public var ignoreSafeArea: LayoutAttribute {
+//        return map(\._ignoreSafeArea, true)
+//    }
     
     public func priority(_ _priority: UILayoutPriority) -> LayoutAttribute {
         return map(\.priority, _priority)
