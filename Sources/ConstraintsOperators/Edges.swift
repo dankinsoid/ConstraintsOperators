@@ -8,7 +8,7 @@
 
 import UIKit
 
-public enum Edges: Int8, CaseIterable {
+public enum Edge: Int8, CaseIterable {
     
     case top = 1, leading = 2, bottom = 4, trailing = 8
     

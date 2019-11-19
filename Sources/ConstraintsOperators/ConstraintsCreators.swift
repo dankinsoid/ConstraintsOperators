@@ -54,7 +54,7 @@ public struct ConstraintBuilder: ConstraintsCreator {
     }
     
     public static func makeToView(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, itemTo: UILayoutable?, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
-        return make(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: item, attribute: attribute1, multiplier: multiplier, constant: constant)
+        return make(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: itemTo, attribute: attribute1, multiplier: multiplier, constant: constant)
     }
     
     public static func constraints(for constraint: NSLayoutConstraint) -> [NSLayoutConstraint] {
