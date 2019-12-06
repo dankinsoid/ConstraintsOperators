@@ -9,6 +9,7 @@
 Сreate constraints with simple expressions:
 
 ```swift
+view1.layout.ignoreAutoresizingMask()
 view1.layout.centerX =| view2.layout.centerX + 10
 view1.layout.centerY =| 15
 
@@ -31,6 +32,7 @@ let constraint: NSLayoutConstraint = view1.layout.height.deactivated =| 200
 view1.layout.height =| view1.superview
 view1.layout.centerX =| view2
 ...
+[view1, view2].layout.ignoreAutoresizingMask()
 [view1, view2].layout.height =| 200
 view1.layout[.centerX, .centerY] =| 0
 view1.layout.edges(.vertical) =| 0
