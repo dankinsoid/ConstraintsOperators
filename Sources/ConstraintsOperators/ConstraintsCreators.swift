@@ -33,7 +33,7 @@ public protocol ConstraintsCreator {
     associatedtype First
     associatedtype Second
     associatedtype Constraint: ConstraintProtocol
-    associatedtype A: AttributeConvertable//: ConstraintProtocol
+    associatedtype A: AttributeConvertable
     static func make(item: First, attribute attribute1: A, relatedBy: NSLayoutConstraint.Relation, toItem: Second?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> Constraint
     static func constraints(for constraint: Constraint) -> [NSLayoutConstraint]
     static func array(for constraint: [Constraint]) -> [NSLayoutConstraint]
@@ -46,7 +46,7 @@ public protocol ConstraintsCreator {
 public struct ConstraintBuilder: ConstraintsCreator {
     
     public static func make(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, toItem: UILayoutable?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
-        return NSLayoutConstraint(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant)
+        return NSLayoutConstraint.create(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant)
     }
     
     public static func makeToParent(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
@@ -87,13 +87,12 @@ public struct ConstraintBuilder: ConstraintsCreator {
 }
 
 public struct ConstraintsBuilder: ConstraintsCreator {
-    public typealias A = [NSLayoutConstraint.Attribute]
     
     public static func make(item: [UILayoutable], attribute attribute1: [NSLayoutConstraint.Attribute], relatedBy: NSLayoutConstraint.Relation, toItem: UILayoutable?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> [NSLayoutConstraint] {
         var result: [NSLayoutConstraint] = []
         for first in item {
             for attribute in attribute1 {
-                result.append(NSLayoutConstraint(item: first, attribute: attribute, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant))
+                result.append(NSLayoutConstraint.create(item: first, attribute: attribute, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant))
             }
         }
         return result
@@ -142,6 +141,15 @@ public struct ConstraintsBuilder: ConstraintsCreator {
             }
         }
         return false
+    }
+}
+
+extension NSLayoutConstraint {
+    
+    static func create(item: Any, attribute: Attribute, relatedBy: Relation, toItem: Any?, attribute att1: Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
+        (item as? UIView)?.translatesAutoresizingMaskIntoConstraints = false
+        (toItem as? UIView)?.translatesAutoresizingMaskIntoConstraints = false
+        return NSLayoutConstraint(item: item, attribute: attribute, relatedBy: relatedBy, toItem: toItem, attribute: att1, multiplier: multiplier, constant: constant)
     }
     
 }
