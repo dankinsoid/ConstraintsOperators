@@ -57,7 +57,6 @@ extension NSLayoutConstraint.Relation {
     
 }
 
-
 extension UILayoutable {
     var parent: UILayoutable? {
         if #available(iOS 11.0, *) {
@@ -69,21 +68,4 @@ extension UILayoutable {
     var constraints: [NSLayoutConstraint] {
         return (self as? UIView)?.constraints ?? (self as? UILayoutGuide)?.owningView?.constraints ?? []
     }
-}
-
-extension Array where Element == UILayoutable {
-    
-    var parents: [UILayoutable] {
-        var result: [UILayoutable] = []
-        var ids: Set<ObjectIdentifier> = []
-        for parent in compactMap({ $0.parent }) {
-            let id = ObjectIdentifier(parent)
-            if !ids.contains(id) {
-                ids.insert(id)
-                result.append(parent)
-            }
-        }
-        return result
-    }
-    
 }
