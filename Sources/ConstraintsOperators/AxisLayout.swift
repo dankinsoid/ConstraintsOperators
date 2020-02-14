@@ -246,6 +246,8 @@ fileprivate func set(_ lhs: [LayoutAttribute<Void, ConstraintBuilder>], _ rhs: [
 
 extension UILayoutable {
     
+    fileprivate var layout: ConvienceLayout<ConstraintBuilder> { ConvienceLayout(self) }
+    
     fileprivate func setConstraint(_ axis: NSLayoutConstraint.Axis, number: LayoutValue.Number) -> [NSLayoutConstraint] {
         let att = axis == .vertical ? layout.height : layout.width
         return setConstraint(att, number: number)

@@ -10,35 +10,38 @@ import UIKit
 
 public protocol UILayoutable: class {}
 
-extension UIView: UILayoutable {
+extension UIView: UILayoutable, Attributable {
+    public typealias B = ConstraintBuilder
+    public var target: UILayoutable { self }
+    
     @available(iOS 11.0, *)
-    public var safeAreaLayout: ConvienceLayout<ConstraintBuilder> { return safeAreaLayoutGuide.layout }
+    public var safeArea: UILayoutGuide { safeAreaLayoutGuide }
 }
 
 extension Array where Element: UIView {
     @available(iOS 11.0, *)
-    public var safeAreaLayout: ConvienceLayout<ConstraintsBuilder> { return ConvienceLayout(map({ $0.safeAreaLayoutGuide })) }
+    public var safeArea: [UILayoutGuide] { map({ $0.safeAreaLayoutGuide }) }
 }
 
-extension UILayoutGuide: UILayoutable {}
-
-extension UILayoutable {
-    public var layout: ConvienceLayout<ConstraintBuilder> { return ConvienceLayout(self) }
+extension UILayoutGuide: UILayoutable, Attributable {
+    public typealias B = ConstraintBuilder
+    public var target: UILayoutable { self }
 }
 
-extension Array where Element: UILayoutable {
-    public var layout: ConvienceLayout<ConstraintsBuilder> { return ConvienceLayout(self) }
-}
-
-public struct ConvienceLayout<B: ConstraintsCreator>: Attributable {
-    public let target: B.First
+struct ConvienceLayout<B: ConstraintsCreator>: Attributable {
+    let target: B.First
     
     init(_ item: B.First) {
         target = item
     }
 }
 
-extension ConvienceLayout where B.First == UILayoutable {
+extension Array: Attributable where Element: UILayoutable {
+    public typealias B = ConstraintsBuilder
+    public var target: [UILayoutable] { self }
+}
+
+extension Attributable where B.First == UILayoutable {
     
     public subscript(_ attributes: NSLayoutConstraint.Attribute...) -> LayoutAttribute<Void, ConstraintsBuilder> {
         return self[attributes]
@@ -55,7 +58,7 @@ extension ConvienceLayout where B.First == UILayoutable {
 }
 
 
-extension ConvienceLayout where B.First == [UILayoutable] {
+extension Attributable where B.First == [UILayoutable] {
     
     public subscript(_ attributes: NSLayoutConstraint.Attribute...) -> LayoutAttribute<Void, ConstraintsBuilder> {
         return self[attributes]
