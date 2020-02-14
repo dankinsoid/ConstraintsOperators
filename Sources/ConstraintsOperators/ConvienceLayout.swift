@@ -29,7 +29,7 @@ extension UILayoutGuide: UILayoutable, Attributable {
 }
 
 public struct ConvienceLayout<B: ConstraintsCreator>: Attributable {
-    let target: B.First
+    public let target: B.First
     
     init(_ item: B.First) {
         target = item
