@@ -147,8 +147,8 @@ public struct ConstraintsBuilder: ConstraintsCreator {
 extension NSLayoutConstraint {
     
     static func create(item: Any, attribute: Attribute, relatedBy: Relation, toItem: Any?, attribute att1: Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
-        (item as? UIView)?.translatesAutoresizingMaskIntoConstraints = false
-        (toItem as? UIView)?.translatesAutoresizingMaskIntoConstraints = false
+//        (item as? UIView)?.translatesAutoresizingMaskIntoConstraints = false
+//        (toItem as? UIView)?.translatesAutoresizingMaskIntoConstraints = false
         return NSLayoutConstraint(item: item, attribute: attribute, relatedBy: relatedBy, toItem: toItem, attribute: att1, multiplier: multiplier, constant: constant)
     }
     
