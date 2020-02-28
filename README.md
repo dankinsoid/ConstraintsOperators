@@ -10,7 +10,7 @@
 
 ```swift
 view1.ignoreAutoresizingMask()
-view1.centerX =| view2.layout.centerX + 10
+view1.centerX =| view2.centerX + 10
 view1.centerY =| 15
 
 view1.width <=| 200
@@ -18,7 +18,7 @@ view1.width >=| 100
 //or
 view1.width =| 100...200
 
-view1.height =| view2.layout.height / 2 + 20
+view1.height =| view2.height / 2 + 20
 ...
 view.width =| 100
 view.width =| 200 //automatically replaces previuos width constraint
@@ -37,7 +37,7 @@ view1.centerX =| view2
 view1[.centerX, .centerY] =| 0
 view1.edges(.vertical) =| 0
 ...
-Axis.vertical =| [10, view1, 0..., view2.fixed(200), 0...5, view3.layout.centerY, 10]
+Axis.vertical =| [10, view1, 0..., view2.fixed(200), 0...5, view3.centerY, 10]
 ...
 view1.top =| view1.leading //compile error, you cannot combine incompatible attributes
 ```
