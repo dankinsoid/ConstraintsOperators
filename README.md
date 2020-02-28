@@ -9,37 +9,37 @@
 Сreate constraints with simple expressions:
 
 ```swift
-view1.layout.ignoreAutoresizingMask()
-view1.layout.centerX =| view2.layout.centerX + 10
-view1.layout.centerY =| 15
+view1.ignoreAutoresizingMask()
+view1.centerX =| view2.layout.centerX + 10
+view1.centerY =| 15
 
-view1.layout.width <=| 200
-view1.layout.width >=| 100
+view1.width <=| 200
+view1.width >=| 100
 //or
-view1.layout.width =| 100...200
+view1.width =| 100...200
 
-view1.layout.height =| view2.layout.height / 2 + 20
+view1.height =| view2.layout.height / 2 + 20
 ...
-view.layout.width =| 100
-view.layout.width =| 200 //automatically replaces previuos width constraint
+view.width =| 100
+view.width =| 200 //automatically replaces previuos width constraint
 ...
-view1.layout.height.priority(.defaultLow) =| 0
+view1.height.priority(.defaultLow) =| 0
 ...
-view1.layout.height.priority(900) =| 10
+view1.height.priority(900) =| 10
 ...
-let constraint: NSLayoutConstraint = view1.layout.height.deactivated =| 200
+let constraint: NSLayoutConstraint = view1.height.deactivated =| 200
 ...
-view1.layout.height =| view1.superview
-view1.layout.centerX =| view2
+view1.height =| view1.superview
+view1.centerX =| view2
 ...
-[view1, view2].layout.ignoreAutoresizingMask()
-[view1, view2].layout.height =| 200
-view1.layout[.centerX, .centerY] =| 0
-view1.layout.edges(.vertical) =| 0
+[view1, view2].ignoreAutoresizingMask()
+[view1, view2].height =| 200
+view1[.centerX, .centerY] =| 0
+view1.edges(.vertical) =| 0
 ...
 Axis.vertical =| [10, view1, 0..., view2.fixed(200), 0...5, view3.layout.centerY, 10]
 ...
-view1.layout.top =| view1.layout.leading //compile error, you cannot combine incompatible attributes
+view1.top =| view1.leading //compile error, you cannot combine incompatible attributes
 ```
 
 Supported operators: `=|`, `<=|`, `>=|`
