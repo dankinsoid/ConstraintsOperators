@@ -162,3 +162,56 @@ extension LayoutAttribute where A: CenterXAttributeCompatible {
         return _setup(self, rhs, relation: .greaterThanOrEqual)
     }
 }
+
+extension LayoutAttribute where A == Attributes.Edges {
+    
+    @discardableResult
+    public func equal(to rhs: UIEdgeInsets) -> [C.Constraint] {
+        map(rhs: rhs, operation: { $0.equal(to: $1) })
+    }
+    
+    @discardableResult
+    public func less(than rhs: UIEdgeInsets) -> [C.Constraint] {
+        map(rhs: rhs, operation: { $0.less(than: $1) })
+    }
+    
+    @discardableResult
+    public func greater(than rhs: UIEdgeInsets) -> [C.Constraint] {
+        map(rhs: rhs, operation: { $0.greater(than: $1) })
+    }
+    
+    private func map(rhs: UIEdgeInsets, operation: (LayoutAttribute, CGFloat) -> C.Constraint) -> [C.Constraint] {
+        [
+            operation(type(C.A.init(.leading)), rhs.left),
+            operation(type(C.A.init(.trailing)), rhs.right),
+            operation(type(C.A.init(.top)), rhs.top),
+            operation(type(C.A.init(.bottom)), rhs.bottom)
+        ]
+    }
+    
+}
+
+extension LayoutAttribute where A == Attributes.Size {
+    
+    @discardableResult
+    public func equal(to rhs: CGSize) -> [C.Constraint] {
+        map(rhs: rhs, operation: { $0.equal(to: $1) })
+    }
+    
+    @discardableResult
+    public func less(than rhs: CGSize) -> [C.Constraint] {
+        map(rhs: rhs, operation: { $0.less(than: $1) })
+    }
+    
+    @discardableResult
+    public func greater(than rhs: CGSize) -> [C.Constraint] {
+        map(rhs: rhs, operation: { $0.greater(than: $1) })
+    }
+    
+    private func map(rhs: CGSize, operation: (LayoutAttribute, CGFloat) -> C.Constraint) -> [C.Constraint] {
+        [
+            operation(type(C.A.init(.width)), rhs.width),
+            operation(type(C.A.init(.height)), rhs.height)
+        ]
+    }
+}

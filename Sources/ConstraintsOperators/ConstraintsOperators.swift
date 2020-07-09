@@ -173,6 +173,66 @@ public func >=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: 
     return _setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
+@discardableResult
+public func =|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>, _ rhs: UIEdgeInsets) -> [C.Constraint] {
+    lhs.equal(to: rhs)
+}
+
+@discardableResult
+public func <=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>, _ rhs: UIEdgeInsets) -> [C.Constraint] {
+    lhs.less(than: rhs)
+}
+
+@discardableResult
+public func >=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>, _ rhs: UIEdgeInsets) -> [C.Constraint] {
+    lhs.greater(than: rhs)
+}
+
+@discardableResult
+public func =|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>?, _ rhs: UIEdgeInsets) -> [C.Constraint]? {
+    lhs?.equal(to: rhs)
+}
+
+@discardableResult
+public func <=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>?, _ rhs: UIEdgeInsets) -> [C.Constraint]? {
+    lhs?.less(than: rhs)
+}
+
+@discardableResult
+public func >=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>?, _ rhs: UIEdgeInsets) -> [C.Constraint]? {
+    lhs?.greater(than: rhs)
+}
+
+@discardableResult
+public func =|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Size, C>, _ rhs: CGSize) -> [C.Constraint] {
+    lhs.equal(to: rhs)
+}
+
+@discardableResult
+public func <=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Size, C>, _ rhs: CGSize) -> [C.Constraint] {
+    lhs.less(than: rhs)
+}
+
+@discardableResult
+public func >=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Size, C>, _ rhs: CGSize) -> [C.Constraint] {
+    lhs.greater(than: rhs)
+}
+
+@discardableResult
+public func =|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Size, C>?, _ rhs: CGSize) -> [C.Constraint]? {
+    lhs?.equal(to: rhs)
+}
+
+@discardableResult
+public func <=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Size, C>?, _ rhs: CGSize) -> [C.Constraint]? {
+    lhs?.less(than: rhs)
+}
+
+@discardableResult
+public func >=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Size, C>?, _ rhs: CGSize) -> [C.Constraint]? {
+    lhs?.greater(than: rhs)
+}
+
 public func *<A, C: ConstraintsCreator>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, C>) -> LayoutAttribute<A, C> {
     var result = rhs
     result.multiplier = lhs
