@@ -163,7 +163,7 @@ extension LayoutAttribute where A: CenterXAttributeCompatible {
     }
 }
 
-extension LayoutAttribute where A == Attributes.Edges {
+extension LayoutAttribute where A == Attributes.Edges, C.A == [NSLayoutConstraint.Attribute] {
     
     @discardableResult
     public func equal(to rhs: UIEdgeInsets) -> [C.Constraint] {
@@ -181,12 +181,12 @@ extension LayoutAttribute where A == Attributes.Edges {
     }
     
     private func map(rhs: UIEdgeInsets, operation: (LayoutAttribute, CGFloat) -> C.Constraint) -> [C.Constraint] {
-        [
-            operation(type(C.A.init(.leading)), rhs.left),
-            operation(type(C.A.init(.trailing)), rhs.right),
-            operation(type(C.A.init(.top)), rhs.top),
-            operation(type(C.A.init(.bottom)), rhs.bottom)
-        ]
+        var result: [C.Constraint] = []
+        if type.contains(.leading) { result.append(operation(type(C.A.init(.leading)), rhs.left)) }
+        if type.contains(.trailing) { result.append(operation(type(C.A.init(.trailing)), rhs.right)) }
+        if type.contains(.top) { result.append(operation(type(C.A.init(.top)), rhs.top)) }
+        if type.contains(.bottom) { result.append(operation(type(C.A.init(.bottom)), rhs.bottom)) }
+        return result
     }
     
 }

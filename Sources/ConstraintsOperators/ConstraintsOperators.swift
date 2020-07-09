@@ -174,32 +174,32 @@ public func >=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: 
 }
 
 @discardableResult
-public func =|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>, _ rhs: UIEdgeInsets) -> [C.Constraint] {
+public func =|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>, _ rhs: UIEdgeInsets) -> [C.Constraint] where C.A == [NSLayoutConstraint.Attribute] {
     lhs.equal(to: rhs)
 }
 
 @discardableResult
-public func <=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>, _ rhs: UIEdgeInsets) -> [C.Constraint] {
+public func <=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>, _ rhs: UIEdgeInsets) -> [C.Constraint] where C.A == [NSLayoutConstraint.Attribute] {
     lhs.less(than: rhs)
 }
 
 @discardableResult
-public func >=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>, _ rhs: UIEdgeInsets) -> [C.Constraint] {
+public func >=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>, _ rhs: UIEdgeInsets) -> [C.Constraint] where C.A == [NSLayoutConstraint.Attribute] {
     lhs.greater(than: rhs)
 }
 
 @discardableResult
-public func =|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>?, _ rhs: UIEdgeInsets) -> [C.Constraint]? {
+public func =|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>?, _ rhs: UIEdgeInsets) -> [C.Constraint]? where C.A == [NSLayoutConstraint.Attribute] {
     lhs?.equal(to: rhs)
 }
 
 @discardableResult
-public func <=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>?, _ rhs: UIEdgeInsets) -> [C.Constraint]? {
+public func <=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>?, _ rhs: UIEdgeInsets) -> [C.Constraint]? where C.A == [NSLayoutConstraint.Attribute] {
     lhs?.less(than: rhs)
 }
 
 @discardableResult
-public func >=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>?, _ rhs: UIEdgeInsets) -> [C.Constraint]? {
+public func >=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>?, _ rhs: UIEdgeInsets) -> [C.Constraint]? where C.A == [NSLayoutConstraint.Attribute] {
     lhs?.greater(than: rhs)
 }
 
