@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name             = 'ConstraintsOperators'
-s.version          = '2.3.4'
+s.version          = '2.3.5'
 s.summary          = 'A short description of ConstraintsOperators.'
 
 s.description      = <<-DESC
