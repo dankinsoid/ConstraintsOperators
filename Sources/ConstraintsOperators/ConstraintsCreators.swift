@@ -43,17 +43,17 @@ public protocol ConstraintsCreator {
     static func makeToView(item: First, attribute attribute1: A, relatedBy: NSLayoutConstraint.Relation, itemTo: Second?, multiplier: CGFloat, constant: CGFloat) -> Constraint
 }
 
-public struct ConstraintBuilder: ConstraintsCreator {
+public struct ConstraintBuilder<L: UILayoutable>: ConstraintsCreator {
     
-    public static func make(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, toItem: UILayoutable?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
+	public static func make(item: L, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, toItem: AnyLayoutable?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
         return NSLayoutConstraint.create(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant)
     }
     
-    public static func makeToParent(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
+    public static func makeToParent(item: L, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
         return make(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: item.parent, attribute: attribute2, multiplier: multiplier, constant: constant)
     }
     
-    public static func makeToView(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, itemTo: UILayoutable?, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
+    public static func makeToView(item: L, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, itemTo: AnyLayoutable?, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint {
         return make(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: itemTo, attribute: attribute1, multiplier: multiplier, constant: constant)
     }
     
@@ -70,7 +70,7 @@ public struct ConstraintBuilder: ConstraintsCreator {
         return constraint.willConflict(with: other)
     }
     
-    public static func makeWithOffset(item: UILayoutable, attribute: NSLayoutConstraint.Attribute, relatedBy relation: NSLayoutConstraint.Relation, multiplier: CGFloat, constant: CGFloat, offset: CGFloat) -> NSLayoutConstraint {
+    public static func makeWithOffset(item: L, attribute: NSLayoutConstraint.Attribute, relatedBy relation: NSLayoutConstraint.Relation, multiplier: CGFloat, constant: CGFloat, offset: CGFloat) -> NSLayoutConstraint {
         let result: Constraint
         switch attribute {
         case .width, .height:
@@ -120,14 +120,14 @@ public struct ConstraintsBuilder: ConstraintsCreator {
         var result: [NSLayoutConstraint] = []
         item.forEach {
             for a in attribute {
-                result.append(ConstraintBuilder.makeWithOffset(item: $0, attribute: a, relatedBy: relation, multiplier: multiplier, constant: constant, offset: offset))
+							result.append(ConstraintBuilder.makeWithOffset(item: $0.any, attribute: a, relatedBy: relation, multiplier: multiplier, constant: constant, offset: offset))
             }
         }
         return result
     }
     
     public static func constraints(for constraint: [NSLayoutConstraint]) -> [NSLayoutConstraint] {
-        return Array(constraint.map(ConstraintBuilder.constraints).joined())
+        return Array(constraint.map(ConstraintBuilder<AnyLayoutable>.constraints).joined())
     }
     
     public static func array(for constraints: [[NSLayoutConstraint]]) -> [NSLayoutConstraint] {
@@ -142,6 +142,15 @@ public struct ConstraintsBuilder: ConstraintsCreator {
         }
         return false
     }
+}
+
+public struct AnyLayoutable: UILayoutable {
+	public var itemForConstraint: Any { item.itemForConstraint }
+	public var item: UILayoutable
+}
+
+extension UILayoutable {
+	var any: AnyLayoutable { AnyLayoutable(item: self) }
 }
 
 extension NSLayoutConstraint {

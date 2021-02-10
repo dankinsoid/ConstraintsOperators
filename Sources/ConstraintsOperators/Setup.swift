@@ -26,12 +26,12 @@ func setup<A, D, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttr
     return result
 }
 
-func _setup<A, C: ConstraintsCreator>(_ lhs: LayoutAttribute<A, C>?, _ rhs: C.Second?, relation: NSLayoutConstraint.Relation) -> C.Constraint? where C.Second == UILayoutable {
+func _setup<A, C: ConstraintsCreator>(_ lhs: LayoutAttribute<A, C>?, _ rhs: C.Second?, relation: NSLayoutConstraint.Relation) -> C.Constraint? where C.Second: UILayoutable {
     guard let l = lhs, let r = rhs else { return nil }
     return setup(l, r, relation: relation)
 }
 
-func setup<A, C: ConstraintsCreator>(_ lhs: LayoutAttribute<A, C>, _ rhs: C.Second, relation: NSLayoutConstraint.Relation) -> C.Constraint where C.Second == UILayoutable {
+func setup<A, C: ConstraintsCreator>(_ lhs: LayoutAttribute<A, C>, _ rhs: C.Second, relation: NSLayoutConstraint.Relation) -> C.Constraint where C.Second: UILayoutable {
     let result = C.makeToView(item: lhs.item, attribute: lhs.type, relatedBy: relation, itemTo: rhs, multiplier: 1 / lhs.multiplier, constant: -lhs.constant)
     result.priority = lhs.priority
     let active = lhs.isActive

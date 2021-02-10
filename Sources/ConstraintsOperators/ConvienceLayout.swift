@@ -23,8 +23,8 @@ extension UILayoutable {
 }
 
 extension UIView: UILayoutable, Attributable {
-    public typealias B = ConstraintBuilder
-    public var target: UILayoutable { self }
+    public typealias B = ConstraintBuilder<UIView>
+    public var target: UIView { self }
 		public var itemForConstraint: Any { self }
     
     @available(iOS 11.0, *)
@@ -37,8 +37,8 @@ extension Array where Element: UIView {
 }
 
 extension UILayoutGuide: UILayoutable, Attributable {
-    public typealias B = ConstraintBuilder
-    public var target: UILayoutable { self }
+	public typealias B = ConstraintBuilder<UILayoutGuide>
+    public var target: UILayoutGuide { self }
 		public var itemForConstraint: Any { self }
 }
 
@@ -56,7 +56,7 @@ extension Array: Attributable where Element: UILayoutable {
     public var target: [UILayoutable] { self }
 }
 
-extension Attributable where B.First == UILayoutable {
+extension Attributable where B.First: UILayoutable {
     
     public subscript(_ attributes: NSLayoutConstraint.Attribute...) -> LayoutAttribute<Void, ConstraintsBuilder> {
         return self[attributes]

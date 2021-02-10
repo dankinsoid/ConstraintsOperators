@@ -68,7 +68,7 @@ extension LayoutAttribute {
 	
 }
 
-extension LayoutAttribute where C.Second == UILayoutable {
+extension LayoutAttribute where C.Second: UILayoutable {
 	
 	public func equal(to rhs: C.Second) -> ConstraintWrapper<C> {
 		ConstraintWrapper<C>(setup(deactivated, rhs, relation: .equal), item: item)

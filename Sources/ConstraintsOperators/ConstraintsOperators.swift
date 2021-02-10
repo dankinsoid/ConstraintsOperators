@@ -18,7 +18,7 @@ public func =|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAtt
 }
 
 @discardableResult
-public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: C.Second) -> C.Constraint where C.Second == UILayoutable {
+public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: C.Second) -> C.Constraint where C.Second: UILayoutable {
     return setup(lhs, rhs, relation: .equal)
 }
 
@@ -54,7 +54,7 @@ public func =|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAtt
 }
 
 @discardableResult
-public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: C.Second?) -> C.Constraint? where C.Second == UILayoutable {
+public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: C.Second?) -> C.Constraint? where C.Second: UILayoutable {
     return _setup(lhs, rhs, relation: .equal)
 }
 
@@ -74,12 +74,12 @@ public func =|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: C
 }
 
 @discardableResult
-public func <=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: LayoutAttribute<T, K>) -> C.Constraint where C.Second == K.First, C.Second == UILayoutable, K.A == NSLayoutConstraint.Attribute {
+public func <=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: LayoutAttribute<T, K>) -> C.Constraint where C.Second == K.First, C.Second: UILayoutable, K.A == NSLayoutConstraint.Attribute {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
 @discardableResult
-public func <=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: C.Second) -> C.Constraint where C.Second == UILayoutable {
+public func <=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: C.Second) -> C.Constraint where C.Second: UILayoutable {
     return setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
@@ -104,7 +104,7 @@ public func <=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAt
 }
 
 @discardableResult
-public func <=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: C.Second?) -> C.Constraint? where C.Second == UILayoutable {
+public func <=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: C.Second?) -> C.Constraint? where C.Second: UILayoutable {
     return _setup(lhs, rhs, relation: .lessThanOrEqual)
 }
 
@@ -129,7 +129,7 @@ public func >=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAt
 }
 
 @discardableResult
-public func >=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: C.Second) -> C.Constraint where C.Second == UILayoutable {
+public func >=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>, _ rhs: C.Second) -> C.Constraint where C.Second: UILayoutable {
     return setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
@@ -154,7 +154,7 @@ public func >=|<T, C: ConstraintsCreator, K: ConstraintsCreator>(_ lhs: LayoutAt
 }
 
 @discardableResult
-public func >=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: C.Second?) -> C.Constraint? where C.Second == UILayoutable {
+public func >=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: C.Second?) -> C.Constraint? where C.Second: UILayoutable {
     return _setup(lhs, rhs, relation: .greaterThanOrEqual)
 }
 
