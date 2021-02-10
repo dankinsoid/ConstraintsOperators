@@ -59,10 +59,52 @@ extension UIView {
 			}
 			
 			@frozen
-			public enum Direction {
+			public enum Direction: UInt8, CaseIterable {
 				case hugging, compression
 			}
+			
+			public struct DirectionSet: OptionSet {
+				public var rawValue: UInt8
+				public var directions: [Direction] {
+					Direction.allCases.filter { contains(DirectionSet($0)) }
+				}
+				
+				public init(rawValue: UInt8) {
+					self.rawValue = rawValue
+				}
+				
+				public init(_ direction: Direction) {
+					rawValue = direction.rawValue
+				}
+				
+				public static var hugging: DirectionSet { DirectionSet(.hugging) }
+				public static var compression: DirectionSet { DirectionSet(.compression) }
+				public static var both: DirectionSet { [.hugging, .compression] }
+			}
 		}
+	}
+	
+}
+
+extension NSLayoutConstraint {
+	
+	public struct AxisSet: OptionSet {
+		public var rawValue: Int
+		public var axis: [Axis] {
+			[Axis.vertical, Axis.horizontal].filter { contains(AxisSet($0)) }
+		}
+		
+		public init(rawValue: Int) {
+			self.rawValue = rawValue
+		}
+		
+		public init(_ direction: Axis) {
+			rawValue = direction.rawValue
+		}
+		
+		public static var vertical: AxisSet { AxisSet(.vertical) }
+		public static var horizontal: AxisSet { AxisSet(.horizontal) }
+		public static var both: AxisSet { [.horizontal, .vertical] }
 	}
 	
 }

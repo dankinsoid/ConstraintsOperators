@@ -10,208 +10,210 @@ import UIKit
 
 extension LayoutAttribute {
     
-    @discardableResult
-    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<A, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return setup(self, rhs, relation: .equal)
+    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<A, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+			ConstraintWrapper<C>(setup(deactivated, rhs, relation: .equal), item: item)
     }
     
-    @discardableResult
-    public func equal(to rhs: CGFloat) -> C.Constraint {
-        return setup(self, rhs, relation: .equal)
+    public func equal(to rhs: CGFloat) -> ConstraintWrapper<C> {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .equal), item: item)
     }
     
-    @discardableResult
-    public func within(_ rhs: ClosedRange<CGFloat>) -> [NSLayoutConstraint] {
-        return C.array(for: [setup(self, rhs.lowerBound, relation: .greaterThanOrEqual), setup(self, rhs.upperBound, relation: .lessThanOrEqual)])
+	  public func within(_ rhs: ClosedRange<CGFloat>) -> ConstraintWrapper<C> where C.Constraint == NSLayoutConstraint {
+        ConstraintWrapper<C>(C.array(for: [setup(deactivated, rhs.lowerBound, relation: .greaterThanOrEqual), setup(deactivated, rhs.upperBound, relation: .lessThanOrEqual)]), item: item)
     }
     
-    @discardableResult
-    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<A, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return _setup(self, rhs, relation: .equal)
+    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<A, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+			_setup(deactivated, rhs, relation: .equal).map { ConstraintWrapper<C>($0, item: item) }
     }
     
-    @discardableResult
-    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return setup(self, rhs, relation: .lessThanOrEqual)
+    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
     }
     
-    @discardableResult
-    public func less(than rhs: CGFloat) -> C.Constraint {
-        return setup(self, rhs, relation: .lessThanOrEqual)
+    public func less(than rhs: CGFloat) -> ConstraintWrapper<C> {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
     }
     
-    @discardableResult
-    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return _setup(self, rhs, relation: .lessThanOrEqual)
+    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+			_setup(deactivated, rhs, relation: .lessThanOrEqual).map { ConstraintWrapper<C>($0, item: item) }
     }
     
-    @discardableResult
-    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return setup(self, rhs, relation: .greaterThanOrEqual)
+    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
     }
     
-    @discardableResult
-    public func greater(than rhs: CGFloat) -> C.Constraint {
-        return setup(self, rhs, relation: .greaterThanOrEqual)
+    public func greater(than rhs: CGFloat) -> ConstraintWrapper<C> {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
     }
     
-    @discardableResult
-    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return _setup(self, rhs, relation: .greaterThanOrEqual)
+    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+			_setup(deactivated, rhs, relation: .greaterThanOrEqual).map { ConstraintWrapper<C>($0, item: item) }
     }
 
 }
 
 extension LayoutAttribute where C.Second == UILayoutable {
     
-    @discardableResult
-    public func equal(to rhs: C.Second) -> C.Constraint {
-        return setup(self, rhs, relation: .equal)
+    public func equal(to rhs: C.Second) -> ConstraintWrapper<C> {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .equal), item: item)
     }
 
-    @discardableResult
-    public func equal(to rhs: C.Second?) -> C.Constraint? {
-        return _setup(self, rhs, relation: .equal)
+    public func equal(to rhs: C.Second?) -> ConstraintWrapper<C>? {
+			_setup(deactivated, rhs, relation: .equal).map { ConstraintWrapper<C>($0, item: item) }
     }
     
-    @discardableResult
-    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return setup(self, rhs, relation: .lessThanOrEqual)
+    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
     }
     
-    @discardableResult
-    public func less(than rhs: C.Second) -> C.Constraint {
-        return setup(self, rhs, relation: .lessThanOrEqual)
+    public func less(than rhs: C.Second) -> ConstraintWrapper<C> {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
     }
 
-    @discardableResult
-    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return setup(self, rhs, relation: .greaterThanOrEqual)
+    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
     }
     
-    @discardableResult
-    public func greater(than rhs: C.Second) -> C.Constraint {
-        return setup(self, rhs, relation: .greaterThanOrEqual)
+    public func greater(than rhs: C.Second) -> ConstraintWrapper<C> {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
     }
     
 }
 
 extension LayoutAttribute where A == Attributes.CenterX {
 
-    @discardableResult
-    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<A, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return setup(self, rhs, relation: .equal)
+    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<A, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .equal), item: item)
     }
 
-    @discardableResult
-    public func equal<T: CenterXAttributeCompatible, K: ConstraintsCreator>(to rhs: LayoutAttribute<T, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return _setup(self, rhs, relation: .equal)
+    public func equal<T: CenterXAttributeCompatible, K: ConstraintsCreator>(to rhs: LayoutAttribute<T, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+			_setup(deactivated, rhs, relation: .equal).map { ConstraintWrapper<C>($0, item: item) }
     }
     
-    @discardableResult
-    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return setup(self, rhs, relation: .lessThanOrEqual)
+    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
     }
     
-    @discardableResult
-    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return _setup(self, rhs, relation: .lessThanOrEqual)
+    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
     }
     
-    @discardableResult
-    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return setup(self, rhs, relation: .greaterThanOrEqual)
+    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
     }
     
-    @discardableResult
-    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return _setup(self, rhs, relation: .greaterThanOrEqual)
+    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
     }
     
 }
 
 extension LayoutAttribute where A: CenterXAttributeCompatible {
     
-    @discardableResult
-    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<Attributes.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return setup(self, rhs, relation: .equal)
+    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<Attributes.CenterX, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .equal), item: item)
     }
     
-    @discardableResult
-    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<Attributes.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return _setup(self, rhs, relation: .equal)
+    public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<Attributes.CenterX, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .equal), item: item)
     }
     
-    @discardableResult
-    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return setup(self, rhs, relation: .lessThanOrEqual)
+    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
     }
     
-    @discardableResult
-    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return _setup(self, rhs, relation: .lessThanOrEqual)
+    public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
     }
     
-    @discardableResult
-    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>) -> C.Constraint where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return setup(self, rhs, relation: .greaterThanOrEqual)
+    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
     }
     
-    @discardableResult
-    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>?) -> C.Constraint? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-        return _setup(self, rhs, relation: .greaterThanOrEqual)
+    public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+        ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
     }
 }
 
 extension LayoutAttribute where A == Attributes.Edges, C.A == [NSLayoutConstraint.Attribute] {
     
-    @discardableResult
-    public func equal(to rhs: UIEdgeInsets) -> [C.Constraint] {
-        map(rhs: rhs, operation: { $0.equal(to: $1) })
+    public func equal(to rhs: UIEdgeInsets) -> ConstraintWrapper<C> {
+			map(rhs: rhs, operation: { $0.equal(to: $1).constraints })
     }
     
-    @discardableResult
-    public func less(than rhs: UIEdgeInsets) -> [C.Constraint] {
-        map(rhs: rhs, operation: { $0.less(than: $1) })
+    public func less(than rhs: UIEdgeInsets) -> ConstraintWrapper<C> {
+			map(rhs: rhs, operation: { $0.less(than: $1).constraints })
     }
     
-    @discardableResult
-    public func greater(than rhs: UIEdgeInsets) -> [C.Constraint] {
-        map(rhs: rhs, operation: { $0.greater(than: $1) })
+    public func greater(than rhs: UIEdgeInsets) -> ConstraintWrapper<C> {
+			map(rhs: rhs, operation: { $0.greater(than: $1).constraints })
     }
     
-    private func map(rhs: UIEdgeInsets, operation: (LayoutAttribute, CGFloat) -> C.Constraint) -> [C.Constraint] {
-        var result: [C.Constraint] = []
-        if type.contains(.leading) { result.append(operation(type(C.A.init(.leading)), rhs.left)) }
-        if type.contains(.trailing) { result.append(operation(type(C.A.init(.trailing)), rhs.right)) }
-        if type.contains(.top) { result.append(operation(type(C.A.init(.top)), rhs.top)) }
-        if type.contains(.bottom) { result.append(operation(type(C.A.init(.bottom)), rhs.bottom)) }
-        return result
+	private func map(rhs: UIEdgeInsets, operation: (LayoutAttribute, CGFloat) -> [C.Constraint]) -> ConstraintWrapper<C> {
+			var result: [C.Constraint] = []
+			if type.contains(.leading) { result.append(contentsOf: operation(type(C.A.init(.leading)).deactivated, rhs.left)) }
+			if type.contains(.trailing) { result.append(contentsOf: operation(type(C.A.init(.trailing)).deactivated, rhs.right)) }
+			if type.contains(.top) { result.append(contentsOf: operation(type(C.A.init(.top)).deactivated, rhs.top)) }
+			if type.contains(.bottom) { result.append(contentsOf: operation(type(C.A.init(.bottom)).deactivated, rhs.bottom)) }
+			return ConstraintWrapper<C>(result, item: item)
     }
     
 }
 
 extension LayoutAttribute where A == Attributes.Size {
     
-    @discardableResult
-    public func equal(to rhs: CGSize) -> [C.Constraint] {
-        map(rhs: rhs, operation: { $0.equal(to: $1) })
+    public func equal(to rhs: CGSize) -> ConstraintWrapper<C> {
+			map(rhs: rhs, operation: { $0.equal(to: $1).constraints })
     }
     
-    @discardableResult
-    public func less(than rhs: CGSize) -> [C.Constraint] {
-        map(rhs: rhs, operation: { $0.less(than: $1) })
+    public func less(than rhs: CGSize) -> ConstraintWrapper<C> {
+			map(rhs: rhs, operation: { $0.less(than: $1).constraints })
     }
     
-    @discardableResult
-    public func greater(than rhs: CGSize) -> [C.Constraint] {
-        map(rhs: rhs, operation: { $0.greater(than: $1) })
+    public func greater(than rhs: CGSize) -> ConstraintWrapper<C> {
+			map(rhs: rhs, operation: { $0.greater(than: $1).constraints })
     }
     
-    private func map(rhs: CGSize, operation: (LayoutAttribute, CGFloat) -> C.Constraint) -> [C.Constraint] {
-        [
-            operation(type(C.A.init(.width)), rhs.width),
-            operation(type(C.A.init(.height)), rhs.height)
-        ]
+		private func map(rhs: CGSize, operation: (LayoutAttribute, CGFloat) -> [C.Constraint]) -> ConstraintWrapper<C> {
+			ConstraintWrapper<C>(
+				operation(type(C.A.init(.width)).deactivated, rhs.width) +
+				operation(type(C.A.init(.height)).deactivated, rhs.height),
+				item: item
+			)
     }
+}
+
+public struct ConstraintWrapper<B: ConstraintsCreator>: Attributable {
+	public let constraints: [B.Constraint]
+	public let target: B.First
+	
+	init(_ constraint: B.Constraint, item target: B.First) {
+		self.constraints = [constraint]
+		self.target = target
+	}
+	
+	init(_ constraints: [B.Constraint], item target: B.First) {
+		self.constraints = constraints
+		self.target = target
+	}
+	
+	init?(_ constraint: B.Constraint?, item target: B.First) {
+		guard let c = constraint else { return nil }
+		self.constraints = [c]
+		self.target = target
+	}
+	
+	init?(_ constraints: [B.Constraint]?, item target: B.First) {
+		guard let c = constraints else { return nil }
+		self.constraints = c
+		self.target = target
+	}
+	
+	public var isActive: Bool {
+		get { constraints.isActive }
+		nonmutating set {
+			constraints.isActive = newValue
+		}
+	}
+	
 }

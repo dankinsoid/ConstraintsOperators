@@ -16,7 +16,7 @@ public protocol ConstraintProtocol {
 extension NSLayoutConstraint: ConstraintProtocol {}
 
 extension Array: ConstraintProtocol where Element: ConstraintProtocol {
-    
+	
     public var isActive: Bool {
         get { return reduce(false, { $0 || $1.isActive }) }
         nonmutating set { forEach { $0.isActive = newValue } }
