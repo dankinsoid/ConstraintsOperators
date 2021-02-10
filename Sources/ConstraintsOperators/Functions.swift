@@ -51,7 +51,7 @@ extension LayoutAttribute {
 	}
 	
 	public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
+		rhs.map(less)
 	}
 	
 	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
@@ -63,7 +63,7 @@ extension LayoutAttribute {
 	}
 	
 	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
+		rhs.map(greater)
 	}
 	
 }
@@ -127,7 +127,7 @@ extension LayoutAttribute where A == Attributes.CenterX {
 	}
 	
 	public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
+		rhs.map(less)
 	}
 	
 	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
@@ -135,7 +135,7 @@ extension LayoutAttribute where A == Attributes.CenterX {
 	}
 	
 	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
+		rhs.map(greater)
 	}
 	
 }
@@ -151,7 +151,7 @@ extension LayoutAttribute where A: CenterXAttributeCompatible {
 	}
 	
 	public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<Attributes.CenterX, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .equal), item: item)
+		rhs.map(equal)
 	}
 	
 	public subscript<K: ConstraintsCreator>(to rhs: LayoutAttribute<Attributes.CenterX, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
@@ -163,7 +163,7 @@ extension LayoutAttribute where A: CenterXAttributeCompatible {
 	}
 	
 	public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
+		rhs.map(less)
 	}
 	
 	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
@@ -171,14 +171,14 @@ extension LayoutAttribute where A: CenterXAttributeCompatible {
 	}
 	
 	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
+		rhs.map(greater)
 	}
 }
 
 extension LayoutAttribute where A == Attributes.Edges, C.A == [NSLayoutConstraint.Attribute] {
 	
 	public func equal(to rhs: UIEdgeInsets) -> ConstraintWrapper<C> {
-		map(rhs: rhs, operation: { $0.equal(to: $1).constraints })
+		map(rhs: rhs, operation: { $0.equal(to: $1) })
 	}
 	
 	public subscript(to rhs: UIEdgeInsets) -> ConstraintWrapper<C> {
@@ -186,20 +186,22 @@ extension LayoutAttribute where A == Attributes.Edges, C.A == [NSLayoutConstrain
 	}
 	
 	public func less(than rhs: UIEdgeInsets) -> ConstraintWrapper<C> {
-		map(rhs: rhs, operation: { $0.less(than: $1).constraints })
+		map(rhs: rhs, operation: { $0.less(than: $1) })
 	}
 	
 	public func greater(than rhs: UIEdgeInsets) -> ConstraintWrapper<C> {
-		map(rhs: rhs, operation: { $0.greater(than: $1).constraints })
+		map(rhs: rhs, operation: { $0.greater(than: $1) })
 	}
 	
-	private func map(rhs: UIEdgeInsets, operation: (LayoutAttribute, CGFloat) -> [C.Constraint]) -> ConstraintWrapper<C> {
-		var result: [C.Constraint] = []
-		if type.contains(.leading) { result.append(contentsOf: operation(type(C.A.init(.leading)), rhs.left)) }
-		if type.contains(.trailing) { result.append(contentsOf: operation(type(C.A.init(.trailing)), rhs.right)) }
-		if type.contains(.top) { result.append(contentsOf: operation(type(C.A.init(.top)), rhs.top)) }
-		if type.contains(.bottom) { result.append(contentsOf: operation(type(C.A.init(.bottom)), rhs.bottom)) }
-		return ConstraintWrapper<C>(result, item: item)
+	private func map(rhs: UIEdgeInsets, operation: @escaping (LayoutAttribute, CGFloat) -> ConstraintWrapper<C>) -> ConstraintWrapper<C> {
+		return ConstraintWrapper<C>({
+			var result: [C.Constraint] = []
+			if type.contains(.leading) { result.append(contentsOf: operation(type(C.A.init(.leading)), rhs.left).constraints()) }
+			if type.contains(.trailing) { result.append(contentsOf: operation(type(C.A.init(.trailing)), rhs.right).constraints()) }
+			if type.contains(.top) { result.append(contentsOf: operation(type(C.A.init(.top)), rhs.top).constraints()) }
+			if type.contains(.bottom) { result.append(contentsOf: operation(type(C.A.init(.bottom)), rhs.bottom).constraints()) }
+			return result
+		}, item: item)
 	}
 	
 }
@@ -207,7 +209,7 @@ extension LayoutAttribute where A == Attributes.Edges, C.A == [NSLayoutConstrain
 extension LayoutAttribute where A == Attributes.Size {
 	
 	public func equal(to rhs: CGSize) -> ConstraintWrapper<C> {
-		map(rhs: rhs, operation: { $0.equal(to: $1).constraints })
+		map(rhs: rhs, operation: { $0.equal(to: $1) })
 	}
 	
 	public subscript(to rhs: CGSize) -> ConstraintWrapper<C> {
@@ -215,52 +217,46 @@ extension LayoutAttribute where A == Attributes.Size {
 	}
 	
 	public func less(than rhs: CGSize) -> ConstraintWrapper<C> {
-		map(rhs: rhs, operation: { $0.less(than: $1).constraints })
+		map(rhs: rhs, operation: { $0.less(than: $1) })
 	}
 	
 	public func greater(than rhs: CGSize) -> ConstraintWrapper<C> {
-		map(rhs: rhs, operation: { $0.greater(than: $1).constraints })
+		map(rhs: rhs, operation: { $0.greater(than: $1) })
 	}
 	
-	private func map(rhs: CGSize, operation: (LayoutAttribute, CGFloat) -> [C.Constraint]) -> ConstraintWrapper<C> {
-		ConstraintWrapper<C>(
-			operation(type(C.A.init(.width)).deactivated, rhs.width) +
-				operation(type(C.A.init(.height)).deactivated, rhs.height),
+	private func map(rhs: CGSize, operation: @escaping (LayoutAttribute, CGFloat) -> ConstraintWrapper<C>) -> ConstraintWrapper<C> {
+		ConstraintWrapper<C>({
+				operation(type(C.A.init(.width)).deactivated, rhs.width).constraints() +
+				operation(type(C.A.init(.height)).deactivated, rhs.height).constraints()
+		},
 			item: item
 		)
 	}
 }
 
 public struct ConstraintWrapper<B: ConstraintsCreator>: Attributable {
-	public let constraints: [B.Constraint]
+	public let constraints: () -> [B.Constraint]
 	public let target: B.First
 	
-	init(_ constraint: B.Constraint, item target: B.First) {
-		self.constraints = [constraint]
+	init(_ constraint: @autoclosure @escaping () -> B.Constraint, item target: B.First) {
+		self.constraints = { [constraint()] }
 		self.target = target
 	}
 	
-	init(_ constraints: [B.Constraint], item target: B.First) {
+	init(_ constraints: @autoclosure @escaping () -> [B.Constraint], item target: B.First) {
 		self.constraints = constraints
 		self.target = target
 	}
 	
-	init?(_ constraint: B.Constraint?, item target: B.First) {
-		guard let c = constraint else { return nil }
-		self.constraints = [c]
-		self.target = target
-	}
-	
-	init?(_ constraints: [B.Constraint]?, item target: B.First) {
-		guard let c = constraints else { return nil }
-		self.constraints = c
+	init(_ constraints: @escaping () -> [B.Constraint], item target: B.First) {
+		self.constraints = constraints
 		self.target = target
 	}
 	
 	public var isActive: Bool {
-		get { constraints.isActive }
+		get { constraints().isActive }
 		nonmutating set {
-			constraints.isActive = newValue
+			constraints().isActive = newValue
 		}
 	}
 	
