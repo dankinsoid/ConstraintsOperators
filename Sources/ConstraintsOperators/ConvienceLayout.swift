@@ -8,7 +8,9 @@
 
 import UIKit
 
-public protocol UILayoutable: class, UILayoutableArray {}
+public protocol UILayoutable: UILayoutableArray {
+	var itemForConstraint: Any { get }
+}
 
 public protocol UILayoutableArray {
 	func asLayoutableArray() -> [UILayoutable]
@@ -23,6 +25,7 @@ extension UILayoutable {
 extension UIView: UILayoutable, Attributable {
     public typealias B = ConstraintBuilder
     public var target: UILayoutable { self }
+		public var itemForConstraint: Any { self }
     
     @available(iOS 11.0, *)
     public var safeArea: UILayoutGuide { safeAreaLayoutGuide }
@@ -36,6 +39,7 @@ extension Array where Element: UIView {
 extension UILayoutGuide: UILayoutable, Attributable {
     public typealias B = ConstraintBuilder
     public var target: UILayoutable { self }
+		public var itemForConstraint: Any { self }
 }
 
 public struct ConvienceLayout<B: ConstraintsCreator>: Attributable {

@@ -265,3 +265,13 @@ public struct ConstraintWrapper<B: ConstraintsCreator>: Attributable {
 	}
 	
 }
+
+extension ConstraintWrapper: UILayoutableArray where B.First: UILayoutableArray {
+	public func asLayoutableArray() -> [UILayoutable] {
+		target.asLayoutableArray()
+	}
+}
+
+extension ConstraintWrapper: UILayoutable where B.First: UILayoutable {
+	public var itemForConstraint: Any { target.itemForConstraint }
+}

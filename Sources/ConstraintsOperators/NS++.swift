@@ -60,12 +60,12 @@ extension NSLayoutConstraint.Relation {
 extension UILayoutable {
     var parent: UILayoutable? {
         if #available(iOS 11.0, *) {
-            return (self as? UIView)?.superview?.safeAreaLayoutGuide
+            return (itemForConstraint as? UIView)?.superview?.safeAreaLayoutGuide
         } else {
-            return (self as? UIView)?.superview
+            return (itemForConstraint as? UIView)?.superview
         }
     }
     var constraints: [NSLayoutConstraint] {
-        return (self as? UIView)?.constraints ?? (self as? UILayoutGuide)?.owningView?.constraints ?? []
+        return (itemForConstraint as? UIView)?.constraints ?? (self as? UILayoutGuide)?.owningView?.constraints ?? []
     }
 }
