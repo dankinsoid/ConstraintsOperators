@@ -8,7 +8,17 @@
 
 import UIKit
 
-public protocol UILayoutable: class {}
+public protocol UILayoutable: class, UILayoutableArray {}
+
+public protocol UILayoutableArray {
+	func asLayoutableArray() -> [UILayoutable]
+}
+
+extension UILayoutable {
+	public func asLayoutableArray() -> [UILayoutable] {
+		[self]
+	}
+}
 
 extension UIView: UILayoutable, Attributable {
     public typealias B = ConstraintBuilder

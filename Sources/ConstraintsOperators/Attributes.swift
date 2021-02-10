@@ -120,34 +120,18 @@ extension Attributable {
     
 }
 
-extension Attributable where B.First == [UILayoutable] {
+extension Attributable where B.First: UILayoutableArray {
     
     public func edges(_ edges: Edges.Set = .all) -> EdgeAttribute {
-        return EdgeAttribute(type: edges.attributes, item: target)
+			return EdgeAttribute(type: edges.attributes, item: target.asLayoutableArray())
     }
     
     public var size: SizeAttribute {
-        SizeAttribute(type: [.width, .height], item: target)
+        SizeAttribute(type: [.width, .height], item: target.asLayoutableArray())
     }
     
     public var center: LayoutAttribute<Void, ConstraintsBuilder> {
-        LayoutAttribute(type: [.centerX, .centerY], item: target)
-    }
-    
-}
-
-extension Attributable where B.First == UILayoutable {
-    
-    public func edges(_ edges: Edges.Set = .all) -> EdgeAttribute {
-        return EdgeAttribute(type: edges.attributes, item: [target])
-    }
-    
-    public var size: SizeAttribute {
-        return SizeAttribute(type: [.width, .height], item: [target])
-    }
-    
-    public var center: LayoutAttribute<Void, ConstraintsBuilder> {
-        LayoutAttribute(type: [.centerX, .centerY], item: [target])
+        LayoutAttribute(type: [.centerX, .centerY], item: target.asLayoutableArray())
     }
     
 }
