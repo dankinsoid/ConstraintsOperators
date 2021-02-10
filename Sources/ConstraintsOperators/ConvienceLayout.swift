@@ -13,18 +13,18 @@ public protocol UILayoutable: UILayoutableArray {
 }
 
 public protocol UILayoutableArray {
-	func asLayoutableArray() -> [UILayoutable]
+	func asLayoutableArray() -> [AnyLayoutable]
 }
 
 extension UILayoutable {
-	public func asLayoutableArray() -> [UILayoutable] {
-		[self]
+	public func asLayoutableArray() -> [AnyLayoutable] {
+		[any]
 	}
 }
 
 extension UIView: UILayoutable, Attributable {
     public typealias B = ConstraintBuilder<AnyLayoutable>
-	public var target: AnyLayoutable { self.any }
+		public var target: AnyLayoutable { self.any }
 		public var itemForConstraint: Any { self }
     
     @available(iOS 11.0, *)
@@ -39,7 +39,7 @@ extension Array where Element: UIView {
 extension UILayoutGuide: UILayoutable, Attributable {
 	public typealias B = ConstraintBuilder<AnyLayoutable>
 	public var target: AnyLayoutable { self.any }
-		public var itemForConstraint: Any { self }
+	public var itemForConstraint: Any { self }
 }
 
 public struct ConvienceLayout<B: ConstraintsCreator>: Attributable {
@@ -53,7 +53,7 @@ public struct ConvienceLayout<B: ConstraintsCreator>: Attributable {
 
 extension Array: Attributable where Element: UILayoutable {
     public typealias B = ConstraintsBuilder
-    public var target: [UILayoutable] { self }
+	public var target: [AnyLayoutable] { self.map { $0.any } }
 }
 
 extension Attributable where B.First: UILayoutable {
@@ -63,17 +63,17 @@ extension Attributable where B.First: UILayoutable {
     }
     
     public subscript(_ attributes: [NSLayoutConstraint.Attribute]) -> LayoutAttribute<Void, ConstraintsBuilder> {
-        return LayoutAttribute(type: attributes, item: [target])
+			return LayoutAttribute(type: attributes, item: [target.any])
     }
     
     public func ignoreAutoresizingMask() {
-        (target as? UIView)?.translatesAutoresizingMaskIntoConstraints = false
+			(target as? UIView)?.translatesAutoresizingMaskIntoConstraints = false
     }
     
 }
 
 
-extension Attributable where B.First == [UILayoutable] {
+extension Attributable where B.First == [AnyLayoutable] {
     
     public subscript(_ attributes: NSLayoutConstraint.Attribute...) -> LayoutAttribute<Void, ConstraintsBuilder> {
         return self[attributes]
@@ -84,7 +84,7 @@ extension Attributable where B.First == [UILayoutable] {
     }
     
     public func ignoreAutoresizingMask() {
-        target.compactMap { $0 as? UIView }.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+			target.compactMap { $0.item as? UIView }.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
     }
     
 }
