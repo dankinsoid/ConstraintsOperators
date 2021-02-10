@@ -35,7 +35,7 @@ extension LayoutAttribute {
     }
     
     public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-			_setup(deactivated, rhs, relation: .lessThanOrEqual).map { ConstraintWrapper<C>($0, item: item) }
+			ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
     }
     
     public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> ConstraintWrapper<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
@@ -47,7 +47,7 @@ extension LayoutAttribute {
     }
     
     public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> ConstraintWrapper<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-			_setup(deactivated, rhs, relation: .greaterThanOrEqual).map { ConstraintWrapper<C>($0, item: item) }
+			ConstraintWrapper<C>(_setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
     }
 
 }
@@ -151,10 +151,10 @@ extension LayoutAttribute where A == Attributes.Edges, C.A == [NSLayoutConstrain
     
 	private func map(rhs: UIEdgeInsets, operation: (LayoutAttribute, CGFloat) -> [C.Constraint]) -> ConstraintWrapper<C> {
 			var result: [C.Constraint] = []
-			if type.contains(.leading) { result.append(contentsOf: operation(type(C.A.init(.leading)).deactivated, rhs.left)) }
-			if type.contains(.trailing) { result.append(contentsOf: operation(type(C.A.init(.trailing)).deactivated, rhs.right)) }
-			if type.contains(.top) { result.append(contentsOf: operation(type(C.A.init(.top)).deactivated, rhs.top)) }
-			if type.contains(.bottom) { result.append(contentsOf: operation(type(C.A.init(.bottom)).deactivated, rhs.bottom)) }
+			if type.contains(.leading) { result.append(contentsOf: operation(type(C.A.init(.leading)), rhs.left)) }
+			if type.contains(.trailing) { result.append(contentsOf: operation(type(C.A.init(.trailing)), rhs.right)) }
+			if type.contains(.top) { result.append(contentsOf: operation(type(C.A.init(.top)), rhs.top)) }
+			if type.contains(.bottom) { result.append(contentsOf: operation(type(C.A.init(.bottom)), rhs.bottom)) }
 			return ConstraintWrapper<C>(result, item: item)
     }
     

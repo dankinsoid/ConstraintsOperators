@@ -175,62 +175,62 @@ public func >=|<T, C: ConstraintsCreator>(_ lhs: LayoutAttribute<T, C>?, _ rhs: 
 
 @discardableResult
 public func =|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>, _ rhs: UIEdgeInsets) -> [C.Constraint] where C.A == [NSLayoutConstraint.Attribute] {
-    lhs.equal(to: rhs)
+	lhs.map(rhs: rhs, operation: { $0 =| $1 })
 }
 
 @discardableResult
 public func <=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>, _ rhs: UIEdgeInsets) -> [C.Constraint] where C.A == [NSLayoutConstraint.Attribute] {
-    lhs.less(than: rhs)
+	lhs.map(rhs: rhs, operation: { $0 <=| $1 })
 }
 
 @discardableResult
 public func >=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>, _ rhs: UIEdgeInsets) -> [C.Constraint] where C.A == [NSLayoutConstraint.Attribute] {
-    lhs.greater(than: rhs)
+	lhs.map(rhs: rhs, operation: { $0 >=| $1 })
 }
 
 @discardableResult
 public func =|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>?, _ rhs: UIEdgeInsets) -> [C.Constraint]? where C.A == [NSLayoutConstraint.Attribute] {
-    lhs?.equal(to: rhs)
+	lhs?.map(rhs: rhs, operation: { $0 =| $1 })
 }
 
 @discardableResult
 public func <=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>?, _ rhs: UIEdgeInsets) -> [C.Constraint]? where C.A == [NSLayoutConstraint.Attribute] {
-    lhs?.less(than: rhs)
+	lhs?.map(rhs: rhs, operation: { $0 <=| $1 })
 }
 
 @discardableResult
 public func >=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Edges, C>?, _ rhs: UIEdgeInsets) -> [C.Constraint]? where C.A == [NSLayoutConstraint.Attribute] {
-    lhs?.greater(than: rhs)
+	lhs?.map(rhs: rhs, operation: { $0 >=| $1 })
 }
 
 @discardableResult
 public func =|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Size, C>, _ rhs: CGSize) -> [C.Constraint] {
-    lhs.equal(to: rhs)
+	lhs.map(rhs: rhs, operation: { $0 =| $1 })
 }
 
 @discardableResult
 public func <=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Size, C>, _ rhs: CGSize) -> [C.Constraint] {
-    lhs.less(than: rhs)
+	lhs.map(rhs: rhs, operation: { $0 <=| $1 })
 }
 
 @discardableResult
 public func >=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Size, C>, _ rhs: CGSize) -> [C.Constraint] {
-    lhs.greater(than: rhs)
+	lhs.map(rhs: rhs, operation: { $0 >=| $1 })
 }
 
 @discardableResult
 public func =|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Size, C>?, _ rhs: CGSize) -> [C.Constraint]? {
-    lhs?.equal(to: rhs)
+	lhs?.map(rhs: rhs, operation: { $0 =| $1 })
 }
 
 @discardableResult
 public func <=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Size, C>?, _ rhs: CGSize) -> [C.Constraint]? {
-    lhs?.less(than: rhs)
+	lhs?.map(rhs: rhs, operation: { $0 <=| $1 })
 }
 
 @discardableResult
 public func >=|<C: ConstraintsCreator>(_ lhs: LayoutAttribute<Attributes.Size, C>?, _ rhs: CGSize) -> [C.Constraint]? {
-    lhs?.greater(than: rhs)
+	lhs?.map(rhs: rhs, operation: { $0 >=| $1 })
 }
 
 public func *<A, C: ConstraintsCreator>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, C>) -> LayoutAttribute<A, C> {
@@ -311,4 +311,26 @@ public func -<A, C: ConstraintsCreator>(_ rhs: LayoutAttribute<A, C>?, _ lhs: CG
     var result = rhs
     result?.constant -= lhs
     return result
+}
+
+
+extension LayoutAttribute where A == Attributes.Edges, C.A == [NSLayoutConstraint.Attribute] {
+	fileprivate func map(rhs: UIEdgeInsets, operation: (LayoutAttribute, CGFloat) -> C.Constraint) -> [C.Constraint] {
+		var result: [C.Constraint] = []
+		if type.contains(.leading) { result.append(operation(type(C.A.init(.leading)), rhs.left)) }
+		if type.contains(.trailing) { result.append(operation(type(C.A.init(.trailing)), rhs.right)) }
+		if type.contains(.top) { result.append(operation(type(C.A.init(.top)), rhs.top)) }
+		if type.contains(.bottom) { result.append(operation(type(C.A.init(.bottom)), rhs.bottom)) }
+		return result
+	}
+}
+
+
+extension LayoutAttribute where A == Attributes.Size {
+	fileprivate func map(rhs: CGSize, operation: (LayoutAttribute, CGFloat) -> C.Constraint) -> [C.Constraint] {
+		[
+			operation(type(C.A.init(.width)).deactivated, rhs.width),
+			operation(type(C.A.init(.height)).deactivated, rhs.height)
+		]
+	}
 }
