@@ -88,7 +88,7 @@ public struct ConstraintBuilder<L: UILayoutable>: ConstraintsCreator {
 
 public struct ConstraintsBuilder: ConstraintsCreator {
     
-    public static func make(item: [UILayoutable], attribute attribute1: [NSLayoutConstraint.Attribute], relatedBy: NSLayoutConstraint.Relation, toItem: UILayoutable?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> [NSLayoutConstraint] {
+    public static func make(item: [UILayoutable], attribute attribute1: [NSLayoutConstraint.Attribute], relatedBy: NSLayoutConstraint.Relation, toItem: AnyLayoutable?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> [NSLayoutConstraint] {
         var result: [NSLayoutConstraint] = []
         for first in item {
             for attribute in attribute1 {
@@ -106,7 +106,7 @@ public struct ConstraintsBuilder: ConstraintsCreator {
         return result
     }
     
-    public static func makeToView(item: [UILayoutable], attribute attribute1: [NSLayoutConstraint.Attribute], relatedBy: NSLayoutConstraint.Relation, itemTo: UILayoutable?, multiplier: CGFloat, constant: CGFloat) -> [NSLayoutConstraint] {
+    public static func makeToView(item: [UILayoutable], attribute attribute1: [NSLayoutConstraint.Attribute], relatedBy: NSLayoutConstraint.Relation, itemTo: AnyLayoutable?, multiplier: CGFloat, constant: CGFloat) -> [NSLayoutConstraint] {
         var result: [NSLayoutConstraint] = []
         item.forEach {
             for attribute in attribute1 {
