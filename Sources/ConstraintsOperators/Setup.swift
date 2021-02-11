@@ -16,14 +16,19 @@ func _setup<A, D, C: UILayoutableArray, K: UILayoutableArray, T: AttributeConver
 }
 
 func setup<A, D, C: UILayoutableArray, K: UILayoutableArray, T: AttributeConvertable>(_ lhs: LayoutAttribute<A, C, T>, _ rhs: LayoutAttribute<D, K, NSLayoutConstraint.Attribute>, relation: NSLayoutConstraint.Relation) -> Constraints<C, T> {
-	let result = ConstraintsBuilder.make(item: lhs.item.asLayoutableArray(), attribute: lhs.type.attributes, relatedBy: relation, toItem: rhs.item.asLayoutableArray(), attribute: rhs.type, multiplier: rhs.multiplier / lhs.multiplier, constant: rhs.constant - lhs.constant)
-    result.priority = min(lhs.priority, rhs.priority)
-    let active = lhs.isActive && rhs.isActive
-    if active {
-			removeConflicts(with: result)
-    }
-    result.isActive = active
-		return Constraints(result, item: lhs.item)
+	Constraints(
+		{
+			let result = ConstraintsBuilder.make(item: lhs.item.asLayoutableArray(), attribute: lhs.type.attributes, relatedBy: relation, toItem: rhs.item.asLayoutableArray(), attribute: rhs.type, multiplier: rhs.multiplier / lhs.multiplier, constant: rhs.constant - lhs.constant)
+			result.priority = min(lhs.priority, rhs.priority)
+			let active = lhs.isActive && rhs.isActive
+			if active {
+				removeConflicts(with: result)
+			}
+			result.isActive = active
+			return result
+		},
+		item: lhs.item
+	)
 }
 
 func _setup<A, C: UILayoutableArray, T: AttributeConvertable, V: UILayoutableArray>(_ lhs: LayoutAttribute<A, C, T>?, _ rhs: V?, relation: NSLayoutConstraint.Relation) -> Constraints<C, T>? {
@@ -32,14 +37,19 @@ func _setup<A, C: UILayoutableArray, T: AttributeConvertable, V: UILayoutableArr
 }
 
 func setup<A, C: UILayoutableArray, T: AttributeConvertable, V: UILayoutableArray>(_ lhs: LayoutAttribute<A, C, T>, _ rhs: V, relation: NSLayoutConstraint.Relation) -> Constraints<C, T> {
-	let result = ConstraintsBuilder.makeToView(item: lhs.item.asLayoutableArray(), attribute: lhs.type.attributes, relatedBy: relation, itemTo: rhs.asLayoutableArray(), multiplier: 1 / lhs.multiplier, constant: -lhs.constant)
-    result.priority = lhs.priority
-    let active = lhs.isActive
-    if active {
-			removeConflicts(with: result)
-    }
-    result.isActive = active
-    return Constraints(result, item: lhs.item)
+	Constraints(
+		{
+			let result = ConstraintsBuilder.makeToView(item: lhs.item.asLayoutableArray(), attribute: lhs.type.attributes, relatedBy: relation, itemTo: rhs.asLayoutableArray(), multiplier: 1 / lhs.multiplier, constant: -lhs.constant)
+			result.priority = lhs.priority
+			let active = lhs.isActive
+			if active {
+				removeConflicts(with: result)
+			}
+			result.isActive = active
+			return result
+		},
+		item: lhs.item
+	)
 }
 
 func removeConflicts(with constraint: [NSLayoutConstraint]) {
@@ -55,12 +65,17 @@ func _setup<N, C: UILayoutableArray, T: AttributeConvertable>(_ lhs: LayoutAttri
 }
 
 func setup<N, C: UILayoutableArray, T: AttributeConvertable>(_ lhs: LayoutAttribute<N, C, T>, _ rhs: CGFloat, relation: NSLayoutConstraint.Relation) -> Constraints<C, T> {
-	let result = ConstraintsBuilder.makeWithOffset(item: lhs.item.asLayoutableArray(), attribute: lhs.type.attributes, relatedBy: relation, multiplier: lhs.multiplier, constant: lhs.constant, offset: rhs)
-    let active = lhs.isActive
-    result.priority = lhs.priority
-    if active {
-        removeConflicts(with: result)
-    }
-    result.isActive = active
-    return Constraints(result, item: lhs.item)
+	Constraints(
+		{
+			let result = ConstraintsBuilder.makeWithOffset(item: lhs.item.asLayoutableArray(), attribute: lhs.type.attributes, relatedBy: relation, multiplier: lhs.multiplier, constant: lhs.constant, offset: rhs)
+			let active = lhs.isActive
+			result.priority = lhs.priority
+			if active {
+				removeConflicts(with: result)
+			}
+			result.isActive = active
+			return result
+		},
+		item: lhs.item
+	)
 }
