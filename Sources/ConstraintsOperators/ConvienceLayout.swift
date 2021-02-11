@@ -13,18 +13,19 @@ public protocol UILayoutable: UILayoutableArray {
 }
 
 public protocol UILayoutableArray {
-	func asLayoutableArray() -> [AnyLayoutable]
+	func asLayoutableArray() -> [UILayoutable]
 }
 
 extension UILayoutable {
-	public func asLayoutableArray() -> [AnyLayoutable] {
-		[any]
+	public func asLayoutableArray() -> [UILayoutable] {
+		[self]
 	}
 }
 
 extension UIView: UILayoutable, Attributable {
-    public typealias B = ConstraintBuilder<AnyLayoutable>
-		public var target: AnyLayoutable { self.any }
+	public typealias Item = UIView
+	public typealias Att = NSLayoutConstraint.Attribute
+		public var target: UIView { self }
 		public var itemForConstraint: Any { self }
     
     @available(iOS 11.0, *)
@@ -37,54 +38,39 @@ extension Array where Element: UIView {
 }
 
 extension UILayoutGuide: UILayoutable, Attributable {
-	public typealias B = ConstraintBuilder<AnyLayoutable>
-	public var target: AnyLayoutable { self.any }
+	public typealias Att = NSLayoutConstraint.Attribute
+	public var target: UILayoutGuide { self }
 	public var itemForConstraint: Any { self }
 }
 
-public struct ConvienceLayout<B: ConstraintsCreator>: Attributable {
-    public let target: B.First
-    
-    init(_ item: B.First) {
-        target = item
-    }
-    
+public struct ConvienceLayout<Item: UILayoutableArray, Att: AttributeConvertable>: Attributable {
+	public let target: Item
+	init(_ item: Item) { target = item }
+}
+
+extension Array: UILayoutableArray where Element: UILayoutable {
+	public func asLayoutableArray() -> [UILayoutable] {
+		self
+	}
 }
 
 extension Array: Attributable where Element: UILayoutable {
-    public typealias B = ConstraintsBuilder
-	public var target: [AnyLayoutable] { self.map { $0.any } }
+	public typealias Att = [NSLayoutConstraint.Attribute]
+	public var target: [Element] { self }
 }
 
-extension Attributable where B.First: UILayoutable {
+extension Attributable where Target: UILayoutableArray {
     
-    public subscript(_ attributes: NSLayoutConstraint.Attribute...) -> LayoutAttribute<Void, ConstraintsBuilder> {
+    public subscript(_ attributes: NSLayoutConstraint.Attribute...) -> LayoutAttribute<Void, Target, [NSLayoutConstraint.Attribute]> {
         return self[attributes]
     }
     
-    public subscript(_ attributes: [NSLayoutConstraint.Attribute]) -> LayoutAttribute<Void, ConstraintsBuilder> {
-			return LayoutAttribute(type: attributes, item: [target.any])
-    }
-    
-    public func ignoreAutoresizingMask() {
-			(target as? UIView)?.translatesAutoresizingMaskIntoConstraints = false
-    }
-    
-}
-
-
-extension Attributable where B.First == [AnyLayoutable] {
-    
-    public subscript(_ attributes: NSLayoutConstraint.Attribute...) -> LayoutAttribute<Void, ConstraintsBuilder> {
-        return self[attributes]
-    }
-    
-    public subscript(_ attributes: [NSLayoutConstraint.Attribute]) -> LayoutAttribute<Void, ConstraintsBuilder> {
+    public subscript(_ attributes: [NSLayoutConstraint.Attribute]) -> LayoutAttribute<Void, Target, [NSLayoutConstraint.Attribute]> {
         return LayoutAttribute(type: attributes, item: target)
     }
     
     public func ignoreAutoresizingMask() {
-			target.compactMap { $0.item as? UIView }.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+			target.asLayoutableArray().compactMap { $0.itemForConstraint as? UIView }.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
     }
     
 }

@@ -7,22 +7,22 @@
 
 import UIKit
 
-public final class Constraints<B: ConstraintsCreator>: Attributable, ConstraintProtocol {
-	private let block: () -> [B.Constraint]
-	public let target: B.First
+public final class Constraints<Item: UILayoutableArray, Att: AttributeConvertable>: Attributable, ConstraintProtocol, UILayoutableArray {
+	private let block: () -> [NSLayoutConstraint]
+	public let target: Item
 	private(set) public lazy var constraints = block()
 	
-	init(_ constraint: @autoclosure @escaping () -> B.Constraint, item target: B.First) {
+	init(_ constraint: @autoclosure @escaping () -> NSLayoutConstraint, item target: Item) {
 		self.block = { [constraint()] }
 		self.target = target
 	}
 	
-	init(_ constraints: @autoclosure @escaping () -> [B.Constraint], item target: B.First) {
+	init(_ constraints: @autoclosure @escaping () -> [NSLayoutConstraint], item target: Item) {
 		self.block = constraints
 		self.target = target
 	}
 	
-	init(_ constraints: @escaping () -> [B.Constraint], item target: B.First) {
+	init(_ constraints: @escaping () -> [NSLayoutConstraint], item target: Item) {
 		self.block = constraints
 		self.target = target
 	}
@@ -41,14 +41,12 @@ public final class Constraints<B: ConstraintsCreator>: Attributable, ConstraintP
 		}
 	}
 	
-}
-
-extension Constraints: UILayoutableArray where B.First: UILayoutableArray {
-	public func asLayoutableArray() -> [AnyLayoutable] {
+	public func asLayoutableArray() -> [UILayoutable] {
 		target.asLayoutableArray()
 	}
+	
 }
 
-extension Constraints: UILayoutable where B.First: UILayoutable {
+extension Constraints: UILayoutable where Item: UILayoutable {
 	public var itemForConstraint: Any { target.itemForConstraint }
 }

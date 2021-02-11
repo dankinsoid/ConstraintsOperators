@@ -10,131 +10,115 @@ import UIKit
 
 extension LayoutAttribute {
 	
-	public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<A, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		Constraints<C>(setup(deactivated, rhs, relation: .equal), item: item)
+	public func equal<E: UILayoutableArray>(to rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .equal)
 	}
 	
-	public subscript<K: ConstraintsCreator>(_ rhs: LayoutAttribute<A, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public subscript<E: UILayoutableArray>(_ rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item, K> {
 		equal(to: rhs)
 	}
 	
-	public func equal(to rhs: CGFloat) -> Constraints<C> {
-		Constraints<C>(setup(deactivated, rhs, relation: .equal), item: item)
+	public func equal(to rhs: CGFloat) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .equal)
 	}
 	
-	public subscript(_ rhs: CGFloat) -> Constraints<C> {
+	public subscript(_ rhs: CGFloat) -> Constraints<Item, K> {
 		equal(to: rhs)
 	}
 	
-	public func within(_ rhs: ClosedRange<CGFloat>) -> Constraints<C> where C.Constraint == NSLayoutConstraint {
-		Constraints<C>(C.array(for: [setup(deactivated, rhs.lowerBound, relation: .greaterThanOrEqual), setup(deactivated, rhs.upperBound, relation: .lessThanOrEqual)]), item: item)
+	public func within(_ rhs: ClosedRange<CGFloat>) -> Constraints<Item, K> {
+		Constraints(setup(deactivated, rhs.lowerBound, relation: .greaterThanOrEqual).constraints + setup(deactivated, rhs.upperBound, relation: .lessThanOrEqual).constraints, item: item)
 	}
 	
-	public func within(_ rhs: ClosedRange<CGFloat>) -> Constraints<C> where C.Constraint == [NSLayoutConstraint] {
-		Constraints<C>(C.array(for: [setup(deactivated, rhs.lowerBound, relation: .greaterThanOrEqual), setup(deactivated, rhs.upperBound, relation: .lessThanOrEqual)]), item: item)
+	public func equal<R: UILayoutableArray>(to rhs: LayoutAttribute<A, R, NSLayoutConstraint.Attribute>?) -> Constraints<Item, K>? {
+		_setup(deactivated, rhs, relation: .equal)
 	}
 	
-	public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<A, K>?) -> Constraints<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		_setup(deactivated, rhs, relation: .equal).map { Constraints<C>($0, item: item) }
-	}
-	
-	public subscript<K: ConstraintsCreator>(_ rhs: LayoutAttribute<A, K>?) -> Constraints<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public subscript<E: UILayoutableArray>(_ rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item, K>? {
 		equal(to: rhs)
 	}
 	
-	public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		Constraints<C>(setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
+	public func less<E: UILayoutableArray>(than rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .lessThanOrEqual)
 	}
 	
-	public func less(than rhs: CGFloat) -> Constraints<C> {
-		Constraints<C>(setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
+	public func less(than rhs: CGFloat) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .lessThanOrEqual)
 	}
 	
-	public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> Constraints<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public func less<R: UILayoutableArray>(than rhs: LayoutAttribute<A, R, NSLayoutConstraint.Attribute>?) -> Constraints<Item, K>? {
 		rhs.map(less)
 	}
 	
-	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		Constraints<C>(setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
+	public func greater<E: UILayoutableArray>(than rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .greaterThanOrEqual)
 	}
 	
-	public func greater(than rhs: CGFloat) -> Constraints<C> {
-		Constraints<C>(setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
+	public func greater(than rhs: CGFloat) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .greaterThanOrEqual)
 	}
 	
-	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> Constraints<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public func greater<R: UILayoutableArray>(than rhs: LayoutAttribute<A, R, NSLayoutConstraint.Attribute>?) -> Constraints<Item, K>? {
 		rhs.map(greater)
 	}
 	
-}
-
-extension LayoutAttribute where C.Second: UILayoutable {
-	
-	public func equal(to rhs: C.Second) -> Constraints<C> {
-		Constraints<C>(setup(deactivated, rhs, relation: .equal), item: item)
+	public func equal<R: UILayoutableArray>(to rhs: R) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .equal)
 	}
 	
-	public subscript(_ rhs: C.Second) -> Constraints<C> {
+	public subscript<R: UILayoutableArray>(_ rhs: R) -> Constraints<Item, K> {
 		equal(to: rhs)
 	}
 	
-	public func equal(to rhs: C.Second?) -> Constraints<C>? {
-		_setup(deactivated, rhs, relation: .equal).map { Constraints<C>($0, item: item) }
+	public func equal<R: UILayoutableArray>(to rhs: R?) -> Constraints<Item, K>? {
+		_setup(deactivated, rhs, relation: .equal)
 	}
 	
-	public subscript(_ rhs: C.Second?) -> Constraints<C>? {
+	public subscript<R: UILayoutableArray>(_ rhs: R?) -> Constraints<Item, K>? {
 		equal(to: rhs)
 	}
 	
-	public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		Constraints<C>(setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
+	public func less<R: UILayoutableArray>(than rhs: R) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .lessThanOrEqual)
 	}
 	
-	public func less(than rhs: C.Second) -> Constraints<C> {
-		Constraints<C>(setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
-	}
-	
-	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		Constraints<C>(setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
-	}
-	
-	public func greater(than rhs: C.Second) -> Constraints<C> {
-		Constraints<C>(setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
+	public func greater<R: UILayoutableArray>(than rhs: R) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .greaterThanOrEqual)
 	}
 	
 }
 
 extension LayoutAttribute where A == Attributes.CenterX {
 	
-	public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<A, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		Constraints<C>(setup(deactivated, rhs, relation: .equal), item: item)
+	public func equal<E: UILayoutableArray>(to rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .equal)
 	}
 	
-	public subscript<K: ConstraintsCreator>(to rhs: LayoutAttribute<A, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public subscript<E: UILayoutableArray>(to rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item, K> {
 		equal(to: rhs)
 	}
 	
-	public func equal<T: CenterXAttributeCompatible, K: ConstraintsCreator>(to rhs: LayoutAttribute<T, K>?) -> Constraints<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		_setup(deactivated, rhs, relation: .equal).map { Constraints<C>($0, item: item) }
+	public func equal<T: CenterXAttributeCompatible, E: UILayoutableArray>(to rhs: LayoutAttribute<T, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item, K>? {
+		_setup(deactivated, rhs, relation: .equal)
 	}
 	
-	public subscript<T: CenterXAttributeCompatible, K: ConstraintsCreator>(to rhs: LayoutAttribute<T, K>?) -> Constraints<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public subscript<T: CenterXAttributeCompatible, E: UILayoutableArray>(to rhs: LayoutAttribute<T, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item, K>? {
 		equal(to: rhs)
 	}
 	
-	public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		Constraints<C>(setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
+	public func less<E: UILayoutableArray>(than rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .lessThanOrEqual)
 	}
 	
-	public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> Constraints<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public func less<R: UILayoutableArray>(than rhs: LayoutAttribute<A, R, NSLayoutConstraint.Attribute>?) -> Constraints<Item, K>? {
 		rhs.map(less)
 	}
 	
-	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		Constraints<C>(setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
+	public func greater<E: UILayoutableArray>(than rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .greaterThanOrEqual)
 	}
 	
-	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<A, K>?) -> Constraints<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public func greater<R: UILayoutableArray>(than rhs: LayoutAttribute<A, R, NSLayoutConstraint.Attribute>?) -> Constraints<Item, K>? {
 		rhs.map(greater)
 	}
 	
@@ -142,64 +126,64 @@ extension LayoutAttribute where A == Attributes.CenterX {
 
 extension LayoutAttribute where A: CenterXAttributeCompatible {
 	
-	public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<Attributes.CenterX, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		Constraints<C>(setup(deactivated, rhs, relation: .equal), item: item)
+	public func equal<E: UILayoutableArray>(to rhs: LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .equal)
 	}
 	
-	public subscript<K: ConstraintsCreator>(to rhs: LayoutAttribute<Attributes.CenterX, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public subscript<E: UILayoutableArray>(to rhs: LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>) -> Constraints<Item, K> {
 		equal(to: rhs)
 	}
 	
-	public func equal<K: ConstraintsCreator>(to rhs: LayoutAttribute<Attributes.CenterX, K>?) -> Constraints<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public func equal<E: UILayoutableArray>(to rhs: LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item, K>? {
 		rhs.map(equal)
 	}
 	
-	public subscript<K: ConstraintsCreator>(to rhs: LayoutAttribute<Attributes.CenterX, K>?) -> Constraints<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public subscript<E: UILayoutableArray>(to rhs: LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item, K>? {
 		equal(to: rhs)
 	}
 	
-	public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		Constraints<C>(setup(deactivated, rhs, relation: .lessThanOrEqual), item: item)
+	public func less<E: UILayoutableArray>(than rhs: LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .lessThanOrEqual)
 	}
 	
-	public func less<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>?) -> Constraints<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public func less<E: UILayoutableArray>(than rhs: LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item, K>? {
 		rhs.map(less)
 	}
 	
-	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>) -> Constraints<C> where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
-		Constraints<C>(setup(deactivated, rhs, relation: .greaterThanOrEqual), item: item)
+	public func greater<E: UILayoutableArray>(than rhs: LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>) -> Constraints<Item, K> {
+		setup(deactivated, rhs, relation: .greaterThanOrEqual)
 	}
 	
-	public func greater<K: ConstraintsCreator>(than rhs: LayoutAttribute<Attributes.CenterX, K>?) -> Constraints<C>? where C.Second == K.First, K.A == NSLayoutConstraint.Attribute {
+	public func greater<E: UILayoutableArray>(than rhs: LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item, K>? {
 		rhs.map(greater)
 	}
 }
 
-extension LayoutAttribute where A == Attributes.Edges, C.A == [NSLayoutConstraint.Attribute] {
+extension LayoutAttribute where A == Attributes.Edges, K == [NSLayoutConstraint.Attribute] {
 	
-	public func equal(to rhs: UIEdgeInsets) -> Constraints<C> {
+	public func equal(to rhs: UIEdgeInsets) -> Constraints<Item, K> {
 		map(rhs: rhs, operation: { $0.equal(to: $1) })
 	}
 	
-	public subscript(to rhs: UIEdgeInsets) -> Constraints<C> {
+	public subscript(to rhs: UIEdgeInsets) -> Constraints<Item, K> {
 		equal(to: rhs)
 	}
 	
-	public func less(than rhs: UIEdgeInsets) -> Constraints<C> {
+	public func less(than rhs: UIEdgeInsets) -> Constraints<Item, K> {
 		map(rhs: rhs, operation: { $0.less(than: $1) })
 	}
 	
-	public func greater(than rhs: UIEdgeInsets) -> Constraints<C> {
+	public func greater(than rhs: UIEdgeInsets) -> Constraints<Item, K> {
 		map(rhs: rhs, operation: { $0.greater(than: $1) })
 	}
 	
-	private func map(rhs: UIEdgeInsets, operation: @escaping (LayoutAttribute, CGFloat) -> Constraints<C>) -> Constraints<C> {
-		return Constraints<C>({
-			var result: [C.Constraint] = []
-			if type.contains(.leading) { result.append(contentsOf: operation(type(C.A.init(.leading)), rhs.left).constraints) }
-			if type.contains(.trailing) { result.append(contentsOf: operation(type(C.A.init(.trailing)), rhs.right).constraints) }
-			if type.contains(.top) { result.append(contentsOf: operation(type(C.A.init(.top)), rhs.top).constraints) }
-			if type.contains(.bottom) { result.append(contentsOf: operation(type(C.A.init(.bottom)), rhs.bottom).constraints) }
+	private func map(rhs: UIEdgeInsets, operation: @escaping (LayoutAttribute, CGFloat) -> Constraints<Item, K>) -> Constraints<Item, K> {
+		return Constraints<Item, K>({
+			var result: [NSLayoutConstraint] = []
+			if type.attributes.contains(.leading) { result += operation(type(K(.leading)), rhs.left).constraints }
+			if type.attributes.contains(.trailing) { result += operation(type(K(.trailing)), rhs.right).constraints }
+			if type.attributes.contains(.top) { result += operation(type(K(.top)), rhs.top).constraints }
+			if type.attributes.contains(.bottom) { result += operation(type(K(.bottom)), rhs.bottom).constraints }
 			return result
 		}, item: item)
 	}
@@ -208,26 +192,26 @@ extension LayoutAttribute where A == Attributes.Edges, C.A == [NSLayoutConstrain
 
 extension LayoutAttribute where A == Attributes.Size {
 	
-	public func equal(to rhs: CGSize) -> Constraints<C> {
+	public func equal(to rhs: CGSize) -> Constraints<Item, K> {
 		map(rhs: rhs, operation: { $0.equal(to: $1) })
 	}
 	
-	public subscript(to rhs: CGSize) -> Constraints<C> {
+	public subscript(to rhs: CGSize) -> Constraints<Item, K> {
 		equal(to: rhs)
 	}
 	
-	public func less(than rhs: CGSize) -> Constraints<C> {
+	public func less(than rhs: CGSize) -> Constraints<Item, K> {
 		map(rhs: rhs, operation: { $0.less(than: $1) })
 	}
 	
-	public func greater(than rhs: CGSize) -> Constraints<C> {
+	public func greater(than rhs: CGSize) -> Constraints<Item, K> {
 		map(rhs: rhs, operation: { $0.greater(than: $1) })
 	}
 	
-	private func map(rhs: CGSize, operation: @escaping (LayoutAttribute, CGFloat) -> Constraints<C>) -> Constraints<C> {
-		Constraints<C>({
-				operation(type(C.A.init(.width)).deactivated, rhs.width).constraints +
-				operation(type(C.A.init(.height)).deactivated, rhs.height).constraints
+	private func map(rhs: CGSize, operation: @escaping (LayoutAttribute, CGFloat) -> Constraints<Item, K>) -> Constraints<Item, K> {
+		Constraints<Item, K>({
+				operation(type(K(.width)).deactivated, rhs.width).constraints +
+				operation(type(K(.height)).deactivated, rhs.height).constraints
 		},
 			item: item
 		)
