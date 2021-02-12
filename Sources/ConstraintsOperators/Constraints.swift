@@ -7,7 +7,8 @@
 
 import UIKit
 
-public final class Constraints<Item: UILayoutableArray, Att: AttributeConvertable>: Attributable, ConstraintProtocol, UILayoutableArray {
+public final class Constraints<Item: UILayoutableArray>: Attributable, ConstraintProtocol, UILayoutableArray {
+	public typealias Att = NSLayoutConstraint.Attribute
 	private let block: () -> [NSLayoutConstraint]
 	public let target: Item
 	private(set) public lazy var constraints = block()
