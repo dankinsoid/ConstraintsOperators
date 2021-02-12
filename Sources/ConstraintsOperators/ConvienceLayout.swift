@@ -54,8 +54,8 @@ extension Array: UILayoutableArray where Element: UILayoutable {
 	}
 }
 
-extension Array: Attributable where Element: UILayoutable {
-	public typealias Att = [NSLayoutConstraint.Attribute]
+extension Array: Attributable where Element: UILayoutable & Attributable {
+	public typealias Att = Element.Att
 	public var target: [Element] { self }
 }
 
