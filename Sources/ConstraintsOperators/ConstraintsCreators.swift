@@ -52,7 +52,7 @@ private struct ConstraintBuilder {
         case .notAnAttribute:
             result = make(item: item, attribute: attribute, relatedBy: relation, toItem: nil, attribute: attribute, multiplier: 1 / multiplier, constant: offset - constant)
         case .bottom, .trailing, .bottomMargin, .trailingMargin, .lastBaseline, .right, .rightMargin:
-            result = makeToParent(item: item, attribute: attribute, relatedBy: relation, attribute: attribute, multiplier: 1 / multiplier, constant: constant - offset)
+					result = makeToParent(item: item, attribute: attribute, relatedBy: relation.reversed, attribute: attribute, multiplier: 1 / multiplier, constant: constant - offset)
         default:
             result = makeToParent(item: item, attribute: attribute, relatedBy: relation, attribute: attribute, multiplier: 1 / multiplier, constant: offset - constant)
         }
@@ -126,4 +126,16 @@ extension NSLayoutConstraint {
 			NSLayoutConstraint(item: item.itemForConstraint, attribute: attribute, relatedBy: relatedBy, toItem: toItem?.itemForConstraint, attribute: att1, multiplier: multiplier, constant: constant)
     }
     
+}
+
+extension NSLayoutConstraint.Relation {
+	
+	var reversed: NSLayoutConstraint.Relation {
+		switch self {
+		case .greaterThanOrEqual: return .lessThanOrEqual
+		case .lessThanOrEqual: 		return .greaterThanOrEqual
+		case .equal:							return .equal
+		}
+	}
+	
 }
