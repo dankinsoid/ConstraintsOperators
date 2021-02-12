@@ -217,3 +217,19 @@ extension LayoutAttribute where A == Attributes.Size {
 		)
 	}
 }
+
+extension Attributable where Att == NSLayoutConstraint.Attribute {
+	
+	public func widthToHeight(equal multiplier: CGFloat, constant: CGFloat = 0) -> Constraints<Target, Att> {
+		width.equal(to: height * multiplier + constant)
+	}
+	
+	public func widthToHeight(less multiplier: CGFloat, constant: CGFloat = 0) -> Constraints<Target, Att> {
+		width.less(than: height * multiplier + constant)
+	}
+	
+	public func widthToHeight(greater multiplier: CGFloat, constant: CGFloat = 0) -> Constraints<Target, Att> {
+		width.greater(than: height * multiplier + constant)
+	}
+	
+}
