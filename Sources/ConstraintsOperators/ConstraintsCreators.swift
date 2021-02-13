@@ -135,6 +135,7 @@ extension NSLayoutConstraint.Relation {
 		case .greaterThanOrEqual: return .lessThanOrEqual
 		case .lessThanOrEqual: 		return .greaterThanOrEqual
 		case .equal:							return .equal
+		default:									return self
 		}
 	}
 	
