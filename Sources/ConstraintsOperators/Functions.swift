@@ -165,6 +165,10 @@ extension LayoutAttribute where A == Attributes.Edges, K == [NSLayoutConstraint.
 		map(rhs: rhs, operation: { $0.equal(to: $1) })
 	}
 	
+	public func equal(to rhs: (top: CGFloat, (left: CGFloat, right: CGFloat), bottom: CGFloat)) -> Constraints<Item> {
+		equal(to: UIEdgeInsets(top: rhs.top, left: rhs.1.left, bottom: rhs.bottom, right: rhs.1.right))
+	}
+	
 	public subscript(to rhs: UIEdgeInsets) -> Constraints<Item> {
 		equal(to: rhs)
 	}
@@ -173,8 +177,16 @@ extension LayoutAttribute where A == Attributes.Edges, K == [NSLayoutConstraint.
 		map(rhs: rhs, operation: { $0.less(than: $1) })
 	}
 	
+	public func less(than rhs: (top: CGFloat, (left: CGFloat, right: CGFloat), bottom: CGFloat)) -> Constraints<Item> {
+		less(than: UIEdgeInsets(top: rhs.top, left: rhs.1.left, bottom: rhs.bottom, right: rhs.1.right))
+	}
+	
 	public func greater(than rhs: UIEdgeInsets) -> Constraints<Item> {
 		map(rhs: rhs, operation: { $0.greater(than: $1) })
+	}
+	
+	public func greater(than rhs: (top: CGFloat, (left: CGFloat, right: CGFloat), bottom: CGFloat)) -> Constraints<Item> {
+		greater(than: UIEdgeInsets(top: rhs.top, left: rhs.1.left, bottom: rhs.bottom, right: rhs.1.right))
 	}
 	
 	private func map(rhs: UIEdgeInsets, operation: @escaping (LayoutAttribute, CGFloat) -> Constraints<Item>) -> Constraints<Item> {

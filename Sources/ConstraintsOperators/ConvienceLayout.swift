@@ -23,7 +23,6 @@ extension UILayoutable {
 }
 
 extension UIView: UILayoutable, Attributable {
-	public typealias Item = UIView
 	public typealias Att = NSLayoutConstraint.Attribute
 		public var target: UIView { self }
 		public var itemForConstraint: Any { self }

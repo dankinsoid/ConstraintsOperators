@@ -179,8 +179,18 @@ public func =|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttri
 }
 
 @discardableResult
+public func =|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>, _ rhs: (top: CGFloat, (left: CGFloat, right: CGFloat), bottom: CGFloat)) -> Constraints<C> {
+	lhs =| UIEdgeInsets(top: rhs.top, left: rhs.1.left, bottom: rhs.bottom, right: rhs.1.right)
+}
+
+@discardableResult
 public func <=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>, _ rhs: UIEdgeInsets) -> Constraints<C> {
 	lhs.map(rhs: rhs, operation: { $0 <=| $1 })
+}
+
+@discardableResult
+public func <=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>, _ rhs: (top: CGFloat, (left: CGFloat, right: CGFloat), bottom: CGFloat)) -> Constraints<C> {
+	lhs <=| UIEdgeInsets(top: rhs.top, left: rhs.1.left, bottom: rhs.bottom, right: rhs.1.right)
 }
 
 @discardableResult
@@ -189,8 +199,18 @@ public func >=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttr
 }
 
 @discardableResult
+public func >=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>, _ rhs: (top: CGFloat, (left: CGFloat, right: CGFloat), bottom: CGFloat)) -> Constraints<C> {
+	lhs >=| UIEdgeInsets(top: rhs.top, left: rhs.1.left, bottom: rhs.bottom, right: rhs.1.right)
+}
+
+@discardableResult
 public func =|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>?, _ rhs: UIEdgeInsets) -> Constraints<C>? {
 	lhs?.map(rhs: rhs, operation: { $0 =| $1 })
+}
+
+@discardableResult
+public func =|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>?, _ rhs: (top: CGFloat, (left: CGFloat, right: CGFloat), bottom: CGFloat)) -> Constraints<C>? {
+	lhs =| UIEdgeInsets(top: rhs.top, left: rhs.1.left, bottom: rhs.bottom, right: rhs.1.right)
 }
 
 @discardableResult
@@ -199,8 +219,18 @@ public func <=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttr
 }
 
 @discardableResult
+public func <=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>?, _ rhs: (top: CGFloat, (left: CGFloat, right: CGFloat), bottom: CGFloat)) -> Constraints<C>? {
+	lhs <=| UIEdgeInsets(top: rhs.top, left: rhs.1.left, bottom: rhs.bottom, right: rhs.1.right)
+}
+
+@discardableResult
 public func >=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>?, _ rhs: UIEdgeInsets) -> Constraints<C>? {
 	lhs?.map(rhs: rhs, operation: { $0 >=| $1 })
+}
+
+@discardableResult
+public func >=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>?, _ rhs: (top: CGFloat, (left: CGFloat, right: CGFloat), bottom: CGFloat)) -> Constraints<C>? {
+	lhs >=| UIEdgeInsets(top: rhs.top, left: rhs.1.left, bottom: rhs.bottom, right: rhs.1.right)
 }
 
 @discardableResult
