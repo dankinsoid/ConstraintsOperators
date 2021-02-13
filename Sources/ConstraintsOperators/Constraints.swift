@@ -9,12 +9,11 @@ import UIKit
 import VDKit
 
 @dynamicMemberLookup
-public final class Constraints<Item: UILayoutableArray>: Attributable, ConstraintProtocol, UILayoutableArray, ValueChainingProtocol {
+public final class Constraints<Item: UILayoutableArray>: Attributable, ConstraintProtocol, UILayoutableArray, Chaining {
 	public typealias W = Item
 	public typealias Att = NSLayoutConstraint.Attribute
 	private let block: () -> [NSLayoutConstraint]
 	public let target: Item
-	public var wrappedValue: Item { target }
 	private(set) public lazy var constraints = block()
 	private(set) public var action: (Item) -> Item = { $0 }
 	
