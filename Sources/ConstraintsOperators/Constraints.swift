@@ -8,14 +8,12 @@
 import UIKit
 import VDKit
 
-@dynamicMemberLookup
-public final class Constraints<Item: UILayoutableArray>: Attributable, ConstraintProtocol, UILayoutableArray, Chaining {
+public final class Constraints<Item: UILayoutableArray>: Attributable, ConstraintProtocol, UILayoutableArray {
 	public typealias W = Item
 	public typealias Att = NSLayoutConstraint.Attribute
 	private let block: () -> [NSLayoutConstraint]
 	public let target: Item
 	private(set) public lazy var constraints = block()
-	private(set) public var action: (Item) -> Item = { $0 }
 	
 	init(_ constraint: @autoclosure @escaping () -> NSLayoutConstraint, item target: Item) {
 		self.block = { [constraint()] }
@@ -45,24 +43,7 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 	public func asLayoutableArray() -> [UILayoutable] {
 		target.asLayoutableArray()
 	}
-	
-	public func copy(with action: @escaping (Item) -> Item) -> Constraints {
-		self.action = action
-		return self
-	}
-	
-	public subscript<A>(dynamicMember keyPath: KeyPath<W, A>) -> ChainingProperty<Constraints, A, KeyPath<W, A>> {
-		ChainingProperty<Constraints, A, KeyPath<W, A>>(self, getter: keyPath)
-	}
-	
-	public subscript<A>(dynamicMember keyPath: WritableKeyPath<W, A>) -> ChainingProperty<Constraints, A, WritableKeyPath<W, A>> {
-		ChainingProperty<Constraints, A, WritableKeyPath<W, A>>(self, getter: keyPath)
-	}
-	
-	public subscript<A>(dynamicMember keyPath: ReferenceWritableKeyPath<W, A>) -> ChainingProperty<Constraints, A, ReferenceWritableKeyPath<W, A>> {
-		ChainingProperty<Constraints, A, ReferenceWritableKeyPath<W, A>>(self, getter: keyPath)
-	}
-	
+
 }
 
 extension Constraints: UILayoutable where Item: UILayoutable {
