@@ -15,6 +15,7 @@ extension UIView {
 		fileprivate let view: UIView
 		public var vertical: AxisLayoutPriority { self[for: .vertical] }
 		public var horizontal: AxisLayoutPriority { self[for: .horizontal] }
+		public var both: AxisLayoutPriority { self[for: .both] }
 
 		public subscript(for axis: NSLayoutConstraint.AxisSet) -> AxisLayoutPriority {
 			AxisLayoutPriority(view: view, axis: axis.axis)
@@ -36,6 +37,10 @@ extension UIView {
 			public var compression: UILayoutPriority {
 				get { self[.compression] }
 				nonmutating set { self[.compression] = newValue }
+			}
+			public var both: UILayoutPriority {
+				get { self[.both] }
+				nonmutating set { self[.both] = newValue }
 			}
 			
 			public subscript(_ direction: DirectionSet) -> UILayoutPriority {
