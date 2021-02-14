@@ -15,24 +15,19 @@ extension UIView {
 		fileprivate let view: UIView
 		public var vertical: AxisLayoutPriority { self[for: .vertical] }
 		public var horizontal: AxisLayoutPriority { self[for: .horizontal] }
-		
-		
-		public subscript(for axis: NSLayoutConstraint.Axis) -> AxisLayoutPriority {
-			switch axis {
-			case .horizontal:	return AxisLayoutPriority(view: view, axis: .horizontal)
-			case .vertical:		return AxisLayoutPriority(view: view, axis: .vertical)
-			@unknown default:	return AxisLayoutPriority(view: view, axis: .vertical)
-			}
+
+		public subscript(for axis: NSLayoutConstraint.AxisSet) -> AxisLayoutPriority {
+			AxisLayoutPriority(view: view, axis: axis.axis)
 		}
 		
-		public subscript(_ direction: AxisLayoutPriority.Direction, for axis: NSLayoutConstraint.Axis) -> UILayoutPriority {
+		public subscript(_ direction: AxisLayoutPriority.DirectionSet, for axis: NSLayoutConstraint.AxisSet) -> UILayoutPriority {
 			get { self[for: axis][direction] }
 			nonmutating set { self[for: axis][direction] = newValue }
 		}
 		
 		public struct AxisLayoutPriority {
 			fileprivate let view: UIView
-			fileprivate let axis: NSLayoutConstraint.Axis
+			fileprivate let axis: [NSLayoutConstraint.Axis]
 			
 			public var hugging: UILayoutPriority {
 				get { self[.hugging] }
@@ -43,18 +38,16 @@ extension UIView {
 				nonmutating set { self[.compression] = newValue }
 			}
 			
-			public subscript(_ direction: Direction) -> UILayoutPriority {
+			public subscript(_ direction: DirectionSet) -> UILayoutPriority {
 				get {
-					switch direction {
-					case .compression: 	return view.contentCompressionResistancePriority(for: axis)
-					case .hugging: 			return view.contentHuggingPriority(for: axis)
-					}
+					var result: [UILayoutPriority] = []
+					if direction.contains(.compression) { result += axis.map(view.contentCompressionResistancePriority) }
+					if direction.contains(.hugging) { result += axis.map(view.contentHuggingPriority) }
+					return result.max() ?? .defaultHigh
 				}
 				nonmutating set {
-					switch direction {
-					case .compression: 	return view.setContentCompressionResistancePriority(newValue, for: axis)
-					case .hugging: 			return view.setContentHuggingPriority(newValue, for: axis)
-					}
+					if direction.contains(.compression) { axis.forEach { view.setContentCompressionResistancePriority(newValue, for: $0) } }
+					if direction.contains(.hugging) { axis.forEach { view.setContentHuggingPriority(newValue, for: $0) } }
 				}
 			}
 			
