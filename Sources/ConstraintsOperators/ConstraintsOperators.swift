@@ -14,168 +14,168 @@ infix operator <=|: AssignmentPrecedence
 
 @discardableResult
 public func =|<T, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: LayoutAttribute<T, K, NSLayoutConstraint.Attribute>) -> Constraints<C> {
-		setup(lhs, rhs, relation: .equal)
+		setup(lhs, rhs, relation: .equal).apply()
 }
 
 @discardableResult
 public func =|<T, C: UILayoutableArray, A: AttributeConvertable, L: UILayoutableArray>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: L) -> Constraints<C> {
-	setup(lhs, rhs, relation: .equal)
+	setup(lhs, rhs, relation: .equal).apply()
 }
 
 @discardableResult
 public func =|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.CenterX, C, A>, _ rhs: LayoutAttribute<T, K, NSLayoutConstraint.Attribute>) -> Constraints<C> {
-		setup(lhs, rhs, relation: .equal)
+		setup(lhs, rhs, relation: .equal).apply()
 }
 
 @discardableResult
 public func =|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: LayoutAttribute<Attributes.CenterX, K, NSLayoutConstraint.Attribute>) -> Constraints<C> {
-		setup(lhs, rhs, relation: .equal)
+		setup(lhs, rhs, relation: .equal).apply()
 }
 
 @discardableResult
 public func =|<T, C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: CGFloat) -> Constraints<C> {
-		setup(lhs, rhs, relation: .equal)
+		setup(lhs, rhs, relation: .equal).apply()
 }
 
 @discardableResult
 public func =|<T, C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: ClosedRange<CGFloat>) -> Constraints<C> {
-	Constraints(setup(lhs, rhs.lowerBound, relation: .greaterThanOrEqual).constraints + setup(lhs, rhs.upperBound, relation: .lessThanOrEqual).constraints, item: lhs.item)
+	Constraints(setup(lhs, rhs.lowerBound, relation: .greaterThanOrEqual).constraints + setup(lhs, rhs.upperBound, relation: .lessThanOrEqual).constraints, item: lhs.item).apply()
 }
 
 @discardableResult
 public func =|<T, C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: ClosedRange<CGFloat>) -> Constraints<C>? {
 	guard let lhs = lhs else { return nil }
-	return Constraints(setup(lhs, rhs.lowerBound, relation: .greaterThanOrEqual).constraints + setup(lhs, rhs.upperBound, relation: .lessThanOrEqual).constraints, item: lhs.item)
+	return Constraints(setup(lhs, rhs.lowerBound, relation: .greaterThanOrEqual).constraints + setup(lhs, rhs.upperBound, relation: .lessThanOrEqual).constraints, item: lhs.item).apply()
 }
 
 @discardableResult
 public func =|<T, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: LayoutAttribute<T, K, NSLayoutConstraint.Attribute>?) -> Constraints<C>? {
-		_setup(lhs, rhs, relation: .equal)
+		_setup(lhs, rhs, relation: .equal)?.apply()
 }
 
 @discardableResult
 public func =|<T, C: UILayoutableArray, A: AttributeConvertable, L: UILayoutableArray>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: L?) -> Constraints<C>? {
-		_setup(lhs, rhs, relation: .equal)
+		_setup(lhs, rhs, relation: .equal)?.apply()
 }
 
 @discardableResult
 public func =|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.CenterX, C, A>?, _ rhs: LayoutAttribute<T, K, NSLayoutConstraint.Attribute>?) -> Constraints<C>? {
-		_setup(lhs, rhs, relation: .equal)
+		_setup(lhs, rhs, relation: .equal)?.apply()
 }
 
 @discardableResult
 public func =|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: LayoutAttribute<Attributes.CenterX, K, NSLayoutConstraint.Attribute>?) -> Constraints<C>? {
-	_setup(lhs, rhs, relation: .equal)
+	_setup(lhs, rhs, relation: .equal)?.apply()
 }
 
 @discardableResult
 public func =|<T, C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: CGFloat) -> Constraints<C>? {
-		_setup(lhs, rhs, relation: .equal)
+		_setup(lhs, rhs, relation: .equal)?.apply()
 }
 
 @discardableResult
 public func <=|<T, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: LayoutAttribute<T, K, NSLayoutConstraint.Attribute>) -> Constraints<C> {
-		setup(lhs, rhs, relation: .lessThanOrEqual)
+		setup(lhs, rhs, relation: .lessThanOrEqual).apply()
 }
 
 @discardableResult
 public func <=|<T, C: UILayoutableArray, A: AttributeConvertable, L: UILayoutableArray>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: L) -> Constraints<C> {
-    return setup(lhs, rhs, relation: .lessThanOrEqual)
+		setup(lhs, rhs, relation: .lessThanOrEqual).apply()
 }
 
 @discardableResult
 public func <=|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: LayoutAttribute<Attributes.CenterX, K, NSLayoutConstraint.Attribute>) -> Constraints<C> {
-    return setup(lhs, rhs, relation: .lessThanOrEqual)
+		setup(lhs, rhs, relation: .lessThanOrEqual).apply()
 }
 
 @discardableResult
 public func <=|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.CenterX, C, A>, _ rhs: LayoutAttribute<T, K, NSLayoutConstraint.Attribute>) -> Constraints<C> {
-    return setup(lhs, rhs, relation: .lessThanOrEqual)
+		setup(lhs, rhs, relation: .lessThanOrEqual).apply()
 }
 
 @discardableResult
 public func <=|<T, C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: CGFloat) -> Constraints<C> {
-    return setup(lhs, rhs, relation: .lessThanOrEqual)
+		setup(lhs, rhs, relation: .lessThanOrEqual).apply()
 }
 
 @discardableResult
 public func <=|<T, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: LayoutAttribute<T, K, NSLayoutConstraint.Attribute>?) -> Constraints<C>? {
-    return _setup(lhs, rhs, relation: .lessThanOrEqual)
+		_setup(lhs, rhs, relation: .lessThanOrEqual)?.apply()
 }
 
 @discardableResult
 public func <=|<T, C: UILayoutableArray, A: AttributeConvertable, L: UILayoutableArray>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: L?) -> Constraints<C>? {
-    return _setup(lhs, rhs, relation: .lessThanOrEqual)
+		_setup(lhs, rhs, relation: .lessThanOrEqual)?.apply()
 }
 
 @discardableResult
 public func <=|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: LayoutAttribute<Attributes.CenterX, K, NSLayoutConstraint.Attribute>?) -> Constraints<C>? {
-    return _setup(lhs, rhs, relation: .lessThanOrEqual)
+		_setup(lhs, rhs, relation: .lessThanOrEqual)?.apply()
 }
 
 @discardableResult
 public func <=|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.CenterX, C, A>?, _ rhs: LayoutAttribute<T, K, NSLayoutConstraint.Attribute>?) -> Constraints<C>? {
-    return _setup(lhs, rhs, relation: .lessThanOrEqual)
+		_setup(lhs, rhs, relation: .lessThanOrEqual)?.apply()
 }
 
 @discardableResult
 public func <=|<T, C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: CGFloat) -> Constraints<C>? {
-    return _setup(lhs, rhs, relation: .lessThanOrEqual)
+		_setup(lhs, rhs, relation: .lessThanOrEqual)?.apply()
 }
 
 @discardableResult
 public func >=|<T, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: LayoutAttribute<T, K, NSLayoutConstraint.Attribute>) -> Constraints<C> {
-    return setup(lhs, rhs, relation: .greaterThanOrEqual)
+		setup(lhs, rhs, relation: .greaterThanOrEqual).apply()
 }
 
 @discardableResult
 public func >=|<T, C: UILayoutableArray, A: AttributeConvertable, L: UILayoutableArray>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: L) -> Constraints<C> {
-    return setup(lhs, rhs, relation: .greaterThanOrEqual)
+    return setup(lhs, rhs, relation: .greaterThanOrEqual).apply()
 }
 
 @discardableResult
 public func >=|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.CenterX, C, A>, _ rhs: LayoutAttribute<T, K, NSLayoutConstraint.Attribute>) -> Constraints<C> {
-    return setup(lhs, rhs, relation: .greaterThanOrEqual)
+    return setup(lhs, rhs, relation: .greaterThanOrEqual).apply()
 }
 
 @discardableResult
 public func >=|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: LayoutAttribute<Attributes.CenterX, K, NSLayoutConstraint.Attribute>) -> Constraints<C> {
-    return setup(lhs, rhs, relation: .greaterThanOrEqual)
+    return setup(lhs, rhs, relation: .greaterThanOrEqual).apply()
 }
 
 @discardableResult
 public func >=|<T, C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>, _ rhs: CGFloat) -> Constraints<C> {
-    return setup(lhs, rhs, relation: .greaterThanOrEqual)
+    return setup(lhs, rhs, relation: .greaterThanOrEqual).apply()
 }
 
 @discardableResult
 public func >=|<T, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: LayoutAttribute<T, K, NSLayoutConstraint.Attribute>?) -> Constraints<C>? {
-    return _setup(lhs, rhs, relation: .greaterThanOrEqual)
+		_setup(lhs, rhs, relation: .greaterThanOrEqual)?.apply()
 }
 
 @discardableResult
 public func >=|<T, C: UILayoutableArray, A: AttributeConvertable, L: UILayoutableArray>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: L?) -> Constraints<C>? {
-    return _setup(lhs, rhs, relation: .greaterThanOrEqual)
+		_setup(lhs, rhs, relation: .greaterThanOrEqual)?.apply()
 }
 
 @discardableResult
 public func >=|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.CenterX, C, A>?, _ rhs: LayoutAttribute<T, K, NSLayoutConstraint.Attribute>?) -> Constraints<C>? {
-    return _setup(lhs, rhs, relation: .greaterThanOrEqual)
+		_setup(lhs, rhs, relation: .greaterThanOrEqual)?.apply()
 }
 
 @discardableResult
 public func >=|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: LayoutAttribute<Attributes.CenterX, K, NSLayoutConstraint.Attribute>?) -> Constraints<C>? {
-    return _setup(lhs, rhs, relation: .greaterThanOrEqual)
+		_setup(lhs, rhs, relation: .greaterThanOrEqual)?.apply()
 }
 
 @discardableResult
 public func >=|<T, C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<T, C, A>?, _ rhs: CGFloat) -> Constraints<C>? {
-    return _setup(lhs, rhs, relation: .greaterThanOrEqual)
+		_setup(lhs, rhs, relation: .greaterThanOrEqual)?.apply()
 }
 
 @discardableResult
 public func =|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>, _ rhs: UIEdgeInsets) -> Constraints<C> {
-	lhs.map(rhs: rhs, operation: { $0 =| $1 })
+	lhs.map(rhs: rhs, operation: { $0 =| $1 }).apply()
 }
 
 @discardableResult
@@ -185,7 +185,7 @@ public func =|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttri
 
 @discardableResult
 public func <=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>, _ rhs: UIEdgeInsets) -> Constraints<C> {
-	lhs.map(rhs: rhs, operation: { $0 <=| $1 })
+	lhs.map(rhs: rhs, operation: { $0 <=| $1 }).apply()
 }
 
 @discardableResult
@@ -195,7 +195,7 @@ public func <=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttr
 
 @discardableResult
 public func >=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>, _ rhs: UIEdgeInsets) -> Constraints<C> {
-	lhs.map(rhs: rhs, operation: { $0 >=| $1 })
+	lhs.map(rhs: rhs, operation: { $0 >=| $1 }).apply()
 }
 
 @discardableResult
@@ -205,7 +205,7 @@ public func >=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttr
 
 @discardableResult
 public func =|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>?, _ rhs: UIEdgeInsets) -> Constraints<C>? {
-	lhs?.map(rhs: rhs, operation: { $0 =| $1 })
+	lhs?.map(rhs: rhs, operation: { $0 =| $1 }).apply()
 }
 
 @discardableResult
@@ -215,7 +215,7 @@ public func =|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttri
 
 @discardableResult
 public func <=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>?, _ rhs: UIEdgeInsets) -> Constraints<C>? {
-	lhs?.map(rhs: rhs, operation: { $0 <=| $1 })
+	lhs?.map(rhs: rhs, operation: { $0 <=| $1 }).apply()
 }
 
 @discardableResult
@@ -225,7 +225,7 @@ public func <=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttr
 
 @discardableResult
 public func >=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Edges, C, A>?, _ rhs: UIEdgeInsets) -> Constraints<C>? {
-	lhs?.map(rhs: rhs, operation: { $0 >=| $1 })
+	lhs?.map(rhs: rhs, operation: { $0 >=| $1 }).apply()
 }
 
 @discardableResult
@@ -235,32 +235,32 @@ public func >=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttr
 
 @discardableResult
 public func =|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Size, C, A>, _ rhs: CGSize) -> Constraints<C> {
-	lhs.map(rhs: rhs, operation: { $0 =| $1 })
+	lhs.map(rhs: rhs, operation: { $0 =| $1 }).apply()
 }
 
 @discardableResult
 public func <=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Size, C, A>, _ rhs: CGSize) -> Constraints<C> {
-	lhs.map(rhs: rhs, operation: { $0 <=| $1 })
+	lhs.map(rhs: rhs, operation: { $0 <=| $1 }).apply()
 }
 
 @discardableResult
 public func >=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Size, C, A>, _ rhs: CGSize) -> Constraints<C> {
-	lhs.map(rhs: rhs, operation: { $0 >=| $1 })
+	lhs.map(rhs: rhs, operation: { $0 >=| $1 }).apply()
 }
 
 @discardableResult
 public func =|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Size, C, A>?, _ rhs: CGSize) -> Constraints<C>? {
-	lhs?.map(rhs: rhs, operation: { $0 =| $1 })
+	lhs?.map(rhs: rhs, operation: { $0 =| $1 }).apply()
 }
 
 @discardableResult
 public func <=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Size, C, A>?, _ rhs: CGSize) -> Constraints<C>? {
-	lhs?.map(rhs: rhs, operation: { $0 <=| $1 })
+	lhs?.map(rhs: rhs, operation: { $0 <=| $1 }).apply()
 }
 
 @discardableResult
 public func >=|<C: UILayoutableArray, A: AttributeConvertable>(_ lhs: LayoutAttribute<Attributes.Size, C, A>?, _ rhs: CGSize) -> Constraints<C>? {
-	lhs?.map(rhs: rhs, operation: { $0 >=| $1 })
+	lhs?.map(rhs: rhs, operation: { $0 >=| $1 }).apply()
 }
 
 public func *<A, C: UILayoutableArray, B: AttributeConvertable>(_ lhs: CGFloat, _ rhs: LayoutAttribute<A, C, B>) -> LayoutAttribute<A, C, B> {

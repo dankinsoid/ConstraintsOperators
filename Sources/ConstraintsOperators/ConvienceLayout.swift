@@ -24,7 +24,7 @@ extension UILayoutable {
 
 extension UIView: UILayoutable, Attributable {
 	public typealias Att = NSLayoutConstraint.Attribute
-		public var target: UIView { self }
+	public var target: UIView { self }
 		public var itemForConstraint: Any { self }
     
     @available(iOS 11.0, *)
@@ -42,9 +42,12 @@ extension UILayoutGuide: UILayoutable, Attributable {
 	public var itemForConstraint: Any { self }
 }
 
-public struct ConvienceLayout<Item: UILayoutableArray, Att: AttributeConvertable>: Attributable {
+public struct ConvienceLayout<Item: UILayoutableArray, Att: AttributeConvertable>: UILayoutableArray, Attributable {
 	public let target: Item
 	init(_ item: Item) { target = item }
+	public func asLayoutableArray() -> [UILayoutable] {
+		target.asLayoutableArray()
+	}
 }
 
 extension Array: UILayoutableArray where Element: UILayoutable {
