@@ -47,11 +47,11 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 		}
 	}
 
-	public func asLayoutableArray() -> [UILayoutable] {
+	public func asLayoutableArray(for other: UILayoutableArray?) -> [UILayoutable] {
 		if let layoutable = self as? UILayoutable {
 			return [layoutable]
 		}
-		return item.asLayoutableArray()
+		return item.asLayoutableArray(for: other)
 	}
 	
 	func apply() -> Constraints {
