@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name             = 'ConstraintsOperators'
-s.version          = '2.8.0'
+s.version          = '2.9.0'
 s.summary          = 'A short description of ConstraintsOperators.'
 
 s.description      = <<-DESC
@@ -16,7 +16,7 @@ s.source           = { :git => 'https://github.com/dankinsoid/ConstraintsOperato
 s.ios.deployment_target = '11.0'
 s.swift_versions = '5.0'
 s.source_files = 'Sources/ConstraintsOperators/**/*'
-s.dependency 'VD', '~> 1.0.47'
+s.dependency 'VD', '~> 1.6.0'
 
 # s.frameworks = 'UIKit', 'MapKit'
 # s.dependency 'AFNetworking', '~> 2.3'
