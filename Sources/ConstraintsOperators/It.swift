@@ -7,29 +7,30 @@
 
 import UIKit
 
-public struct SelfLayoutReference: Attributable, UILayoutableArray {
-	public typealias Att = NSLayoutConstraint.Attribute
-	fileprivate let map: (UILayoutable) -> UILayoutable
-	public var target: SelfLayoutReference { self }
-	public var superview: SelfLayoutReference { SelfLayoutReference(map: { $0.parent ?? $0 }) }
-	public var safeArea: SelfLayoutReference { SelfLayoutReference(map: { $0._safeArea ?? $0 }) }
-	
-	public func asLayoutableArray(for other: UILayoutableArray?) -> [UILayoutable] {
-		guard let item = other else { return [] }
-		return item.asLayoutableArray(for: nil).map(map)
-	}
-}
+//struct SelfLayoutReference<Item: UILayoutable>: Attributable, UILayoutableArray {
+//	typealias Att = NSLayoutConstraint.Attribute
+//	let map: (UILayoutable) -> UILayoutable
+//	var target: SelfLayoutReference { self }
+//
+//	public func asLayoutableArray(for other: UILayoutableArray?) -> [UILayoutable] {
+//		guard let item = other else { return [] }
+//		return item.asLayoutableArray(for: nil).map(map)
+//	}
+//}
 
-public var its: SelfLayoutReference { SelfLayoutReference(map: { $0 }) }
-
-extension UILayoutable {
-	
-	var _safeArea: UILayoutGuide? {
-		if #available(iOS 11.0, *) {
-			return (itemForConstraint as? UIView)?.safeAreaLayoutGuide
-		} else {
-			return nil
-		}
-	}
-	
-}
+//public protocol LayoutAttributeConvertable {
+//	associatedtype A
+//	associatedtype Item: UILayoutableArray
+//	associatedtype K: AttributeConvertable
+//	func attribute<B, L: UILayoutableArray, Q: AttributeConvertable>(for other: LayoutAttribute<B, L, Q>) -> LayoutAttribute<A, Item, K>
+//}
+//
+//extension UIView: LayoutAttributeConvertable {
+//
+//	public func attribute<B, L: UILayoutableArray, Q: AttributeConvertable>(for other: LayoutAttribute<B, L, Q>) -> LayoutAttribute<NonAttribute, UIView, NSLayoutConstraint.Attribute> {
+//		LayoutAttribute(type: other.type as! NSLayoutConstraint.Attribute, item: self, constant: 0, multiplier: 1, priority: other.priority, isActive: other.isActive)
+//	}
+//
+//}
+//
+//public enum NonAttribute {}

@@ -14,6 +14,10 @@ extension LayoutAttribute {
 		setup(deactivated, rhs, relation: .equal)
 	}
 	
+	public func equal<E: UILayoutableArray>(to rhs: @escaping (Item) -> LayoutAttribute<A, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item> {
+		__setup(deactivated, rhs, relation: .equal)
+	}
+	
 	public subscript<E: UILayoutableArray>(_ rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
 		equal(to: rhs)
 	}
@@ -42,6 +46,10 @@ extension LayoutAttribute {
 		setup(deactivated, rhs, relation: .lessThanOrEqual)
 	}
 	
+	public func less<E: UILayoutableArray>(than rhs: @escaping (Item) -> LayoutAttribute<A, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item> {
+		__setup(deactivated, rhs, relation: .lessThanOrEqual)
+	}
+	
 	public func less(than rhs: CGFloat) -> Constraints<Item> {
 		setup(deactivated, rhs, relation: .lessThanOrEqual)
 	}
@@ -54,6 +62,10 @@ extension LayoutAttribute {
 		setup(deactivated, rhs, relation: .greaterThanOrEqual)
 	}
 	
+	public func greater<E: UILayoutableArray>(than rhs: @escaping (Item) -> LayoutAttribute<A, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item> {
+		__setup(deactivated, rhs, relation: .greaterThanOrEqual)
+	}
+	
 	public func greater(than rhs: CGFloat) -> Constraints<Item> {
 		setup(deactivated, rhs, relation: .greaterThanOrEqual)
 	}
@@ -64,6 +76,10 @@ extension LayoutAttribute {
 	
 	public func equal<R: UILayoutableArray>(to rhs: R) -> Constraints<Item> {
 		setup(deactivated, rhs, relation: .equal)
+	}
+	
+	public func equal<E: UILayoutableArray>(to rhs: @escaping (Item) -> E?) -> Constraints<Item> {
+		__setup(deactivated, rhs, relation: .equal)
 	}
 	
 	public subscript<R: UILayoutableArray>(_ rhs: R) -> Constraints<Item> {
@@ -82,44 +98,60 @@ extension LayoutAttribute {
 		setup(deactivated, rhs, relation: .lessThanOrEqual)
 	}
 	
+	public func less<E: UILayoutableArray>(than rhs: @escaping (Item) -> E?) -> Constraints<Item> {
+		__setup(deactivated, rhs, relation: .lessThanOrEqual)
+	}
+	
 	public func greater<R: UILayoutableArray>(than rhs: R) -> Constraints<Item> {
 		setup(deactivated, rhs, relation: .greaterThanOrEqual)
+	}
+	
+	public func greater<E: UILayoutableArray>(than rhs: @escaping (Item) -> E?) -> Constraints<Item> {
+		__setup(deactivated, rhs, relation: .greaterThanOrEqual)
 	}
 	
 }
 
 extension LayoutAttribute where A == Attributes.CenterX {
 	
-	public func equal<E: UILayoutableArray>(to rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
+	public func equal<T: CenterXAttributeCompatible, E: UILayoutableArray>(to rhs: LayoutAttribute<T, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
 		setup(deactivated, rhs, relation: .equal)
-	}
-	
-	public subscript<E: UILayoutableArray>(to rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
-		equal(to: rhs)
 	}
 	
 	public func equal<T: CenterXAttributeCompatible, E: UILayoutableArray>(to rhs: LayoutAttribute<T, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item>? {
 		_setup(deactivated, rhs, relation: .equal)
 	}
 	
+	public func equal<T: CenterXAttributeCompatible, E: UILayoutableArray>(to rhs: @escaping (Item) -> LayoutAttribute<T, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item>? {
+		__setup(deactivated, rhs, relation: .equal)
+	}
+	
 	public subscript<T: CenterXAttributeCompatible, E: UILayoutableArray>(to rhs: LayoutAttribute<T, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item>? {
 		equal(to: rhs)
 	}
 	
-	public func less<E: UILayoutableArray>(than rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
+	public func less<T: CenterXAttributeCompatible, E: UILayoutableArray>(than rhs: LayoutAttribute<T, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
 		setup(deactivated, rhs, relation: .lessThanOrEqual)
 	}
 	
-	public func less<R: UILayoutableArray>(than rhs: LayoutAttribute<A, R, NSLayoutConstraint.Attribute>?) -> Constraints<Item>? {
-		rhs.map(less)
+	public func less<T: CenterXAttributeCompatible, E: UILayoutableArray>(than rhs: LayoutAttribute<T, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item>? {
+		_setup(deactivated, rhs, relation: .lessThanOrEqual)
 	}
 	
-	public func greater<E: UILayoutableArray>(than rhs: LayoutAttribute<A, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
+	public func less<T: CenterXAttributeCompatible, E: UILayoutableArray>(than rhs: @escaping (Item) -> LayoutAttribute<T, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
+		__setup(deactivated, rhs, relation: .lessThanOrEqual)
+	}
+	
+	public func greater<T: CenterXAttributeCompatible, E: UILayoutableArray>(than rhs: LayoutAttribute<T, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
 		setup(deactivated, rhs, relation: .greaterThanOrEqual)
 	}
 	
-	public func greater<R: UILayoutableArray>(than rhs: LayoutAttribute<A, R, NSLayoutConstraint.Attribute>?) -> Constraints<Item>? {
-		rhs.map(greater)
+	public func greater<T: CenterXAttributeCompatible, R: UILayoutableArray>(than rhs: LayoutAttribute<T, R, NSLayoutConstraint.Attribute>?) -> Constraints<Item>? {
+		_setup(deactivated, rhs, relation: .greaterThanOrEqual)
+	}
+	
+	public func greater<T: CenterXAttributeCompatible, E: UILayoutableArray>(than rhs: @escaping (Item) -> LayoutAttribute<T, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
+		__setup(deactivated, rhs, relation: .greaterThanOrEqual)
 	}
 	
 }
@@ -138,6 +170,10 @@ extension LayoutAttribute where A: CenterXAttributeCompatible {
 		rhs.map(equal)
 	}
 	
+	public func equal<E: UILayoutableArray>(to rhs: @escaping (Item) -> LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
+		__setup(deactivated, rhs, relation: .equal)
+	}
+	
 	public subscript<E: UILayoutableArray>(to rhs: LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item>? {
 		equal(to: rhs)
 	}
@@ -150,12 +186,20 @@ extension LayoutAttribute where A: CenterXAttributeCompatible {
 		rhs.map(less)
 	}
 	
+	public func less<E: UILayoutableArray>(than rhs: @escaping (Item) -> LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
+		__setup(deactivated, rhs, relation: .lessThanOrEqual)
+	}
+	
 	public func greater<E: UILayoutableArray>(than rhs: LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
 		setup(deactivated, rhs, relation: .greaterThanOrEqual)
 	}
 	
 	public func greater<E: UILayoutableArray>(than rhs: LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>?) -> Constraints<Item>? {
 		rhs.map(greater)
+	}
+	
+	public func greater<E: UILayoutableArray>(than rhs: @escaping (Item) -> LayoutAttribute<Attributes.CenterX, E, NSLayoutConstraint.Attribute>) -> Constraints<Item> {
+		__setup(deactivated, rhs, relation: .greaterThanOrEqual)
 	}
 }
 

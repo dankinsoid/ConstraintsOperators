@@ -15,12 +15,13 @@ func _setup<A, D, C: UILayoutableArray, K: UILayoutableArray, T: AttributeConver
     return setup(l, r, relation: relation)
 }
 
-func setup<A, D, C: UILayoutableArray, K: UILayoutableArray, T: AttributeConvertable>(_ lhs: LayoutAttribute<A, C, T>, _ rhs: LayoutAttribute<D, K, NSLayoutConstraint.Attribute>, relation: NSLayoutConstraint.Relation) -> Constraints<C> {
+func __setup<A, D, C: UILayoutableArray, K: UILayoutableArray, T: AttributeConvertable>(_ lhs: LayoutAttribute<A, C, T>, _ rhs: @escaping (C) -> LayoutAttribute<D, K, NSLayoutConstraint.Attribute>?, relation: NSLayoutConstraint.Relation) -> Constraints<C> {
 	Constraints(
 		{
-			let result = ConstraintsBuilder.make(item: lhs.item.asLayoutableArray(for: rhs.item), attribute: lhs.type.attributes, relatedBy: relation, toItem: rhs.item.asLayoutableArray(for: lhs.item), attribute: rhs.type, multiplier: rhs.multiplier / lhs.multiplier, constant: rhs.constant - lhs.constant)
-			result.priority = min(lhs.priority, rhs.priority)
-			let active = lhs.isActive && rhs.isActive
+			guard let right = rhs(lhs.item) else { return [] }
+			let result = ConstraintsBuilder.make(item: lhs.item.asLayoutableArray(for: right.item), attribute: lhs.type.attributes, relatedBy: relation, toItem: right.item.asLayoutableArray(for: lhs.item), attribute: right.type, multiplier: right.multiplier / lhs.multiplier, constant: right.constant - lhs.constant)
+			result.priority = min(lhs.priority, right.priority)
+			let active = lhs.isActive && right.isActive
 			if active {
 				removeConflicts(with: result)
 			}
@@ -31,15 +32,20 @@ func setup<A, D, C: UILayoutableArray, K: UILayoutableArray, T: AttributeConvert
 	)
 }
 
+func setup<A, D, C: UILayoutableArray, K: UILayoutableArray, T: AttributeConvertable>(_ lhs: LayoutAttribute<A, C, T>, _ rhs: LayoutAttribute<D, K, NSLayoutConstraint.Attribute>, relation: NSLayoutConstraint.Relation) -> Constraints<C> {
+	__setup(lhs, { _ in rhs }, relation: relation)
+}
+
 func _setup<A, C: UILayoutableArray, T: AttributeConvertable, V: UILayoutableArray>(_ lhs: LayoutAttribute<A, C, T>?, _ rhs: V?, relation: NSLayoutConstraint.Relation) -> Constraints<C>? {
     guard let l = lhs, let r = rhs else { return nil }
     return setup(l, r, relation: relation)
 }
 
-func setup<A, C: UILayoutableArray, T: AttributeConvertable, V: UILayoutableArray>(_ lhs: LayoutAttribute<A, C, T>, _ rhs: V, relation: NSLayoutConstraint.Relation) -> Constraints<C> {
+func __setup<A, C: UILayoutableArray, T: AttributeConvertable, V: UILayoutableArray>(_ lhs: LayoutAttribute<A, C, T>, _ rhs: @escaping (C) -> V?, relation: NSLayoutConstraint.Relation) -> Constraints<C> {
 	Constraints(
 		{
-			let result = ConstraintsBuilder.makeToView(item: lhs.item.asLayoutableArray(for: rhs), attribute: lhs.type.attributes, relatedBy: relation, itemTo: rhs.asLayoutableArray(for: lhs.item), multiplier: 1 / lhs.multiplier, constant: -lhs.constant)
+			guard let right = rhs(lhs.item) else { return [] }
+			let result = ConstraintsBuilder.makeToView(item: lhs.item.asLayoutableArray(for: right), attribute: lhs.type.attributes, relatedBy: relation, itemTo: right.asLayoutableArray(for: lhs.item), multiplier: 1 / lhs.multiplier, constant: -lhs.constant)
 			result.priority = lhs.priority
 			let active = lhs.isActive
 			if active {
@@ -50,6 +56,10 @@ func setup<A, C: UILayoutableArray, T: AttributeConvertable, V: UILayoutableArra
 		},
 		item: lhs.item
 	)
+}
+
+func setup<A, C: UILayoutableArray, T: AttributeConvertable, V: UILayoutableArray>(_ lhs: LayoutAttribute<A, C, T>, _ rhs: V, relation: NSLayoutConstraint.Relation) -> Constraints<C> {
+	__setup(lhs, { _ in  rhs }, relation: relation)
 }
 
 func removeConflicts(with constraint: [NSLayoutConstraint]) {
