@@ -13,8 +13,15 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 	public typealias Att = NSLayoutConstraint.Attribute
 	private let block: () -> [NSLayoutConstraint]
 	public var target: Constraints { self }
-	public let item: Item
+	public let item: Item?
 	public lazy var constraints = block()
+	
+	static var empty: Constraints { Constraints() }
+	
+	private init() {
+		block = {[]}
+		item = nil
+	}
 	
 	init(_ constraint: @autoclosure @escaping () -> NSLayoutConstraint, item target: Item) {
 		self.block = { [constraint()] }
@@ -47,11 +54,11 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 		}
 	}
 
-	public func asLayoutableArray(for other: UILayoutableArray?) -> [UILayoutable] {
+	public func asLayoutableArray() -> [UILayoutable] {
 		if let layoutable = self as? UILayoutable {
 			return [layoutable]
 		}
-		return item.asLayoutableArray(for: other)
+		return item?.asLayoutableArray() ?? []
 	}
 	
 	func apply() -> Constraints {
@@ -62,5 +69,5 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 }
 
 extension Constraints: UILayoutable where Item: UILayoutable {
-	public var itemForConstraint: Any { item.itemForConstraint }
+	public var itemForConstraint: Any { item?.itemForConstraint as Any }
 }

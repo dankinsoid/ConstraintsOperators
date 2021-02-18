@@ -148,6 +148,7 @@ extension Attributable {
 }
 
 public protocol CenterXAttributeCompatible {}
+public protocol HorizontalLayoutableAttribute {}
 
 public enum Attributes {
     public enum LeadTrail: CenterXAttributeCompatible, HorizontalLayoutableAttribute {}
@@ -156,15 +157,15 @@ public enum Attributes {
     public enum Vertical {}
     public enum Size {}
     public enum Edges {}
+		public enum Same {}
 }
 
 public struct AnyLayoutable: UILayoutable {
 	public var itemForConstraint: Any
 }
 
-extension LayoutAttribute where Item: UILayoutable, K == NSLayoutConstraint.Attribute {
-	
-	func asAny() -> AnyAttribute1 {
-		AnyAttribute1(type: type, item: AnyLayoutable(itemForConstraint: item.itemForConstraint), constant: constant, multiplier: multiplier, priority: priority, isActive: isActive)
+extension UILayoutable {
+	var any: AnyLayoutable {
+		AnyLayoutable(itemForConstraint: itemForConstraint)
 	}
 }

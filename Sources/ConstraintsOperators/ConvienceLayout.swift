@@ -13,12 +13,18 @@ public protocol UILayoutable: UILayoutableArray {
 }
 
 public protocol UILayoutableArray {
-	func asLayoutableArray(for other: UILayoutableArray?) -> [UILayoutable]
+	func asLayoutableArray() -> [UILayoutable]
 }
 
 extension UILayoutable {
-	public func asLayoutableArray(for other: UILayoutableArray?) -> [UILayoutable] {
+	public func asLayoutableArray() -> [UILayoutable] {
 		[self]
+	}
+}
+
+extension UILayoutable {
+	var view: UIView? {
+		(itemForConstraint as? UIView) ?? (itemForConstraint as? UILayoutGuide)?.owningView
 	}
 }
 
@@ -45,13 +51,13 @@ extension UILayoutGuide: UILayoutable, Attributable {
 public struct ConvienceLayout<Item: UILayoutableArray, Att: AttributeConvertable>: UILayoutableArray, Attributable {
 	public let target: Item
 	init(_ item: Item) { target = item }
-	public func asLayoutableArray(for other: UILayoutableArray?) -> [UILayoutable] {
-		target.asLayoutableArray(for: other)
+	public func asLayoutableArray() -> [UILayoutable] {
+		target.asLayoutableArray()
 	}
 }
 
 extension Array: UILayoutableArray where Element: UILayoutable {
-	public func asLayoutableArray(for other: UILayoutableArray?) -> [UILayoutable] {
+	public func asLayoutableArray() -> [UILayoutable] {
 		self
 	}
 }
@@ -72,7 +78,7 @@ extension Attributable where Target: UILayoutableArray {
     }
     
     public func ignoreAutoresizingMask() {
-			target.asLayoutableArray(for: nil).compactMap { $0.itemForConstraint as? UIView }.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+			target.asLayoutableArray().compactMap { $0.itemForConstraint as? UIView }.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
     }
     
 }
