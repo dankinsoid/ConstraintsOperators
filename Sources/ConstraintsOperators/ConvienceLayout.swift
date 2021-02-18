@@ -16,8 +16,12 @@ public protocol UILayoutableArray {
 	func asLayoutableArray() -> [UILayoutable]
 }
 
+public protocol EmptyInitable {
+	init()
+}
+
 public protocol UITypedLayoutableArray {
-	associatedtype Layoutable: UILayoutableArray
+	associatedtype Layoutable: UILayoutableArray & EmptyInitable
 	var layoutable: Layoutable { get }
 }
 
@@ -33,7 +37,7 @@ extension UILayoutable {
 	}
 }
 
-extension UIView: UILayoutable, Attributable, UITypedLayoutableArray {
+extension UIView: UILayoutable, Attributable, UITypedLayoutableArray, EmptyInitable {
 	public typealias Att = NSLayoutConstraint.Attribute
 	public var target: UIView { self }
 	public var itemForConstraint: Any { self }
@@ -47,7 +51,7 @@ extension Array where Element: UIView {
     public var safeArea: [UILayoutGuide] { map({ $0.safeAreaLayoutGuide }) }
 }
 
-extension UILayoutGuide: UILayoutable, Attributable, UITypedLayoutableArray {
+extension UILayoutGuide: UILayoutable, Attributable, UITypedLayoutableArray, EmptyInitable {
 	public typealias Att = NSLayoutConstraint.Attribute
 	public var target: UILayoutGuide { self }
 	public var itemForConstraint: Any { self }
@@ -66,7 +70,7 @@ extension ConvienceLayout: UITypedLayoutableArray where Item: UITypedLayoutableA
 	public var layoutable: Item.Layoutable { target.layoutable }
 }
 
-extension Array: UILayoutableArray where Element: UILayoutable {
+extension Array: UILayoutableArray, EmptyInitable where Element: UILayoutable {
 	public func asLayoutableArray() -> [UILayoutable] {
 		self
 	}

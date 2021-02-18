@@ -8,7 +8,7 @@ final class ConstraintsOperatorsTests: XCTestCase {
 			view1.height
 				.equal { $0.superview?.safeArea }
 				.edges()
-				.equal { $0?.superview?.safeArea }
+				.equal { $0.superview?.safeArea }
 				.isActive = true
 		
 			view1.size =| view2

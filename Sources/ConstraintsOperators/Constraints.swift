@@ -19,7 +19,7 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 	static var empty: Constraints { Constraints() }
 	
 	private init() {
-		block = {[]}
+		block = { [] }
 		item = nil
 	}
 	
@@ -73,8 +73,8 @@ extension Constraints: UILayoutable where Item: UILayoutable {
 }
 
 extension Constraints: UITypedLayoutableArray where Item: UITypedLayoutableArray {
-	public typealias Layoutable = Item.Layoutable?
-	public var layoutable: Item.Layoutable? { item?.layoutable }
+	public typealias Layoutable = Item.Layoutable
+	public var layoutable: Item.Layoutable { item?.layoutable ?? Item.Layoutable.init() }
 }
 
 extension Optional: UILayoutableArray where Wrapped: UILayoutableArray {
