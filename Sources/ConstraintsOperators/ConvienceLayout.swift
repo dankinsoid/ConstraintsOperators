@@ -16,6 +16,11 @@ public protocol UILayoutableArray {
 	func asLayoutableArray() -> [UILayoutable]
 }
 
+public protocol UITypedLayoutableArray {
+	associatedtype Layoutable: UILayoutableArray
+	var layoutable: Layoutable { get }
+}
+
 extension UILayoutable {
 	public func asLayoutableArray() -> [UILayoutable] {
 		[self]
@@ -28,13 +33,13 @@ extension UILayoutable {
 	}
 }
 
-extension UIView: UILayoutable, Attributable {
+extension UIView: UILayoutable, Attributable, UITypedLayoutableArray {
 	public typealias Att = NSLayoutConstraint.Attribute
 	public var target: UIView { self }
-		public var itemForConstraint: Any { self }
-    
-    @available(iOS 11.0, *)
-    public var safeArea: UILayoutGuide { safeAreaLayoutGuide }
+	public var itemForConstraint: Any { self }
+	public var layoutable: UIView { self }
+	@available(iOS 11.0, *)
+	public var safeArea: UILayoutGuide { safeAreaLayoutGuide }
 }
 
 extension Array where Element: UIView {
@@ -42,10 +47,11 @@ extension Array where Element: UIView {
     public var safeArea: [UILayoutGuide] { map({ $0.safeAreaLayoutGuide }) }
 }
 
-extension UILayoutGuide: UILayoutable, Attributable {
+extension UILayoutGuide: UILayoutable, Attributable, UITypedLayoutableArray {
 	public typealias Att = NSLayoutConstraint.Attribute
 	public var target: UILayoutGuide { self }
 	public var itemForConstraint: Any { self }
+	public var layoutable: UILayoutGuide { self }
 }
 
 public struct ConvienceLayout<Item: UILayoutableArray, Att: AttributeConvertable>: UILayoutableArray, Attributable {
@@ -56,13 +62,22 @@ public struct ConvienceLayout<Item: UILayoutableArray, Att: AttributeConvertable
 	}
 }
 
+extension ConvienceLayout: UITypedLayoutableArray where Item: UITypedLayoutableArray {
+	public var layoutable: Item.Layoutable { target.layoutable }
+}
+
 extension Array: UILayoutableArray where Element: UILayoutable {
 	public func asLayoutableArray() -> [UILayoutable] {
 		self
 	}
 }
 
-extension Array: Attributable where Element: UILayoutable & Attributable {
+extension Array: UITypedLayoutableArray where Element: UILayoutable {
+	public typealias Layoutable = [Element]
+	public var layoutable: [Element] { self }
+}
+
+extension Array: Attributable where Element: UILayoutable & Attributable & UITypedLayoutableArray {
 	public typealias Att = Element.Att
 	public var target: [Element] { self }
 }

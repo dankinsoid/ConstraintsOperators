@@ -71,3 +71,14 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 extension Constraints: UILayoutable where Item: UILayoutable {
 	public var itemForConstraint: Any { item?.itemForConstraint as Any }
 }
+
+extension Constraints: UITypedLayoutableArray where Item: UITypedLayoutableArray {
+	public typealias Layoutable = Item.Layoutable?
+	public var layoutable: Item.Layoutable? { item?.layoutable }
+}
+
+extension Optional: UILayoutableArray where Wrapped: UILayoutableArray {
+	public func asLayoutableArray() -> [UILayoutable] {
+		self?.asLayoutableArray() ?? []
+	}
+}

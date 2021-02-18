@@ -14,10 +14,6 @@ extension LayoutAttribute {
 		rhs.constraints(with: self, relation: .equal)
 	}
 	
-	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item) -> T) -> Constraints<Item> where T.Attribute == A {
-		LazyLayoutAttribute(attribute: rhs).constraints(with: self, relation: .equal)
-	}
-	
 	public subscript<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == A {
 		equal(to: rhs)
 	}
@@ -30,24 +26,12 @@ extension LayoutAttribute {
 		rhs.constraints(with: self, relation: .lessThanOrEqual)
 	}
 	
-	public func less<E: LayoutAttributeType>(than rhs: @escaping (Item) -> E) -> Constraints<Item> where E.Attribute == A {
-		LazyLayoutAttribute(attribute: rhs).constraints(with: self, relation: .lessThanOrEqual)
-	}
-	
 	public func greater<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute == A {
 		rhs.constraints(with: self, relation: .greaterThanOrEqual)
 	}
 	
-	public func greater<E: LayoutAttributeType>(than rhs: @escaping (Item) -> E) -> Constraints<Item> where E.Attribute == A {
-		LazyLayoutAttribute(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
-	}
-	
 	public func equal<T: LayoutAttributeType>(to rhs: T) -> Constraints<Item> where T.Attribute == Attributes.Same {
 		rhs.constraints(with: self, relation: .equal)
-	}
-	
-	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item) -> T) -> Constraints<Item> where T.Attribute == Attributes.Same {
-		LazyLayoutAttribute(attribute: rhs).constraints(with: self, relation: .equal)
 	}
 	
 	public subscript<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == Attributes.Same {
@@ -58,16 +42,36 @@ extension LayoutAttribute {
 		rhs.constraints(with: self, relation: .lessThanOrEqual)
 	}
 	
-	public func less<E: LayoutAttributeType>(than rhs: @escaping (Item) -> E) -> Constraints<Item> where E.Attribute == Attributes.Same {
-		LazyLayoutAttribute(attribute: rhs).constraints(with: self, relation: .lessThanOrEqual)
-	}
-	
 	public func greater<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute == Attributes.Same {
 		rhs.constraints(with: self, relation: .greaterThanOrEqual)
 	}
 	
-	public func greater<E: LayoutAttributeType>(than rhs: @escaping (Item) -> E) -> Constraints<Item> where E.Attribute == Attributes.Same {
-		LazyLayoutAttribute(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
+}
+
+extension LayoutAttribute where Item: UITypedLayoutableArray {
+	
+	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute == A {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .equal)
+	}
+	
+	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute == Attributes.Same {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .equal)
+	}
+	
+	public func less<E: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> E) -> Constraints<Item> where E.Attribute == A {
+		LazyLayoutAttribute<Item, E>(attribute: rhs).constraints(with: self, relation: .lessThanOrEqual)
+	}
+	
+	public func less<E: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> E) -> Constraints<Item> where E.Attribute == Attributes.Same {
+		LazyLayoutAttribute<Item, E>(attribute: rhs).constraints(with: self, relation: .lessThanOrEqual)
+	}
+	
+	public func greater<E: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> E) -> Constraints<Item> where E.Attribute == A {
+		LazyLayoutAttribute<Item, E>(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
+	}
+	
+	public func greater<E: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> E) -> Constraints<Item> where E.Attribute == Attributes.Same {
+		LazyLayoutAttribute<Item, E>(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
 	}
 	
 }
@@ -78,10 +82,6 @@ extension LayoutAttribute where A == Attributes.CenterX {
 		rhs.constraints(with: self, relation: .equal)
 	}
 	
-	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item) -> T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
-		LazyLayoutAttribute(attribute: rhs).constraints(with: self, relation: .equal)
-	}
-	
 	public subscript<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
 		equal(to: rhs)
 	}
@@ -90,16 +90,24 @@ extension LayoutAttribute where A == Attributes.CenterX {
 		rhs.constraints(with: self, relation: .lessThanOrEqual)
 	}
 	
-	public func less<T: LayoutAttributeType>(than rhs: @escaping (Item) -> T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
-		LazyLayoutAttribute(attribute: rhs).constraints(with: self, relation: .lessThanOrEqual)
-	}
-	
 	public func greater<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
 		rhs.constraints(with: self, relation: .greaterThanOrEqual)
 	}
 	
-	public func greater<T: LayoutAttributeType>(than rhs: @escaping (Item) -> T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
-		LazyLayoutAttribute(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
+}
+
+extension LayoutAttribute where Item: UITypedLayoutableArray, A == Attributes.CenterX {
+	
+	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .equal)
+	}
+	
+	public func less<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .lessThanOrEqual)
+	}
+	
+	public func greater<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
 	}
 	
 }
@@ -110,10 +118,6 @@ extension LayoutAttribute where A: CenterXAttributeCompatible {
 		rhs.constraints(with: self, relation: .equal)
 	}
 	
-	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item) -> T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
-		LazyLayoutAttribute(attribute: rhs).constraints(with: self, relation: .equal)
-	}
-	
 	public subscript<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
 		equal(to: rhs)
 	}
@@ -122,16 +126,24 @@ extension LayoutAttribute where A: CenterXAttributeCompatible {
 		rhs.constraints(with: self, relation: .lessThanOrEqual)
 	}
 	
-	public func less<T: LayoutAttributeType>(than rhs: @escaping (Item) -> T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
-		LazyLayoutAttribute(attribute: rhs).constraints(with: self, relation: .lessThanOrEqual)
-	}
-	
 	public func greater<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
 		rhs.constraints(with: self, relation: .greaterThanOrEqual)
 	}
 	
-	public func greater<T: LayoutAttributeType>(than rhs: @escaping (Item) -> T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
-		LazyLayoutAttribute(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
+}
+
+extension LayoutAttribute where Item: UITypedLayoutableArray, A: CenterXAttributeCompatible {
+	
+	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .equal)
+	}
+	
+	public func less<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .lessThanOrEqual)
+	}
+	
+	public func greater<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
 	}
 	
 }

@@ -7,17 +7,6 @@
 
 import UIKit
 
-//struct SelfLayoutReference<Item: UILayoutable>: Attributable, UILayoutableArray {
-//	typealias Att = NSLayoutConstraint.Attribute
-//	let map: (UILayoutable) -> UILayoutable
-//	var target: SelfLayoutReference { self }
-//
-//	public func asLayoutableArray() -> [UILayoutable] {
-//		guard let item = other else { return [] }
-//		return item.asLayoutableArray().map(map)
-//	}
-//}
-
 public protocol LayoutAttributeType {
 	associatedtype Attribute
 	func constraints<B, L: UILayoutableArray, Q: AttributeConvertable>(with first: LayoutAttribute<B, L, Q>?, relation: NSLayoutConstraint.Relation) -> Constraints<L>
@@ -113,13 +102,19 @@ extension CGFloat: LayoutAttributeType {
 	}
 }
 
-struct LazyLayoutAttribute<A: UILayoutableArray, C: LayoutAttributeType>: LayoutAttributeType {
+struct LazyLayoutAttribute<A: UITypedLayoutableArray, C: LayoutAttributeType>: LayoutAttributeType {
 	public typealias Attribute = C.Attribute
-	let attribute: (A) -> C
+	let attribute: (A.Layoutable) -> C
 	
 	func constraints<B, L: UILayoutableArray, Q: AttributeConvertable>(with first: LayoutAttribute<B, L, Q>?, relation: NSLayoutConstraint.Relation) -> Constraints<L> {
 		guard let first = first, L.self == A.self else { return .empty }
-		return Constraints({ (first.item as? A).map { self.attribute($0).constraints(with: first, relation: relation).constraints } ?? [] }, item: first.item)
+		return Constraints(
+			{
+				((first.item as? A)?.layoutable ?? (first.item as? A.Layoutable))
+					.map { self.attribute($0).constraints(with: first, relation: relation).constraints } ?? []
+			},
+			item: first.item
+		)
 	}
 	
 }
