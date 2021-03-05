@@ -9,13 +9,25 @@
 import UIKit
 
 public protocol ConstraintProtocol {
-    var isActive: Bool { get nonmutating set }
-    var priority: UILayoutPriority { get nonmutating set }
+	var isActive: Bool { get nonmutating set }
+	var constant: CGFloat { get nonmutating set }
+	var priority: UILayoutPriority { get nonmutating set }
 }
 
 extension NSLayoutConstraint: ConstraintProtocol {}
 
 extension Array: ConstraintProtocol where Element: ConstraintProtocol {
+	
+	public var constant: CGFloat {
+		get {
+			first?.constant ?? 0
+		}
+		nonmutating set {
+			forEach {
+				$0.constant = newValue
+			}
+		}
+	}
 	
     public var isActive: Bool {
         get { return reduce(false, { $0 || $1.isActive }) }

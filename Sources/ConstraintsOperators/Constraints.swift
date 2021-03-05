@@ -53,6 +53,14 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 			constraints.priority = newValue
 		}
 	}
+	
+	public var constant: CGFloat {
+		get { constraints.constant }
+		set {
+			(item as? ConstraintProtocol)?.constant = newValue
+			constraints.constant = newValue
+		}
+	}
 
 	public func asLayoutableArray() -> [UILayoutable] {
 		if let layoutable = self as? UILayoutable {
@@ -81,4 +89,9 @@ extension Optional: UILayoutableArray where Wrapped: UILayoutableArray {
 	public func asLayoutableArray() -> [UILayoutable] {
 		self?.asLayoutableArray() ?? []
 	}
+}
+
+extension UIView {
+	
+	
 }
