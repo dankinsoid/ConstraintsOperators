@@ -11,74 +11,61 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 	public typealias Target = Constraints
 	public typealias W = Item
 	public typealias Att = NSLayoutConstraint.Attribute
-	private(set) public var block: () -> [NSLayoutConstraint]
 	public var target: Constraints { self }
 	public let item: Item?
-	private var _constraints: [NSLayoutConstraint]?
 	public var constraints: [NSLayoutConstraint] {
-		let result = _constraints ?? block()
-		if _constraints == nil {
-			_constraints = result
-			onCreate?(result)
-		}
-		return result
+		onlyConstraints.constraints
 	}
-	public var onCreate: (([NSLayoutConstraint]) -> Void)?
+	public let onlyConstraints: OnlyConstraints
 	
 	static var empty: Constraints { Constraints() }
 	
 	private init() {
-		block = { [] }
+		onlyConstraints = OnlyConstraints()
 		item = nil
 	}
 	
 	public init(_ constraint: @autoclosure @escaping () -> NSLayoutConstraint, item target: Item) {
-		self.block = { [constraint()] }
+		onlyConstraints = OnlyConstraints { [constraint()] }
 		self.item = target
 	}
 	
 	public init(_ constraints: @autoclosure @escaping () -> [NSLayoutConstraint], item target: Item) {
-		self.block = constraints
+		onlyConstraints = OnlyConstraints(constraints)
 		self.item = target
 	}
 	
 	public init(_ constraints: @escaping () -> [NSLayoutConstraint], item target: Item) {
-		self.block = constraints
+		onlyConstraints = OnlyConstraints(constraints)
 		self.item = target
 	}
 	
 	public var isActive: Bool {
-		get { constraints.isActive }
+		get { onlyConstraints.isActive }
 		set {
 			(item as? ConstraintProtocol)?.isActive = newValue
-			constraints.isActive = newValue
+			onlyConstraints.isActive = newValue
 		}
 	}
 	
 	public var priority: UILayoutPriority {
-		get { constraints.priority }
+		get { onlyConstraints.priority }
 		set {
 			(item as? ConstraintProtocol)?.priority = newValue
-			constraints.priority = newValue
+			onlyConstraints.priority = newValue
 		}
 	}
 	
 	public var constant: CGFloat {
-		get { constraints.constant }
+		get { onlyConstraints.constant }
 		set {
 			(item as? ConstraintProtocol)?.constant = newValue
-			constraints.constant = newValue
+			onlyConstraints.constant = newValue
 		}
 	}
 
 	public func update(_ constraints: Constraints) {
-		if let current = _constraints {
-			let isActive = current.isActive
-			current.isActive = false
-			constraints.isActive = isActive
-		}
-		block = constraints.block
-		_constraints = constraints._constraints
+		onlyConstraints.update(constraints.onlyConstraints)
 	}
 	
 	public func asLayoutableArray() -> [UILayoutable] {
@@ -93,6 +80,62 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 		return self
 	}
 	
+	public final class OnlyConstraints {
+		private var block: () -> [NSLayoutConstraint]
+		private var _constraints: [NSLayoutConstraint]?
+		public var constraints: [NSLayoutConstraint] {
+			let result = _constraints ?? block()
+			if _constraints == nil {
+				_constraints = result
+			}
+			return result
+		}
+		
+		static var empty: Constraints { Constraints() }
+		
+		fileprivate init() {
+			block = { [] }
+		}
+		
+		public init(_ constraints: @escaping () -> [NSLayoutConstraint]) {
+			self.block = constraints
+		}
+		
+		public var isActive: Bool {
+			get { constraints.isActive }
+			set {
+				constraints.isActive = newValue
+			}
+		}
+		
+		public var priority: UILayoutPriority {
+			get { constraints.priority }
+			set {
+				constraints.priority = newValue
+			}
+		}
+		
+		public var constant: CGFloat {
+			get { constraints.constant }
+			set {
+				constraints.constant = newValue
+			}
+		}
+		
+		public func update(_ constraints: OnlyConstraints) {
+			if let current = _constraints {
+				let isActive = current.isActive
+				current.isActive = false
+				constraints.isActive = isActive
+			}
+			block = constraints.block
+			_constraints = constraints._constraints
+		}
+		
+		func apply() {
+			_ = constraints
+		}
+	}
 }
 
 extension Constraints: UILayoutable where Item: UILayoutable {
