@@ -11,7 +11,7 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 	public typealias Target = Constraints
 	public typealias W = Item
 	public typealias Att = NSLayoutConstraint.Attribute
-	private var block: () -> [NSLayoutConstraint]
+	private(set) public var block: () -> [NSLayoutConstraint]
 	public var target: Constraints { self }
 	public let item: Item?
 	private var _constraints: [NSLayoutConstraint]?
