@@ -19,9 +19,11 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 		let result = _constraints ?? block()
 		if _constraints == nil {
 			_constraints = result
+			onCreate?(result)
 		}
 		return result
 	}
+	public var onCreate: (([NSLayoutConstraint]) -> Void)?
 	
 	static var empty: Constraints { Constraints() }
 	
