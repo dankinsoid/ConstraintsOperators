@@ -71,9 +71,9 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 
 	public func update(_ constraints: Constraints) {
 		if let current = _constraints {
-			current.forEach {
-				$0.isActive = false
-			}
+			let isActive = current.isActive
+			current.isActive = false
+			constraints.isActive = isActive
 		}
 		block = constraints.block
 		_constraints = constraints._constraints
