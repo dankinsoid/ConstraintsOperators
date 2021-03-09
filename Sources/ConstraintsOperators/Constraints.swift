@@ -11,10 +11,17 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 	public typealias Target = Constraints
 	public typealias W = Item
 	public typealias Att = NSLayoutConstraint.Attribute
-	private let block: () -> [NSLayoutConstraint]
+	private var block: () -> [NSLayoutConstraint]
 	public var target: Constraints { self }
 	public let item: Item?
-	public lazy var constraints = block()
+	private var _constraints: [NSLayoutConstraint]?
+	public var constraints: [NSLayoutConstraint] {
+		let result = _constraints ?? block()
+		if _constraints == nil {
+			_constraints = result
+		}
+		return result
+	}
 	
 	static var empty: Constraints { Constraints() }
 	
@@ -23,17 +30,17 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 		item = nil
 	}
 	
-	init(_ constraint: @autoclosure @escaping () -> NSLayoutConstraint, item target: Item) {
+	public init(_ constraint: @autoclosure @escaping () -> NSLayoutConstraint, item target: Item) {
 		self.block = { [constraint()] }
 		self.item = target
 	}
 	
-	init(_ constraints: @autoclosure @escaping () -> [NSLayoutConstraint], item target: Item) {
+	public init(_ constraints: @autoclosure @escaping () -> [NSLayoutConstraint], item target: Item) {
 		self.block = constraints
 		self.item = target
 	}
 	
-	init(_ constraints: @escaping () -> [NSLayoutConstraint], item target: Item) {
+	public init(_ constraints: @escaping () -> [NSLayoutConstraint], item target: Item) {
 		self.block = constraints
 		self.item = target
 	}
@@ -62,6 +69,14 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 		}
 	}
 
+	public func update(_ constraints: Constraints) {
+		_constraints?.forEach {
+			$0.isActive = false
+		}
+		block = constraints.block
+		_constraints = constraints._constraints
+	}
+	
 	public func asLayoutableArray() -> [UILayoutable] {
 		if let layoutable = self as? UILayoutable {
 			return [layoutable]
