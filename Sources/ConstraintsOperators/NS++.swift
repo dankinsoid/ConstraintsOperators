@@ -59,9 +59,9 @@ extension NSLayoutConstraint.Relation {
 
 extension UILayoutable {
     var parent: UILayoutable? {
-			return (itemForConstraint as? UIView)?.superview
+			return (itemForConstraint.item as? UIView)?.superview
     }
     var constraints: [NSLayoutConstraint] {
-        return (itemForConstraint as? UIView)?.constraints ?? (self as? UILayoutGuide)?.owningView?.constraints ?? []
+			return (itemForConstraint.item as? UIView)?.constraints ?? (self as? UILayoutGuide)?.owningView?.constraints ?? []
     }
 }

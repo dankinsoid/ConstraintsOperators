@@ -9,7 +9,23 @@
 import UIKit
 
 public protocol UILayoutable: UILayoutableArray {
-	var itemForConstraint: Any { get }
+	var itemForConstraint: ConstraintItem { get }
+}
+
+public struct ConstraintItem {
+	weak var item: AnyObject?
+	
+	public init(_ item: UIView?) {
+		self.item = item
+	}
+	
+	public init(_ item: UILayoutGuide?) {
+		self.item = item
+	}
+	
+	public init(_ item: ConstraintItem?) {
+		self.item = item?.item
+	}
 }
 
 public protocol UILayoutableArray {
@@ -33,14 +49,14 @@ extension UILayoutable {
 
 extension UILayoutable {
 	var view: UIView? {
-		(itemForConstraint as? UIView) ?? (itemForConstraint as? UILayoutGuide)?.owningView
+		(itemForConstraint.item as? UIView) ?? (itemForConstraint.item as? UILayoutGuide)?.owningView
 	}
 }
 
 extension UIView: UILayoutable, Attributable, UITypedLayoutableArray, EmptyInitable {
 	public typealias Att = NSLayoutConstraint.Attribute
 	public var target: UIView { self }
-	public var itemForConstraint: Any { self }
+	public var itemForConstraint: ConstraintItem { ConstraintItem(self) }
 	public var layoutable: UIView { self }
 	@available(iOS 11.0, *)
 	public var safeArea: UILayoutGuide { safeAreaLayoutGuide }
@@ -54,7 +70,7 @@ extension Array where Element: UIView {
 extension UILayoutGuide: UILayoutable, Attributable, UITypedLayoutableArray, EmptyInitable {
 	public typealias Att = NSLayoutConstraint.Attribute
 	public var target: UILayoutGuide { self }
-	public var itemForConstraint: Any { self }
+	public var itemForConstraint: ConstraintItem { ConstraintItem(self) }
 	public var layoutable: UILayoutGuide { self }
 }
 
@@ -97,7 +113,7 @@ extension Attributable where Target: UILayoutableArray {
     }
     
     public func ignoreAutoresizingMask() {
-			target.asLayoutableArray().compactMap { $0.itemForConstraint as? UIView }.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+			target.asLayoutableArray().compactMap { $0.itemForConstraint.item as? UIView }.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
     }
     
 }

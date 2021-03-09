@@ -70,8 +70,10 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 	}
 
 	public func update(_ constraints: Constraints) {
-		_constraints?.forEach {
-			$0.isActive = false
+		if let current = _constraints {
+			current.forEach {
+				$0.isActive = false
+			}
 		}
 		block = constraints.block
 		_constraints = constraints._constraints
@@ -92,7 +94,7 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 }
 
 extension Constraints: UILayoutable where Item: UILayoutable {
-	public var itemForConstraint: Any { item?.itemForConstraint as Any }
+	public var itemForConstraint: ConstraintItem { ConstraintItem(item?.itemForConstraint) }
 }
 
 extension Constraints: UITypedLayoutableArray where Item: UITypedLayoutableArray {

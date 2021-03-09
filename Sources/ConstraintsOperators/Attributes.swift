@@ -161,7 +161,7 @@ public enum Attributes {
 }
 
 public struct AnyLayoutable: UILayoutable {
-	public var itemForConstraint: Any
+	public var itemForConstraint: ConstraintItem
 }
 
 extension UILayoutable {
