@@ -13,7 +13,7 @@ public protocol UILayoutable: UILayoutableArray {
 }
 
 public struct ConstraintItem {
-	weak var item: AnyObject?
+	private(set) public weak var item: AnyObject?
 	
 	public init(_ item: UIView?) {
 		self.item = item
