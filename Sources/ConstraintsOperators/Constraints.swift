@@ -18,7 +18,7 @@ public final class Constraints<Item: UILayoutableArray>: Attributable, Constrain
 	}
 	public let onlyConstraints: OnlyConstraints
 	
-	static var empty: Constraints { Constraints() }
+	public static var empty: Constraints { Constraints() }
 	
 	private init() {
 		onlyConstraints = OnlyConstraints()
