@@ -10,7 +10,7 @@ import UIKit
 
 public struct LayoutAttribute<A, Item: UILayoutableArray, K: AttributeConvertable> {
     var type: K
-    var item: Item
+    internal(set) public var item: Item
     var constant: CGFloat
     var multiplier: CGFloat
     var priority: UILayoutPriority
