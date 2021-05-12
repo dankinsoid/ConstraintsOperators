@@ -129,6 +129,8 @@ extension Attributable {
 		return EdgeAttribute(type: edges.attributes, item: target)
 	}
 	
+	public var edges: EdgeAttribute<Target> { edges() }
+	
 	public var size: SizeAttribute<Target> {
 		SizeAttribute(type: [.width, .height], item: target)
 	}
