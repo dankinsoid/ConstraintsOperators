@@ -18,6 +18,10 @@ extension LayoutAttribute {
 		equal(to: rhs)
 	}
 	
+	public func callAsFunction<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == A {
+		equal(to: rhs)
+	}
+	
 	public func within(_ rhs: ClosedRange<CGFloat>) -> Constraints<Item> {
 		rhs.constraints(with: self, relation: .equal)
 	}
@@ -38,6 +42,10 @@ extension LayoutAttribute {
 		equal(to: rhs)
 	}
 	
+	public func callAsFunction<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == Attributes.Same {
+		equal(to: rhs)
+	}
+	
 	public func less<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute == Attributes.Same {
 		rhs.constraints(with: self, relation: .lessThanOrEqual)
 	}
@@ -45,7 +53,6 @@ extension LayoutAttribute {
 	public func greater<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute == Attributes.Same {
 		rhs.constraints(with: self, relation: .greaterThanOrEqual)
 	}
-	
 }
 
 extension LayoutAttribute where Item: UITypedLayoutableArray {
@@ -86,6 +93,10 @@ extension LayoutAttribute where A == Attributes.CenterX {
 		equal(to: rhs)
 	}
 	
+	public func callAsFunction<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
+		equal(to: rhs)
+	}
+	
 	public func less<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
 		rhs.constraints(with: self, relation: .lessThanOrEqual)
 	}
@@ -93,7 +104,6 @@ extension LayoutAttribute where A == Attributes.CenterX {
 	public func greater<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
 		rhs.constraints(with: self, relation: .greaterThanOrEqual)
 	}
-	
 }
 
 extension LayoutAttribute where Item: UITypedLayoutableArray, A == Attributes.CenterX {
@@ -109,7 +119,6 @@ extension LayoutAttribute where Item: UITypedLayoutableArray, A == Attributes.Ce
 	public func greater<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
 		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
 	}
-	
 }
 
 extension LayoutAttribute where A: CenterXAttributeCompatible {
@@ -119,6 +128,10 @@ extension LayoutAttribute where A: CenterXAttributeCompatible {
 	}
 	
 	public subscript<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
+		equal(to: rhs)
+	}
+	
+	public func callAsFunction<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
 		equal(to: rhs)
 	}
 	
@@ -158,6 +171,10 @@ extension LayoutAttribute where A == Attributes.Edges, K == [NSLayoutConstraint.
 		equal(to: rhs)
 	}
 	
+	public func callAsFunction(to rhs: UIEdgeInsets) -> Constraints<Item> {
+		equal(to: rhs)
+	}
+	
 	public func less(than rhs: UIEdgeInsets) -> Constraints<Item> {
 		map(rhs: rhs, operation: { $0.less(than: $1) })
 	}
@@ -186,6 +203,10 @@ extension LayoutAttribute where A == Attributes.Size {
 	}
 	
 	public subscript(to rhs: CGSize) -> Constraints<Item> {
+		equal(to: rhs)
+	}
+	
+	public func callAsFunction(to rhs: CGSize) -> Constraints<Item> {
 		equal(to: rhs)
 	}
 	
