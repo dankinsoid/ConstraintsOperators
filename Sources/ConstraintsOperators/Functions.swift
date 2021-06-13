@@ -167,11 +167,11 @@ extension LayoutAttribute where A == Attributes.Edges, K == [NSLayoutConstraint.
 		map(rhs: rhs, operation: { $0.equal(to: $1) })
 	}
 	
-	public subscript(to rhs: UIEdgeInsets) -> Constraints<Item> {
+	public subscript(_ rhs: UIEdgeInsets) -> Constraints<Item> {
 		equal(to: rhs)
 	}
 	
-	public func callAsFunction(to rhs: UIEdgeInsets) -> Constraints<Item> {
+	public func callAsFunction(_ rhs: UIEdgeInsets) -> Constraints<Item> {
 		equal(to: rhs)
 	}
 	
@@ -202,11 +202,11 @@ extension LayoutAttribute where A == Attributes.Size {
 		map(rhs: rhs, operation: { $0.equal(to: $1) })
 	}
 	
-	public subscript(to rhs: CGSize) -> Constraints<Item> {
+	public subscript(_ rhs: CGSize) -> Constraints<Item> {
 		equal(to: rhs)
 	}
 	
-	public func callAsFunction(to rhs: CGSize) -> Constraints<Item> {
+	public func callAsFunction(_ rhs: CGSize) -> Constraints<Item> {
 		equal(to: rhs)
 	}
 	
