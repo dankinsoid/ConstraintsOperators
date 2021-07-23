@@ -14,64 +14,64 @@ infix operator <=|: AssignmentPrecedence
 
 @discardableResult
 public func =|<T, C: UILayoutableArray, K: AttributeConvertable, A: LayoutAttributeType>(_ lhs: LayoutAttribute<T, C, K>?, _ rhs: A) -> Constraints<C> where T == A.Attribute {
-	rhs.constraints(with: lhs, relation: .equal).apply()
+	rhs.constraints(with: .init(first: lhs, relation: .equal, location: nil)).apply()
 }
 
 @discardableResult
 public func =|<T, C: UILayoutableArray, K: AttributeConvertable, A: LayoutAttributeType>(_ lhs: LayoutAttribute<T, C, K>?, _ rhs: A) -> Constraints<C> where A.Attribute == Attributes.Same {
-	rhs.constraints(with: lhs, relation: .equal).apply()
+	rhs.constraints(with: .init(first: lhs, relation: .equal, location: nil)).apply()
 }
 
 @discardableResult
 public func =|<C: UILayoutableArray, K: AttributeConvertable, A: LayoutAttributeType>(_ lhs: LayoutAttribute<Attributes.CenterX, C, K>?, _ rhs: A) -> Constraints<C> where A.Attribute: CenterXAttributeCompatible {
-	rhs.constraints(with: lhs, relation: .equal).apply()
+	rhs.constraints(with: .init(first: lhs, relation: .equal, location: nil)).apply()
 }
 
 @discardableResult
 public func =|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: AttributeConvertable, A: LayoutAttributeType>(_ lhs: LayoutAttribute<T, C, K>?, _ rhs: A) -> Constraints<C> where A.Attribute == Attributes.CenterX {
-	rhs.constraints(with: lhs, relation: .equal).apply()
+	rhs.constraints(with: .init(first: lhs, relation: .equal, location: nil)).apply()
 }
 
 
 @discardableResult
 public func <=|<T, C: UILayoutableArray, K: AttributeConvertable, A: LayoutAttributeType>(_ lhs: LayoutAttribute<T, C, K>?, _ rhs: A) -> Constraints<C> where T == A.Attribute {
-	rhs.constraints(with: lhs, relation: .lessThanOrEqual).apply()
+	rhs.constraints(with: .init(first: lhs, relation: .lessThanOrEqual, location: nil)).apply()
 }
 
 @discardableResult
 public func <=|<T, C: UILayoutableArray, K: AttributeConvertable, A: LayoutAttributeType>(_ lhs: LayoutAttribute<T, C, K>?, _ rhs: A) -> Constraints<C> where A.Attribute == Attributes.Same {
-	rhs.constraints(with: lhs, relation: .lessThanOrEqual).apply()
+	rhs.constraints(with: .init(first: lhs, relation: .lessThanOrEqual, location: nil)).apply()
 }
 
 @discardableResult
 public func <=|<C: UILayoutableArray, K: AttributeConvertable, A: LayoutAttributeType>(_ lhs: LayoutAttribute<Attributes.CenterX, C, K>, _ rhs: A) -> Constraints<C> where A.Attribute: CenterXAttributeCompatible {
-	rhs.constraints(with: lhs, relation: .lessThanOrEqual).apply()
+	rhs.constraints(with: .init(first: lhs, relation: .lessThanOrEqual, location: nil)).apply()
 }
 
 @discardableResult
 public func <=|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: AttributeConvertable, A: LayoutAttributeType>(_ lhs: LayoutAttribute<T, C, K>?, _ rhs: A) -> Constraints<C> where A.Attribute == Attributes.CenterX {
-	rhs.constraints(with: lhs, relation: .lessThanOrEqual).apply()
+	rhs.constraints(with: .init(first: lhs, relation: .lessThanOrEqual, location: nil)).apply()
 }
 
 
 @discardableResult
 public func >=|<T, C: UILayoutableArray, K: AttributeConvertable, A: LayoutAttributeType>(_ lhs: LayoutAttribute<T, C, K>?, _ rhs: A) -> Constraints<C> where T == A.Attribute {
-	rhs.constraints(with: lhs, relation: .greaterThanOrEqual).apply()
+	rhs.constraints(with: .init(first: lhs, relation: .greaterThanOrEqual, location: nil)).apply()
 }
 
 @discardableResult
 public func >=|<T, C: UILayoutableArray, K: AttributeConvertable, A: LayoutAttributeType>(_ lhs: LayoutAttribute<T, C, K>?, _ rhs: A) -> Constraints<C> where A.Attribute == Attributes.Same {
-	rhs.constraints(with: lhs, relation: .greaterThanOrEqual).apply()
+	rhs.constraints(with: .init(first: lhs, relation: .greaterThanOrEqual, location: nil)).apply()
 }
 
 @discardableResult
 public func >=|<C: UILayoutableArray, K: AttributeConvertable, A: LayoutAttributeType>(_ lhs: LayoutAttribute<Attributes.CenterX, C, K>?, _ rhs: A) -> Constraints<C> where A.Attribute: CenterXAttributeCompatible {
-	rhs.constraints(with: lhs, relation: .greaterThanOrEqual).apply()
+	rhs.constraints(with: .init(first: lhs, relation: .greaterThanOrEqual, location: nil)).apply()
 }
 
 @discardableResult
 public func >=|<T: CenterXAttributeCompatible, C: UILayoutableArray, K: AttributeConvertable, A: LayoutAttributeType>(_ lhs: LayoutAttribute<T, C, K>?, _ rhs: A) -> Constraints<C> where A.Attribute == Attributes.CenterX {
-	rhs.constraints(with: lhs, relation: .greaterThanOrEqual).apply()
+	rhs.constraints(with: .init(first: lhs, relation: .greaterThanOrEqual, location: nil)).apply()
 }
 
 ///EDGES

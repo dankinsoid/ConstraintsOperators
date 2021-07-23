@@ -43,12 +43,12 @@ extension Array: ConstraintProtocol where Element: ConstraintProtocol {
 
 private struct ConstraintBuilder {
 	
-	static func make(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, toItem: UILayoutable?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint? {
-				NSLayoutConstraint.create(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant)
+	static func make(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, toItem: UILayoutable?, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat, location: (String, UInt)?) -> NSLayoutConstraint? {
+				NSLayoutConstraint.create(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: toItem, attribute: attribute2, multiplier: multiplier, constant: constant, location: location)
     }
     
-		static func makeToParent(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint? {
-				make(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: item.parent, attribute: attribute2, multiplier: multiplier, constant: constant)
+		static func makeToParent(item: UILayoutable, attribute attribute1: NSLayoutConstraint.Attribute, relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat, location: (String, UInt)?) -> NSLayoutConstraint? {
+				make(item: item, attribute: attribute1, relatedBy: relatedBy, toItem: item.parent, attribute: attribute2, multiplier: multiplier, constant: constant, location: location)
     }
     
 		static func constraints(for constraint: NSLayoutConstraint) -> [NSLayoutConstraint] {
@@ -56,17 +56,17 @@ private struct ConstraintBuilder {
             ((constraint.secondItem as? UILayoutable)?.constraints ?? [])
     }
     
-    static func makeWithOffset(item: UILayoutable, attribute: NSLayoutConstraint.Attribute, relatedBy relation: NSLayoutConstraint.Relation, multiplier: CGFloat, constant: CGFloat, offset: CGFloat) -> NSLayoutConstraint? {
+    static func makeWithOffset(item: UILayoutable, attribute: NSLayoutConstraint.Attribute, relatedBy relation: NSLayoutConstraint.Relation, multiplier: CGFloat, constant: CGFloat, offset: CGFloat, location: (String, UInt)?) -> NSLayoutConstraint? {
         let result: NSLayoutConstraint?
         switch attribute {
         case .width, .height:
-            result = make(item: item, attribute: attribute, relatedBy: relation, toItem: nil, attribute: .notAnAttribute, multiplier: 1 / multiplier, constant: max(0, offset - constant))
+            result = make(item: item, attribute: attribute, relatedBy: relation, toItem: nil, attribute: .notAnAttribute, multiplier: 1 / multiplier, constant: max(0, offset - constant), location: location)
         case .notAnAttribute:
-            result = make(item: item, attribute: attribute, relatedBy: relation, toItem: nil, attribute: attribute, multiplier: 1 / multiplier, constant: offset - constant)
+            result = make(item: item, attribute: attribute, relatedBy: relation, toItem: nil, attribute: attribute, multiplier: 1 / multiplier, constant: offset - constant, location: location)
         case .bottom, .trailing, .bottomMargin, .trailingMargin, .lastBaseline, .right, .rightMargin:
-					result = makeToParent(item: item, attribute: attribute, relatedBy: relation.reversed, attribute: attribute, multiplier: 1 / multiplier, constant: constant - offset)
+					result = makeToParent(item: item, attribute: attribute, relatedBy: relation.reversed, attribute: attribute, multiplier: 1 / multiplier, constant: constant - offset, location: location)
         default:
-            result = makeToParent(item: item, attribute: attribute, relatedBy: relation, attribute: attribute, multiplier: 1 / multiplier, constant: offset - constant)
+            result = makeToParent(item: item, attribute: attribute, relatedBy: relation, attribute: attribute, multiplier: 1 / multiplier, constant: offset - constant, location: location)
         }
         return result
     }
@@ -74,12 +74,12 @@ private struct ConstraintBuilder {
 
 struct ConstraintsBuilder {
     
-    static func make(item: [UILayoutable], attribute attribute1: [NSLayoutConstraint.Attribute], relatedBy: NSLayoutConstraint.Relation, toItem: [UILayoutable?], attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> [NSLayoutConstraint] {
+    static func make(item: [UILayoutable], attribute attribute1: [NSLayoutConstraint.Attribute], relatedBy: NSLayoutConstraint.Relation, toItem: [UILayoutable?], attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat, location: (String, UInt)?) -> [NSLayoutConstraint] {
         var result: [NSLayoutConstraint] = []
         for first in item {
             for attribute in attribute1 {
 							for second in toItem {
-								if let constraint = NSLayoutConstraint.create(item: first, attribute: attribute, relatedBy: relatedBy, toItem: second, attribute: attribute2, multiplier: multiplier, constant: constant) {
+								if let constraint = NSLayoutConstraint.create(item: first, attribute: attribute, relatedBy: relatedBy, toItem: second, attribute: attribute2, multiplier: multiplier, constant: constant, location: location) {
                 	result.append(constraint)
 								}
 							}
@@ -88,29 +88,29 @@ struct ConstraintsBuilder {
         return result
     }
     
-    static func makeToParent(item: [UILayoutable], attribute attribute1: [NSLayoutConstraint.Attribute], relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) -> [NSLayoutConstraint] {
+    static func makeToParent(item: [UILayoutable], attribute attribute1: [NSLayoutConstraint.Attribute], relatedBy: NSLayoutConstraint.Relation, attribute attribute2: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat, location: (String, UInt)?) -> [NSLayoutConstraint] {
         var result: [NSLayoutConstraint] = []
         item.forEach {
-            result += make(item: [$0], attribute: attribute1, relatedBy: relatedBy, toItem: [$0.parent], attribute: attribute2, multiplier: multiplier, constant: constant)
+            result += make(item: [$0], attribute: attribute1, relatedBy: relatedBy, toItem: [$0.parent], attribute: attribute2, multiplier: multiplier, constant: constant, location: location)
         }
         return result
     }
     
-    static func makeToView(item: [UILayoutable], attribute attribute1: [NSLayoutConstraint.Attribute], relatedBy: NSLayoutConstraint.Relation, itemTo: [UILayoutable?], multiplier: CGFloat, constant: CGFloat) -> [NSLayoutConstraint] {
+    static func makeToView(item: [UILayoutable], attribute attribute1: [NSLayoutConstraint.Attribute], relatedBy: NSLayoutConstraint.Relation, itemTo: [UILayoutable?], multiplier: CGFloat, constant: CGFloat, location: (String, UInt)?) -> [NSLayoutConstraint] {
         var result: [NSLayoutConstraint] = []
         item.forEach {
             for attribute in attribute1 {
-                result += make(item: [$0], attribute: [attribute], relatedBy: relatedBy, toItem: itemTo, attribute: attribute, multiplier: multiplier, constant: constant)
+                result += make(item: [$0], attribute: [attribute], relatedBy: relatedBy, toItem: itemTo, attribute: attribute, multiplier: multiplier, constant: constant, location: location)
             }
         }
         return result
     }
     
-    static func makeWithOffset(item: [UILayoutable], attribute: [NSLayoutConstraint.Attribute], relatedBy relation: NSLayoutConstraint.Relation, multiplier: CGFloat, constant: CGFloat, offset: CGFloat) -> [NSLayoutConstraint] {
+    static func makeWithOffset(item: [UILayoutable], attribute: [NSLayoutConstraint.Attribute], relatedBy relation: NSLayoutConstraint.Relation, multiplier: CGFloat, constant: CGFloat, offset: CGFloat, location: (String, UInt)?) -> [NSLayoutConstraint] {
         var result: [NSLayoutConstraint] = []
         item.forEach {
             for a in attribute {
-							if let constraint = ConstraintBuilder.makeWithOffset(item: $0, attribute: a, relatedBy: relation, multiplier: multiplier, constant: constant, offset: offset) {
+							if let constraint = ConstraintBuilder.makeWithOffset(item: $0, attribute: a, relatedBy: relation, multiplier: multiplier, constant: constant, offset: offset, location: location) {
 								result.append(constraint)
 							}
             }
@@ -138,11 +138,12 @@ struct ConstraintsBuilder {
 
 extension NSLayoutConstraint {
     
-    static func create(item: UILayoutable, attribute: Attribute, relatedBy: Relation, toItem: UILayoutable?, attribute att1: Attribute, multiplier: CGFloat, constant: CGFloat) -> NSLayoutConstraint? {
-			guard let item = item.itemForConstraint.item else { return nil }
-			return NSLayoutConstraint(item: item, attribute: attribute, relatedBy: relatedBy, toItem: toItem?.itemForConstraint.item, attribute: att1, multiplier: multiplier, constant: constant)
+	static func create(item: UILayoutable, attribute: Attribute, relatedBy: Relation, toItem: UILayoutable?, attribute att1: Attribute, multiplier: CGFloat, constant: CGFloat, location: (String, UInt)?) -> NSLayoutConstraint? {
+		guard let item = item.itemForConstraint.item else { return nil }
+		let result = LayoutConstraint(item: item, attribute: attribute, relatedBy: relatedBy, toItem: toItem?.itemForConstraint.item, attribute: att1, multiplier: multiplier, constant: constant)
+		result.sourceLocation = location
+		return result
     }
-    
 }
 
 extension NSLayoutConstraint.Relation {
@@ -155,5 +156,4 @@ extension NSLayoutConstraint.Relation {
 		default:									return self
 		}
 	}
-	
 }

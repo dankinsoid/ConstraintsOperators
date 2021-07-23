@@ -10,177 +10,177 @@ import UIKit
 
 extension LayoutAttribute {
 	
-	public func equal<T: LayoutAttributeType>(to rhs: T) -> Constraints<Item> where T.Attribute == A {
-		rhs.constraints(with: self, relation: .equal)
+	public func equal<T: LayoutAttributeType>(to rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == A {
+		rhs.constraints(with: .init(first: self, relation: .equal, location: (file, line)))
 	}
 	
-	public subscript<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == A {
-		equal(to: rhs)
+	public subscript<T: LayoutAttributeType>(_ rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == A {
+		equal(to: rhs, file, line)
 	}
 	
-	public func callAsFunction<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == A {
-		equal(to: rhs)
+	public func callAsFunction<T: LayoutAttributeType>(_ rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == A {
+		equal(to: rhs, file, line)
 	}
 	
-	public func within(_ rhs: ClosedRange<CGFloat>) -> Constraints<Item> {
-		rhs.constraints(with: self, relation: .equal)
+	public func within(_ rhs: ClosedRange<CGFloat>, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> {
+		rhs.constraints(with: .init(first: self, relation: .equal, location: (file, line)))
 	}
 	
-	public func less<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute == A {
-		rhs.constraints(with: self, relation: .lessThanOrEqual)
+	public func less<T: LayoutAttributeType>(than rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == A {
+		rhs.constraints(with: .init(first: self, relation: .lessThanOrEqual, location: (file, line)))
 	}
 	
-	public func greater<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute == A {
-		rhs.constraints(with: self, relation: .greaterThanOrEqual)
+	public func greater<T: LayoutAttributeType>(than rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == A {
+		rhs.constraints(with: .init(first: self, relation: .greaterThanOrEqual, location: (file, line)))
 	}
 	
-	public func equal<T: LayoutAttributeType>(to rhs: T) -> Constraints<Item> where T.Attribute == Attributes.Same {
-		rhs.constraints(with: self, relation: .equal)
+	public func equal<T: LayoutAttributeType>(to rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.Same {
+		rhs.constraints(with: .init(first: self, relation: .equal, location: (file, line)))
 	}
 	
-	public subscript<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == Attributes.Same {
-		equal(to: rhs)
+	public subscript<T: LayoutAttributeType>(_ rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.Same {
+		equal(to: rhs, file, line)
 	}
 	
-	public func callAsFunction<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == Attributes.Same {
-		equal(to: rhs)
+	public func callAsFunction<T: LayoutAttributeType>(_ rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.Same {
+		equal(to: rhs, file, line)
 	}
 	
-	public func less<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute == Attributes.Same {
-		rhs.constraints(with: self, relation: .lessThanOrEqual)
+	public func less<T: LayoutAttributeType>(than rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.Same {
+		rhs.constraints(with: .init(first: self, relation: .lessThanOrEqual, location: (file, line)))
 	}
 	
-	public func greater<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute == Attributes.Same {
-		rhs.constraints(with: self, relation: .greaterThanOrEqual)
+	public func greater<T: LayoutAttributeType>(than rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.Same {
+		rhs.constraints(with: .init(first: self, relation: .greaterThanOrEqual, location: (file, line)))
 	}
 }
 
 extension LayoutAttribute where Item: UITypedLayoutableArray {
 	
-	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute == A {
-		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .equal)
+	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item.Layoutable) -> T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == A {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: .init(first: self, relation: .equal, location: (file, line)))
 	}
 	
-	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute == Attributes.Same {
-		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .equal)
+	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item.Layoutable) -> T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.Same {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: .init(first: self, relation: .equal, location: (file, line)))
 	}
 	
-	public func less<E: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> E) -> Constraints<Item> where E.Attribute == A {
-		LazyLayoutAttribute<Item, E>(attribute: rhs).constraints(with: self, relation: .lessThanOrEqual)
+	public func less<E: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> E, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where E.Attribute == A {
+		LazyLayoutAttribute<Item, E>(attribute: rhs).constraints(with: .init(first: self, relation: .lessThanOrEqual, location: (file, line)))
 	}
 	
-	public func less<E: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> E) -> Constraints<Item> where E.Attribute == Attributes.Same {
-		LazyLayoutAttribute<Item, E>(attribute: rhs).constraints(with: self, relation: .lessThanOrEqual)
+	public func less<E: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> E, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where E.Attribute == Attributes.Same {
+		LazyLayoutAttribute<Item, E>(attribute: rhs).constraints(with: .init(first: self, relation: .lessThanOrEqual, location: (file, line)))
 	}
 	
-	public func greater<E: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> E) -> Constraints<Item> where E.Attribute == A {
-		LazyLayoutAttribute<Item, E>(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
+	public func greater<E: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> E, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where E.Attribute == A {
+		LazyLayoutAttribute<Item, E>(attribute: rhs).constraints(with: .init(first: self, relation: .greaterThanOrEqual, location: (file, line)))
 	}
 	
-	public func greater<E: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> E) -> Constraints<Item> where E.Attribute == Attributes.Same {
-		LazyLayoutAttribute<Item, E>(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
+	public func greater<E: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> E, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where E.Attribute == Attributes.Same {
+		LazyLayoutAttribute<Item, E>(attribute: rhs).constraints(with: .init(first: self, relation: .greaterThanOrEqual, location: (file, line)))
 	}
 	
 }
 
 extension LayoutAttribute where A == Attributes.CenterX {
 	
-	public func equal<T: LayoutAttributeType>(to rhs: T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
-		rhs.constraints(with: self, relation: .equal)
+	public func equal<T: LayoutAttributeType>(to rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
+		rhs.constraints(with: .init(first: self, relation: .equal, location: (file, line)))
 	}
 	
-	public subscript<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
-		equal(to: rhs)
+	public subscript<T: LayoutAttributeType>(_ rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
+		equal(to: rhs, file, line)
 	}
 	
-	public func callAsFunction<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
-		equal(to: rhs)
+	public func callAsFunction<T: LayoutAttributeType>(_ rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
+		equal(to: rhs, file, line)
 	}
 	
-	public func less<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
-		rhs.constraints(with: self, relation: .lessThanOrEqual)
+	public func less<T: LayoutAttributeType>(than rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
+		rhs.constraints(with: .init(first: self, relation: .lessThanOrEqual, location: (file, line)))
 	}
 	
-	public func greater<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
-		rhs.constraints(with: self, relation: .greaterThanOrEqual)
+	public func greater<T: LayoutAttributeType>(than rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
+		rhs.constraints(with: .init(first: self, relation: .greaterThanOrEqual, location: (file, line)))
 	}
 }
 
 extension LayoutAttribute where Item: UITypedLayoutableArray, A == Attributes.CenterX {
 	
-	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
-		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .equal)
+	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item.Layoutable) -> T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: .init(first: self, relation: .equal, location: (file, line)))
 	}
 	
-	public func less<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
-		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .lessThanOrEqual)
+	public func less<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: .init(first: self, relation: .lessThanOrEqual, location: (file, line)))
 	}
 	
-	public func greater<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
-		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
+	public func greater<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute: CenterXAttributeCompatible {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: .init(first: self, relation: .greaterThanOrEqual, location: (file, line)))
 	}
 }
 
 extension LayoutAttribute where A: CenterXAttributeCompatible {
 	
-	public func equal<T: LayoutAttributeType>(to rhs: T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
-		rhs.constraints(with: self, relation: .equal)
+	public func equal<T: LayoutAttributeType>(to rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
+		rhs.constraints(with: .init(first: self, relation: .equal, location: (file, line)))
 	}
 	
-	public subscript<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
-		equal(to: rhs)
+	public subscript<T: LayoutAttributeType>(_ rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
+		equal(to: rhs, file, line)
 	}
 	
-	public func callAsFunction<T: LayoutAttributeType>(_ rhs: T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
-		equal(to: rhs)
+	public func callAsFunction<T: LayoutAttributeType>(_ rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
+		equal(to: rhs, file, line)
 	}
 	
-	public func less<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
-		rhs.constraints(with: self, relation: .lessThanOrEqual)
+	public func less<T: LayoutAttributeType>(than rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
+		rhs.constraints(with: .init(first: self, relation: .lessThanOrEqual, location: (file, line)))
 	}
 	
-	public func greater<T: LayoutAttributeType>(than rhs: T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
-		rhs.constraints(with: self, relation: .greaterThanOrEqual)
+	public func greater<T: LayoutAttributeType>(than rhs: T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
+		rhs.constraints(with: .init(first: self, relation: .greaterThanOrEqual, location: (file, line)))
 	}
 	
 }
 
 extension LayoutAttribute where Item: UITypedLayoutableArray, A: CenterXAttributeCompatible {
 	
-	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
-		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .equal)
+	public func equal<T: LayoutAttributeType>(to rhs: @escaping (Item.Layoutable) -> T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: .init(first: self, relation: .equal, location: (file, line)))
 	}
 	
-	public func less<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
-		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .lessThanOrEqual)
+	public func less<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: .init(first: self, relation: .lessThanOrEqual, location: (file, line)))
 	}
 	
-	public func greater<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
-		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: self, relation: .greaterThanOrEqual)
+	public func greater<T: LayoutAttributeType>(than rhs: @escaping (Item.Layoutable) -> T, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> where T.Attribute == Attributes.CenterX {
+		LazyLayoutAttribute<Item, T>(attribute: rhs).constraints(with: .init(first: self, relation: .greaterThanOrEqual, location: (file, line)))
 	}
 	
 }
 
 extension LayoutAttribute where A == Attributes.Edges, K == [NSLayoutConstraint.Attribute] {
 	
-	public func equal(to rhs: UIEdgeInsets) -> Constraints<Item> {
-		map(rhs: rhs, operation: { $0.equal(to: $1) })
+	public func equal(to rhs: UIEdgeInsets, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> {
+		map(rhs: rhs, operation: { $0.equal(to: $1, file, line) })
 	}
 	
-	public subscript(_ rhs: UIEdgeInsets) -> Constraints<Item> {
-		equal(to: rhs)
+	public subscript(_ rhs: UIEdgeInsets, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> {
+		equal(to: rhs, file, line)
 	}
 	
-	public func callAsFunction(_ rhs: UIEdgeInsets) -> Constraints<Item> {
-		equal(to: rhs)
+	public func callAsFunction(_ rhs: UIEdgeInsets, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> {
+		equal(to: rhs, file, line)
 	}
 	
-	public func less(than rhs: UIEdgeInsets) -> Constraints<Item> {
-		map(rhs: rhs, operation: { $0.less(than: $1) })
+	public func less(than rhs: UIEdgeInsets, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> {
+		map(rhs: rhs, operation: { $0.less(than: $1, file, line) })
 	}
 	
-	public func greater(than rhs: UIEdgeInsets) -> Constraints<Item> {
-		map(rhs: rhs, operation: { $0.greater(than: $1) })
+	public func greater(than rhs: UIEdgeInsets, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> {
+		map(rhs: rhs, operation: { $0.greater(than: $1, file, line) })
 	}
 	
 	private func map(rhs: UIEdgeInsets, operation: @escaping (LayoutAttribute, CGFloat) -> Constraints<Item>) -> Constraints<Item> {
@@ -198,24 +198,24 @@ extension LayoutAttribute where A == Attributes.Edges, K == [NSLayoutConstraint.
 
 extension LayoutAttribute where A == Attributes.Size {
 	
-	public func equal(to rhs: CGSize) -> Constraints<Item> {
-		map(rhs: rhs, operation: { $0.equal(to: $1) })
+	public func equal(to rhs: CGSize, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> {
+		map(rhs: rhs, operation: { $0.equal(to: $1, file, line) })
 	}
 	
-	public subscript(_ rhs: CGSize) -> Constraints<Item> {
-		equal(to: rhs)
+	public subscript(_ rhs: CGSize, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> {
+		equal(to: rhs, file, line)
 	}
 	
-	public func callAsFunction(_ rhs: CGSize) -> Constraints<Item> {
-		equal(to: rhs)
+	public func callAsFunction(_ rhs: CGSize, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> {
+		equal(to: rhs, file, line)
 	}
 	
-	public func less(than rhs: CGSize) -> Constraints<Item> {
-		map(rhs: rhs, operation: { $0.less(than: $1) })
+	public func less(than rhs: CGSize, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> {
+		map(rhs: rhs, operation: { $0.less(than: $1, file, line) })
 	}
 	
-	public func greater(than rhs: CGSize) -> Constraints<Item> {
-		map(rhs: rhs, operation: { $0.greater(than: $1) })
+	public func greater(than rhs: CGSize, _ file: String = #file, _ line: UInt = #line) -> Constraints<Item> {
+		map(rhs: rhs, operation: { $0.greater(than: $1, file, line) })
 	}
 	
 	private func map(rhs: CGSize, operation: @escaping (LayoutAttribute, CGFloat) -> Constraints<Item>) -> Constraints<Item> {
@@ -230,16 +230,15 @@ extension LayoutAttribute where A == Attributes.Size {
 
 extension Attributable where Att == NSLayoutConstraint.Attribute {
 	
-	public func widthToHeight(equal multiplier: CGFloat, constant: CGFloat = 0, priority: UILayoutPriority = .required) -> Constraints<Target> {
-		width.priority(priority).equal(to: height * multiplier + constant)
+	public func widthToHeight(equal multiplier: CGFloat, constant: CGFloat = 0, priority: UILayoutPriority = .required, _ file: String = #file, _ line: UInt = #line) -> Constraints<Target> {
+		width.priority(priority).equal(to: height * multiplier + constant, file, line)
 	}
 	
-	public func widthToHeight(less multiplier: CGFloat, constant: CGFloat = 0, priority: UILayoutPriority = .required) -> Constraints<Target> {
-		width.priority(priority).less(than: height * multiplier + constant)
+	public func widthToHeight(less multiplier: CGFloat, constant: CGFloat = 0, priority: UILayoutPriority = .required, _ file: String = #file, _ line: UInt = #line) -> Constraints<Target> {
+		width.priority(priority).less(than: height * multiplier + constant, file, line)
 	}
 	
-	public func widthToHeight(greater multiplier: CGFloat, constant: CGFloat = 0, priority: UILayoutPriority = .required) -> Constraints<Target> {
-		width.priority(priority).greater(than: height * multiplier + constant)
+	public func widthToHeight(greater multiplier: CGFloat, constant: CGFloat = 0, priority: UILayoutPriority = .required, _ file: String = #file, _ line: UInt = #line) -> Constraints<Target> {
+		width.priority(priority).greater(than: height * multiplier + constant, file, line)
 	}
-	
 }
