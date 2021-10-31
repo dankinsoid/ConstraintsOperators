@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import VDKit
+import VDUIKit
 
 extension Edges.Set {
     

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import VDKit
+import VDUIKit
 
 public struct LayoutAttribute<A, Item: UILayoutableArray, K: AttributeConvertable> {
     var type: K
