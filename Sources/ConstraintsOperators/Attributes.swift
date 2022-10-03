@@ -126,7 +126,7 @@ extension Attributable {
     public var centerYWithinMargins: LayoutAttribute<Attributes.Vertical, Target, Att> { LayoutAttribute(type: Att(.centerYWithinMargins), item: target) }
     
 	
-	public func edges(_ edges: Edges.Set = .all) -> EdgeAttribute<Target> {
+	public func edges(_ edges: Edges.Set) -> EdgeAttribute<Target> {
 		return EdgeAttribute(type: edges.attributes, item: target)
 	}
 	
