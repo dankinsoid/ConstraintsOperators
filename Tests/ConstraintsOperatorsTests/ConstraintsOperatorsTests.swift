@@ -7,7 +7,7 @@ final class ConstraintsOperatorsTests: XCTestCase {
 			let view2 = UIView()
 			view1
 				.height.equal { $0.superview?.safeArea }
-				.edges().equal { $0.superview?.safeArea }
+                .edges.equal { $0.superview?.safeArea }
 				.height(0)
 				.edges(0)
 				.isActive = true

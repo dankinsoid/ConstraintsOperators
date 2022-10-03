@@ -8,6 +8,7 @@
 
 import UIKit
 import VDUIKit
+import SwiftUI
 
 public struct LayoutAttribute<A, Item: UILayoutableArray, K: AttributeConvertable> {
     var type: K
@@ -126,11 +127,12 @@ extension Attributable {
     public var centerYWithinMargins: LayoutAttribute<Attributes.Vertical, Target, Att> { LayoutAttribute(type: Att(.centerYWithinMargins), item: target) }
     
 	
-	public func edges(_ edges: Edges.Set) -> EdgeAttribute<Target> {
-		return EdgeAttribute(type: edges.attributes, item: target)
+    public func edges(_ edges: Edges.Set, _ other: Edges.Set...) -> EdgeAttribute<Target> {
+        let allEdges = ([edges] + other).reduce(into: [] as Edges.Set) { $0.formUnion($1) }
+        return EdgeAttribute(type: allEdges.attributes, item: target)
 	}
 	
-	public var edges: EdgeAttribute<Target> { edges() }
+    public var edges: EdgeAttribute<Target> { edges(.all) }
 	
 	public var size: SizeAttribute<Target> {
 		SizeAttribute(type: [.width, .height], item: target)
