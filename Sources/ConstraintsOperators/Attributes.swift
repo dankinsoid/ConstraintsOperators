@@ -1,13 +1,3 @@
-//
-//  Attributes.swift
-//  TestPr
-//
-//  Created by crypto_user on 10/09/2019.
-//  Copyright © 2019 crypto_user. All rights reserved.
-//
-
-import UIKit
-import VDUIKit
 import SwiftUI
 
 public struct LayoutAttribute<A, Item: UILayoutableArray, K: AttributeConvertable> {
@@ -125,18 +115,14 @@ extension Attributable {
     public var centerY:              LayoutAttribute<Attributes.Vertical, Target, Att> { LayoutAttribute(type: Att(.centerY), item: target) }
     public var centerXWithinMargins: LayoutAttribute<Attributes.CenterX, Target, Att> { LayoutAttribute(type: Att(.centerXWithinMargins), item: target) }
     public var centerYWithinMargins: LayoutAttribute<Attributes.Vertical, Target, Att> { LayoutAttribute(type: Att(.centerYWithinMargins), item: target) }
-    
-	
-    public func edges(_ edges: Edges.Set, _ other: Edges.Set...) -> EdgeAttribute<Target> {
-        let allEdges = ([edges] + other).reduce(into: [] as Edges.Set) { $0.formUnion($1) }
-        return EdgeAttribute(type: allEdges.attributes, item: target)
-	}
-	
-    public var edges: EdgeAttribute<Target> { edges(.all) }
 	
 	public var size: SizeAttribute<Target> {
 		SizeAttribute(type: [.width, .height], item: target)
 	}
+    
+    public var edges: EdgeAttribute<Target> {
+        EdgeAttribute(type: [.leading, .trailing, .top, .bottom], item: target)
+    }
 	
 	public var center: LayoutAttribute<Void, Target, [NSLayoutConstraint.Attribute]> {
 		LayoutAttribute(type: [.centerX, .centerY], item: target)
@@ -149,8 +135,20 @@ extension Attributable {
     func attribute<T>(type: NSLayoutConstraint.Attribute) -> LayoutAttribute<T, Target, Att> {
         LayoutAttribute(type: Att(type), item: target)
     }
-
 }
+
+#if canImport(SwiftUI)
+import SwiftUI
+
+@available(iOS 13.0, *)
+public extension Attributable {
+    
+    func edges(_ edges: Edge.Set, _ other: Edge.Set...) -> EdgeAttribute<Target> {
+        let allEdges = ([edges] + other).reduce(into: [] as Edge.Set) { $0.formUnion($1) }
+        return EdgeAttribute(type: allEdges.attributes, item: target)
+    }
+}
+#endif
 
 public protocol CenterXAttributeCompatible {}
 public protocol HorizontalLayoutableAttribute {}

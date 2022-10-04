@@ -1,7 +1,9 @@
 import XCTest
 @testable import ConstraintsOperators
 
+@available(iOS 13.0, *)
 final class ConstraintsOperatorsTests: XCTestCase {
+    
     func testExample() {
 			let view1 = UIView()
 			let view2 = UIView()

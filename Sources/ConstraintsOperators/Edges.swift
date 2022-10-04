@@ -1,15 +1,8 @@
-//
-//  Edges.swift
-//  TestPr
-//
-//  Created by crypto_user on 09/09/2019.
-//  Copyright © 2019 crypto_user. All rights reserved.
-//
+#if canImport(SwiftUI)
+import SwiftUI
 
-import UIKit
-import VDUIKit
-
-extension Edges.Set {
+@available(iOS 13.0, *)
+extension Edge.Set {
     
     var attributes: [NSLayoutConstraint.Attribute] {
         var result: [NSLayoutConstraint.Attribute] = []
@@ -21,3 +14,4 @@ extension Edges.Set {
     }
     
 }
+#endif
